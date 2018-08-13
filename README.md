@@ -1,3 +1,3 @@
-# Studio_Project_1
-This is to list all the functions in the project 
+# Studio Project 1
+This is to list all the added functions in the project and their uses/definition
 
