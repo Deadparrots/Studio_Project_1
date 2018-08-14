@@ -136,7 +136,7 @@ void render()
 
 void splashScreenWait()    // waits for time to pass in splash screen
 {
-    if (g_dElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
+    if (g_dElapsedTime > 0.5) // wait for 0.5 seconds to switch to game mode, else do nothing
         g_eGameState = S_GAME;
 }
 
@@ -209,7 +209,7 @@ void renderSplashScreen()  // renders the splash screen
     COORD c = g_Console.getConsoleSize();
     c.Y /= 3;
     c.X = c.X / 2 - 9;
-    g_Console.writeToBuffer(c, "A game in 3 seconds", 0x03);
+    g_Console.writeToBuffer(c, "A game in 0.5 seconds", 0x03);
     c.Y += 1;
     c.X = g_Console.getConsoleSize().X / 2 - 20;
     g_Console.writeToBuffer(c, "Press <Space> to change character colour", 0x09);
@@ -226,6 +226,13 @@ void renderGame()
 
 void renderMap()
 {
+    // Set up sample colours, and output shadings
+    //const WORD colors[] = {
+    //    0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
+    //    0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
+    //};
+
+    //COORD c;
     for (int i = 0; i < 12; ++i)
     {
 		fstream myfile("map.txt");
@@ -236,6 +243,10 @@ void renderMap()
 				getline(myfile, sLine);
 			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
 		}
+        //c.X = 0;
+        //c.Y = 0;
+        //colour(colors[i]);
+        //g_Console.writeToBuffer(c, " °±²Û", colors[i]);
     }
 }
 
@@ -341,7 +352,7 @@ void generate()
 		}
 	}
 	point3 = myfile.tellp();
-	random = rand() % 3 + 3;
+	random = rand() % 3 + 2;
 	if (point3 < myfile.end / 2)
 		for (size_t f = 0; f < random; f++)
 		{
@@ -356,7 +367,7 @@ void generate()
 			for (size_t i = 0; i < (random * 2) - f; i++)
 				myfile.write(" ", 1);
 		}
-	random = rand() % 3 + 4;
+	random = rand() % 3 + 3;
 	if (point1 < myfile.end / 2)
 		for (size_t i = 0; i < random; i++)
 		{
@@ -392,7 +403,7 @@ void generate()
 				myfile.write(" ", 1);
 		}
 	point5 = myfile.tellp();
-	random = rand() % 20 + 10;
+	random = rand() % 20 + 8;
 	for (size_t f = 0; f < random; f++)
 	{
 		myfile.seekp(point5 + (rand() % 4 + 1) * 82);
