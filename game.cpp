@@ -15,7 +15,8 @@ bool    g_abKeyPressed[K_COUNT];
 SGameChar   g_sChar;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
-
+int Lives = 3; // Number of lives the player has left (Base Value is 3)
+WeaponParameters Weapons[4];
 // Console object
 Console g_Console(80, 25, "SP1 Framework");
 
@@ -215,25 +216,59 @@ void renderSplashScreen()  // renders the splash screen
 void renderGame()
 {
     renderMap();        // renders the map to the buffer first
+	renderUI();			// renders the UI to the buffer
     renderCharacter();  // renders the character into the buffer
 }
 
 void renderMap()
 {
-    // Set up sample colours, and output shadings
-    const WORD colors[] = {
-        0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
-        0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
-    };
+	// Set up sample colours, and output shadings
+	const WORD colors[] = {
+		0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
+		0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
+	};
 
-    COORD c;
-    for (int i = 0; i < 12; ++i)
-    {
-        c.X = 5 * i;
-        c.Y = i + 1;
-        colour(colors[i]);
-        g_Console.writeToBuffer(c, " °±²Û", colors[i]);
-    }
+	COORD c;
+	for (int i = 0; i < 12; ++i)
+	{
+		c.X = 5 * i;
+		c.Y = i + 1;
+		colour(colors[i]);
+		g_Console.writeToBuffer(c, " °±²Û", colors[i]);
+	}
+}
+
+void renderUI()
+{
+	COORD UIBG;
+	COORD UI;
+	for (int i = 0; g_Console.getConsoleSize().X > i; i++) // For every value of x
+	{
+		UIBG.X = i;
+		for (int j = 0; 3 > j; j++) // Sets UI Height to 3
+		{
+			UIBG.Y = j;
+			g_Console.writeToBuffer(UIBG," ",0x00);
+		}
+	}
+	UI.Y = 1; // Sets Height of UI text
+	UI.X = g_Console.getConsoleSize().X / 3 - 8; // Start of UI text
+	g_Console.writeToBuffer(UI,"Lives : ",0x08);
+	UI.X = g_Console.getConsoleSize().X / 3;
+	char livesdisplay = Lives + '0';
+	g_Console.writeToBuffer(UI,livesdisplay, 0x08); // Displays the number of lives
+	UI.X = g_Console.getConsoleSize().X / 3 + 2;
+	g_Console.writeToBuffer(UI,"Weapon : ",0x08);
+	UI.X = UI.X + 9;
+	g_Console.writeToBuffer(UI, Weapons[1].Name, 0x08); // Display Equipped Weapon (TO BE CHANGED TO ADJUSTABLE)
+	UI.X = UI.X + Weapons[1].Name.length() + 1; // Increases UI.X by text length of weapon 1's name
+	g_Console.writeToBuffer(UI, "Ammo : ", 0x08);
+	UI.X = UI.X + 7;
+	g_Console.writeToBuffer(UI, Weapons[1].Clip, 0x07); // Display Current Clip
+	UI.X = UI.X + 1;
+	g_Console.writeToBuffer(UI, "/", 0x08);
+	UI.X = UI.X + 1;
+	g_Console.writeToBuffer(UI, Weapons[1].AmmoTotal, 0x08); // Total Ammo not in clip
 }
 
 void renderCharacter()

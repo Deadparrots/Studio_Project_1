@@ -2,6 +2,7 @@
 #define _GAME_H
 
 #include "Framework\timer.h"
+#include <string>
 
 extern CStopWatch g_swTimer;
 extern bool g_bQuitGame;
@@ -33,6 +34,17 @@ struct SGameChar
     bool  m_bActive;
 };
 
+struct WeaponParameters
+{
+	std::string Name;
+	int Clip; // Ammo in Clip
+	int ClipMax; // Max size of Clip
+	int AmmoTotal; // Total Ammo
+	int Reload; // Reload Speed
+	int ProjectileSpeed; // Projectile Speed
+	int Range; // Range
+};
+
 void init        ( void );      // initialize your variables, allocate memory, etc
 void getInput    ( void );      // get input from player
 void update      ( double dt ); // update the game and the state of the game
@@ -47,6 +59,7 @@ void clearScreen();         // clears the current screen and draw from scratch
 void renderSplashScreen();  // renders the splash screen
 void renderGame();          // renders the game stuff
 void renderMap();           // renders the map to the buffer first
+void renderUI();			// renders the ui to the buffer
 void renderCharacter();     // renders the character into the buffer
 void renderFramerate();     // renders debug information, frame rate, elapsed time, etc
 void renderToScreen();      // dump the contents of the buffer to the screen, one frame worth of game
