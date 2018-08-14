@@ -15,7 +15,11 @@ enum EKEYS
     K_RIGHT,
     K_ESCAPE,
     K_SPACE,
-    K_COUNT
+	K_W,
+	K_A,
+	K_S,
+	K_D,
+	K_COUNT
 };
 
 // Enumeration for the different screen states
@@ -24,6 +28,14 @@ enum EGAMESTATES
     S_SPLASHSCREEN,
     S_GAME,
     S_COUNT
+};
+enum EWEAPONSTATES
+{
+	Hold,
+	FireUp,
+	FireDown,
+	FireLeft,
+	FireRight
 };
 
 // struct for the game character
@@ -54,6 +66,7 @@ void renderEnemy3();
 void renderEnemy4();
 void renderEnemy5();
 void renderEnemy6();
+void renderWeapon();
 void renderFramerate();     // renders debug information, frame rate, elapsed time, etc
 void renderToScreen();      // dump the contents of the buffer to the screen, one frame worth of game
 void generate();
