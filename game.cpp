@@ -6,6 +6,11 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+using namespace std;
 
 double  g_dElapsedTime;
 double  g_dDeltaTime;
@@ -28,6 +33,7 @@ Console g_Console(80, 25, "SP1 Framework");
 //--------------------------------------------------------------
 void init( void )
 {
+	generate();
     // Set precision for floating point output
     g_dElapsedTime = 0.0;
     g_dBounceTime = 0.0;
@@ -229,10 +235,18 @@ void renderMap()
     COORD c;
     for (int i = 0; i < 12; ++i)
     {
-        c.X = 5 * i;
-        c.Y = i + 1;
+		fstream myfile("map.txt");
+		string sLine;
+		for (short i = 0; i < 24 * 80; i++)
+		{
+			if (i % 80 == 0)
+				getline(myfile, sLine);
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
+		}
+        c.X = 0;
+        c.Y = 0;
         colour(colors[i]);
-        g_Console.writeToBuffer(c, " °±²Û", colors[i]);
+        g_Console.writeToBuffer(c, " Â°Â±Â²Ã›", colors[i]);
     }
 }
 
@@ -269,4 +283,133 @@ void renderToScreen()
 {
     // Writes the buffer to the console, hence you will see what you have written
     g_Console.flushBufferToConsole();
+}
+
+void generate()
+{
+	int random, point1, point2, point3, point4, point5;
+	srand(time(NULL));
+	fstream myfile("map.txt");
+	for (size_t i = 0; i < 24; i++)
+	{
+		if (rand() % 2 && i > 7 && i < 17)
+		{
+			int random1 = rand() % 20 + 15;
+			int random2 = rand() % 20 + 15;
+			for (size_t i = 0; i < random1; i++)
+				myfile.write("#", 1);
+			for (size_t i = 0; i < 80 - random1 - random2; i++)
+				myfile.write(" ", 1);
+			for (size_t i = 0; i < random2; i++)
+				myfile.write("#", 1);
+		}
+		else
+			for (size_t i = 0; i < 80; i++)
+				myfile.write("#", 1);
+		myfile.write("\n", 1);
+	}
+	random = rand() % 5 + 37;
+	for (size_t i = 0; i < 10; i++)
+	{
+		myfile.seekp(random + 82 * (i + 7));
+		myfile.write(" ", 1);
+		myfile.write(" ", 1);
+	}
+	point1 = (rand() % 10 + 2) + ((rand() % 8) + 8) * 82;
+	myfile.seekp(point1);
+	random = rand() % 10 + 20;
+	point2 = point1 + random;
+	for (size_t i = 0; i < random; i++)
+		myfile.write(" ", 1);
+	random = rand() % 4 + 8;
+	for (size_t f = 0; f < random; f++)
+	{
+		myfile.seekp(point1 + (4 - f) * 82);
+		if (f > 3)
+			for (size_t i = 0; i < random + 5 - f; i++)
+				myfile.write(" ", 1);
+		else
+			for (size_t i = 0; i < random + 5 + f; i++)
+				myfile.write(" ", 1);
+	}
+	random = rand() % 5 + 3;
+	if (rand() % 2)
+	{
+		for (size_t f = 0; f < random; f++)
+		{
+			myfile.seekp(point2 + f * 82 - f);
+			for (size_t i = 0; i < random + 5 + f; i++)
+				myfile.write(" ", 1);
+		}
+	}
+	else
+	{
+		for (size_t f = 0; f < random; f++)
+		{
+			myfile.seekp(point2 - f * 82 + f);
+			for (size_t i = 0; i < random + 8 - f; i++)
+				myfile.write(" ", 1);
+		}
+	}
+	point3 = myfile.tellp();
+	random = rand() % 3 + 3;
+	if (point3 < myfile.end / 2)
+		for (size_t f = 0; f < random; f++)
+		{
+			myfile.seekp(point3 + 82 * f + 2 * f);
+			for (size_t i = 0; i < (random * 2) + f; i++)
+				myfile.write(" ", 1);
+		}
+	else
+		for (size_t f = 0; f < random; f++)
+		{
+			myfile.seekp(point3 - (82 * f) + 2 * f);
+			for (size_t i = 0; i < (random * 2) - f; i++)
+				myfile.write(" ", 1);
+		}
+	random = rand() % 3 + 4;
+	if (point1 < myfile.end / 2)
+		for (size_t i = 0; i < random; i++)
+		{
+			myfile.seekp(point1 - 1 + i * 82);
+			if (rand() % 2)
+			{
+				myfile.write(" ", 1);
+				myfile.write(" ", 1);
+			}
+			else
+				myfile.write(" ", 1);
+		}
+	else
+		for (size_t i = 0; i < random; i++)
+		{
+			myfile.seekp(point1 - 1 - i * 82);
+			myfile.write(" ", 1);
+		}
+	point4 = myfile.tellp();
+	random = rand() % 3 + 1;
+	if (point4 < myfile.end / 2)
+		for (size_t i = 0; i < random; i++)
+		{
+			myfile.seekp(point4 + 82 * i);
+			for (size_t i = 0; i < (random); i++)
+				myfile.write(" ", 1);
+		}
+	else
+		for (size_t i = 0; i < random; i++)
+		{
+			myfile.seekp(point4 - (82 * i));
+			for (size_t i = 0; i < (random); i++)
+				myfile.write(" ", 1);
+		}
+	point5 = myfile.tellp();
+	random = rand() % 20 + 10;
+	for (size_t f = 0; f < random; f++)
+	{
+		myfile.seekp(point5 + (rand() % 4 + 1) * 82);
+		for (size_t i = 0; i < random; i++)
+			myfile.write(" ", 1);
+	}
+
+	myfile.close();
 }
