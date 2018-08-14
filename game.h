@@ -61,7 +61,13 @@ void renderGame();          // renders the game stuff
 void renderMap();           // renders the map to the buffer first
 void renderUI();			// renders the ui to the buffer
 void renderCharacter();     // renders the character into the buffer
+void renderEnemy1();
+void renderEnemy2();
+void renderEnemy3();
+void renderEnemy4();
+void renderEnemy5();
+void renderEnemy6();
 void renderFramerate();     // renders debug information, frame rate, elapsed time, etc
 void renderToScreen();      // dump the contents of the buffer to the screen, one frame worth of game
-
+void generate();
 #endif // _GAME_H

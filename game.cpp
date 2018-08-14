@@ -1,3 +1,4 @@
+
 // This is the main file for the game logic and function
 //
 //
@@ -6,6 +7,11 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+using namespace std;
 
 double  g_dElapsedTime;
 double  g_dDeltaTime;
@@ -13,10 +19,17 @@ bool    g_abKeyPressed[K_COUNT];
 
 // Game specific variables here
 SGameChar   g_sChar;
+SGameChar	g_enemy1;
+SGameChar	g_enemy2;
+SGameChar	g_enemy3;
+SGameChar	g_enemy4;
+SGameChar	g_enemy5;
+SGameChar	g_enemy6;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 int Lives = 3; // Number of lives the player has left (Base Value is 3)
 WeaponParameters Weapons[4];
+
 // Console object
 Console g_Console(80, 25, "SP1 Framework");
 
@@ -29,16 +42,107 @@ Console g_Console(80, 25, "SP1 Framework");
 //--------------------------------------------------------------
 void init( void )
 {
+	generate();
     // Set precision for floating point output
     g_dElapsedTime = 0.0;
     g_dBounceTime = 0.0;
 
     // sets the initial state for the game
     g_eGameState = S_SPLASHSCREEN;
-
-    g_sChar.m_cLocation.X = g_Console.getConsoleSize().X / 2;
-    g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2;
-    g_sChar.m_bActive = true;
+	int enemyX, enemyY;
+	fstream myfile("map.txt");
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_sChar.m_cLocation.X = enemyX;
+	g_sChar.m_cLocation.Y = enemyY;
+	g_sChar.m_bActive = true;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy1.m_cLocation.X = enemyX;
+	g_enemy1.m_cLocation.Y = enemyY;
+	g_enemy1.m_bActive = true;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy2.m_cLocation.X = enemyX;
+	g_enemy2.m_cLocation.Y = enemyY;
+	g_enemy2.m_bActive = true;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy3.m_cLocation.X = enemyX;
+	g_enemy3.m_cLocation.Y = enemyY;
+	g_enemy3.m_bActive = true;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy4.m_cLocation.X = enemyX;
+	g_enemy4.m_cLocation.Y = enemyY;
+	g_enemy4.m_bActive = true;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy5.m_cLocation.X = enemyX;
+	g_enemy5.m_cLocation.Y = enemyY;
+	g_enemy5.m_bActive = true;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy6.m_cLocation.X = enemyX;
+	g_enemy6.m_cLocation.Y = enemyY;
+	g_enemy6.m_bActive = true;
+	myfile.close();
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 }
@@ -131,7 +235,7 @@ void render()
 
 void splashScreenWait()    // waits for time to pass in splash screen
 {
-    if (g_dElapsedTime > 3.0) // wait for 3 seconds to switch to game mode, else do nothing
+    if (g_dElapsedTime > 0.5) // wait for 0.5 seconds to switch to game mode, else do nothing
         g_eGameState = S_GAME;
 }
 
@@ -147,33 +251,58 @@ void moveCharacter()
     bool bSomethingHappened = false;
     if (g_dBounceTime > g_dElapsedTime)
         return;
-
+	fstream myfile("map.txt");
     // Updating the location of the character based on the key press
     // providing a beep sound whenver we shift the character
     if (g_abKeyPressed[K_UP] && g_sChar.m_cLocation.Y > 0)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.Y--;
-        bSomethingHappened = true;
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+		{
+			//Beep(1440, 30);
+			g_sChar.m_cLocation.Y--;
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.X > 0)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.X--;
-        bSomethingHappened = true;
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+		{
+			//Beep(1440, 30);
+			g_sChar.m_cLocation.X--;
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.Y++;
-        bSomethingHappened = true;
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+		{
+			//Beep(1440, 30);
+			g_sChar.m_cLocation.Y++;
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.X++;
-        bSomethingHappened = true;
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+		{
+			//Beep(1440, 30);
+			g_sChar.m_cLocation.X++;
+			bSomethingHappened = true;
+		}
     }
+	myfile.close();
     if (g_abKeyPressed[K_SPACE])
     {
         g_sChar.m_bActive = !g_sChar.m_bActive;
@@ -204,7 +333,7 @@ void renderSplashScreen()  // renders the splash screen
     COORD c = g_Console.getConsoleSize();
     c.Y /= 3;
     c.X = c.X / 2 - 9;
-    g_Console.writeToBuffer(c, "A game in 3 seconds", 0x03);
+    g_Console.writeToBuffer(c, "A game in 0.5 seconds", 0x03);
     c.Y += 1;
     c.X = g_Console.getConsoleSize().X / 2 - 20;
     g_Console.writeToBuffer(c, "Press <Space> to change character colour", 0x09);
@@ -216,28 +345,42 @@ void renderSplashScreen()  // renders the splash screen
 void renderGame()
 {
     renderMap();        // renders the map to the buffer first
-	renderUI();			// renders the UI to the buffer
     renderCharacter();  // renders the character into the buffer
+  renderUI(); // renders the UI to the buffer
+	renderEnemy1();
+	renderEnemy2();
+	renderEnemy3();
+	renderEnemy4();
+	renderEnemy5();
+	renderEnemy6();
+
 }
 
 void renderMap()
 {
-	// Set up sample colours, and output shadings
-	const WORD colors[] = {
-		0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
-		0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
-	};
+    // Set up sample colours, and output shadings
+    //const WORD colors[] = {
+    //    0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
+    //    0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
+    //};
 
-	COORD c;
-	for (int i = 0; i < 12; ++i)
-	{
-		c.X = 5 * i;
-		c.Y = i + 1;
-		colour(colors[i]);
-		g_Console.writeToBuffer(c, " °±²Û", colors[i]);
-	}
+    //COORD c;
+    for (int i = 0; i < 12; ++i)
+    {
+		fstream myfile("map.txt");
+		string sLine;
+		for (short i = 0; i < 24 * 80; i++)
+		{
+			if (i % 80 == 0)
+				getline(myfile, sLine);
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
+		}
+        //c.X = 0;
+        //c.Y = 0;
+        //colour(colors[i]);
+        //g_Console.writeToBuffer(c, " Â°Â±Â²Ã›", colors[i]);
+    }
 }
-
 void renderUI()
 {
 	COORD UIBG;
@@ -274,13 +417,52 @@ void renderUI()
 void renderCharacter()
 {
     // Draw the location of the character
-    WORD charColor = 0x0C;
+    WORD charColor = 0x0B;
     if (g_sChar.m_bActive)
     {
         charColor = 0x0A;
     }
-    g_Console.writeToBuffer(g_sChar.m_cLocation, (char)1, charColor);
+    g_Console.writeToBuffer(g_sChar.m_cLocation, (char)80, charColor);
 }
+
+void renderEnemy1()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_enemy1.m_cLocation, (char)69, charColor);
+}
+void renderEnemy2()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_enemy2.m_cLocation, (char)69, charColor);
+}
+void renderEnemy3()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_enemy3.m_cLocation, (char)69, charColor);
+}
+void renderEnemy4()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_enemy4.m_cLocation, (char)69, charColor);
+}
+void renderEnemy5()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_enemy5.m_cLocation, (char)69, charColor);
+}
+void renderEnemy6()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_enemy6.m_cLocation, (char)69, charColor);
+}
+
+
 
 void renderFramerate()
 {
@@ -304,4 +486,175 @@ void renderToScreen()
 {
     // Writes the buffer to the console, hence you will see what you have written
     g_Console.flushBufferToConsole();
+}
+
+void generate()
+{
+	int random, point1, point2, point3, point4, point5;
+	srand(time(NULL));
+	fstream myfile("map.txt");
+	for (size_t i = 0; i < 24; i++)
+	{
+		if (rand() % 2 && i > 7 && i < 17)
+		{
+			int random1 = rand() % 20 + 15;
+			int random2 = rand() % 20 + 15;
+			for (size_t i = 0; i < random1; i++)
+				myfile.write(".", 1);
+			for (size_t i = 0; i < 80 - random1 - random2; i++)
+				myfile.write(" ", 1);
+			for (size_t i = 0; i < random2; i++)
+				myfile.write(".", 1);
+		}
+		else
+			for (size_t i = 0; i < 80; i++)
+				myfile.write(".", 1);
+		myfile.write("\n", 1);
+	}
+	random = rand() % 5 + 37;
+	for (size_t i = 0; i < 10; i++)
+	{
+		myfile.seekp(random + 82 * (i + 7));
+		myfile.write(" ", 1);
+		myfile.write(" ", 1);
+	}
+	point1 = (rand() % 10 + 5) + ((rand() % 2) + 14) * 82;
+	myfile.seekp(point1);
+	random = rand() % 10 + 20;
+	point2 = point1 + random;
+	for (size_t i = 0; i < random; i++)
+		myfile.write(" ", 1);
+	random = rand() % 4 + 8;
+	for (size_t f = 0; f < random; f++)
+	{
+		myfile.seekp(point1 + (4 - f) * 82);
+		if (f > 3)
+			for (size_t i = 0; i < random + 5 - f; i++)
+				myfile.write(" ", 1);
+		else
+			for (size_t i = 0; i < random + 5 + f; i++)
+				myfile.write(" ", 1);
+	}
+	random = rand() % 5 + 3;
+	if (rand() % 2)
+	{
+		for (size_t f = 0; f < random; f++)
+		{
+			myfile.seekp(point2 + f * 82 - f);
+			for (size_t i = 0; i < random + 5 + f; i++)
+				myfile.write(" ", 1);
+		}
+	}
+	else
+	{
+		for (size_t f = 0; f < random; f++)
+		{
+			myfile.seekp(point2 - f * 82 + f);
+			for (size_t i = 0; i < random + 8 - f; i++)
+				myfile.write(" ", 1);
+		}
+	}
+	point3 = myfile.tellp();
+	random = rand() % 3 + 2;
+	for (size_t f = 0; f < random; f++)
+	{
+		myfile.seekp(point3 - (82 * f) + 2 * f);
+		for (size_t i = 0; i < (random * 2) - f; i++)
+			myfile.write(" ", 1);
+	}
+	random = rand() % 3 + 3;
+	if (point1 < myfile.end / 2)
+		for (size_t i = 0; i < random; i++)
+		{
+			myfile.seekp(point1 - 1 + i * 82);
+			if (rand() % 2)
+			{
+				myfile.write(" ", 1);
+				myfile.write(" ", 1);
+			}
+			else
+				myfile.write(" ", 1);
+		}
+	else
+		for (size_t i = 0; i < random; i++)
+		{
+			myfile.seekp(point1 - 1 - i * 82);
+			myfile.write(" ", 1);
+		}
+	point4 = myfile.tellp();
+	random = rand() % 3;
+	if (point4 < myfile.end / 2)
+		for (size_t i = 0; i < random; i++)
+		{
+			myfile.seekp(point4 + 82 * i);
+			for (size_t i = 0; i < (random); i++)
+				myfile.write(" ", 1);
+		}
+	else
+		for (size_t i = 0; i < random; i++)
+		{
+			myfile.seekp(point4 - (82 * i));
+			for (size_t i = 0; i < (random); i++)
+				myfile.write(" ", 1);
+		}
+	point5 = myfile.tellp();
+	random = rand() % 20 + 8;
+	for (size_t f = 0; f < random; f++)
+	{
+		myfile.seekp(point5 + (rand() % 4 + 1) * 82);
+		for (size_t i = 0; i < random; i++)
+			myfile.write(" ", 1);
+	}
+	for (size_t i = 0; i < 82*24; i++)
+	{
+		myfile.seekg(i);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == '.' && i > 82 && i < 23*82)
+		{
+			myfile.seekg(i - 82);
+			char * buffer = new char[0];
+			myfile.read(buffer, 1);
+			if (buffer[0] == ' ')
+			{
+				myfile.seekp(i);
+				myfile.write("#", 1);
+			}
+			else
+			{
+				myfile.seekg(i + 82);
+				char * buffer = new char[0];
+				myfile.read(buffer, 1);
+				if (buffer[0] == ' ')
+				{
+					myfile.seekp(i);
+					myfile.write("#", 1);
+				}
+				else
+				{
+					myfile.seekg(i + 1);
+					char * buffer = new char[0];
+					myfile.read(buffer, 1);
+					if (buffer[0] == ' ')
+					{
+						myfile.seekp(i);
+						myfile.write("#", 1);
+					}
+					else
+					{
+						myfile.seekg(i - 1);
+						char * buffer = new char[0];
+						myfile.read(buffer, 1);
+						if (buffer[0] == ' ')
+						{
+							myfile.seekp(i);
+							myfile.write("#", 1);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	myfile.close();
 }

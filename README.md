@@ -1,5 +1,5 @@
-# Studio_Project_1
-This is to list all the functions in the project 
+# Studio Project 1
+This is to list all the added functions in the project and their uses/definition
 
 ##### init()
 Initializes the game variables, load data, allocate memory, etc. Code that should run before the game starts should be here.
