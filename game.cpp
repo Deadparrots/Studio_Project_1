@@ -18,6 +18,12 @@ bool    g_abKeyPressed[K_COUNT];
 
 // Game specific variables here
 SGameChar   g_sChar;
+SGameChar	g_enemy1;
+SGameChar	g_enemy2;
+SGameChar	g_enemy3;
+SGameChar	g_enemy4;
+SGameChar	g_enemy5;
+SGameChar	g_enemy6;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 
@@ -40,10 +46,100 @@ void init( void )
 
     // sets the initial state for the game
     g_eGameState = S_SPLASHSCREEN;
-
-    g_sChar.m_cLocation.X = g_Console.getConsoleSize().X / 2;
-    g_sChar.m_cLocation.Y = g_Console.getConsoleSize().Y / 2;
-    g_sChar.m_bActive = true;
+	int enemyX, enemyY;
+	fstream myfile("map.txt");
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_sChar.m_cLocation.X = enemyX;
+	g_sChar.m_cLocation.Y = enemyY;
+	g_sChar.m_bActive = true;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy1.m_cLocation.X = enemyX;
+	g_enemy1.m_cLocation.Y = enemyY;
+	g_enemy1.m_bActive = true;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy2.m_cLocation.X = enemyX;
+	g_enemy2.m_cLocation.Y = enemyY;
+	g_enemy2.m_bActive = true;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy3.m_cLocation.X = enemyX;
+	g_enemy3.m_cLocation.Y = enemyY;
+	g_enemy3.m_bActive = true;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy4.m_cLocation.X = enemyX;
+	g_enemy4.m_cLocation.Y = enemyY;
+	g_enemy4.m_bActive = true;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy5.m_cLocation.X = enemyX;
+	g_enemy5.m_cLocation.Y = enemyY;
+	g_enemy5.m_bActive = true;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy6.m_cLocation.X = enemyX;
+	g_enemy6.m_cLocation.Y = enemyY;
+	g_enemy6.m_bActive = true;
+	myfile.close();
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
 }
@@ -152,32 +248,56 @@ void moveCharacter()
     bool bSomethingHappened = false;
     if (g_dBounceTime > g_dElapsedTime)
         return;
-
+	fstream myfile("map.txt");
     // Updating the location of the character based on the key press
     // providing a beep sound whenver we shift the character
     if (g_abKeyPressed[K_UP] && g_sChar.m_cLocation.Y > 0)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.Y--;
-        bSomethingHappened = true;
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+		{
+			//Beep(1440, 30);
+			g_sChar.m_cLocation.Y--;
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.X > 0)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.X--;
-        bSomethingHappened = true;
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+		{
+			//Beep(1440, 30);
+			g_sChar.m_cLocation.X--;
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.Y++;
-        bSomethingHappened = true;
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+		{
+			//Beep(1440, 30);
+			g_sChar.m_cLocation.Y++;
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
     {
-        //Beep(1440, 30);
-        g_sChar.m_cLocation.X++;
-        bSomethingHappened = true;
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+		{
+			//Beep(1440, 30);
+			g_sChar.m_cLocation.X++;
+			bSomethingHappened = true;
+		}
     }
     if (g_abKeyPressed[K_SPACE])
     {
@@ -222,6 +342,13 @@ void renderGame()
 {
     renderMap();        // renders the map to the buffer first
     renderCharacter();  // renders the character into the buffer
+	renderEnemy1();
+	renderEnemy2();
+	renderEnemy3();
+	renderEnemy4();
+	renderEnemy5();
+	renderEnemy6();
+
 }
 
 void renderMap()
@@ -253,13 +380,52 @@ void renderMap()
 void renderCharacter()
 {
     // Draw the location of the character
-    WORD charColor = 0x0C;
+    WORD charColor = 0x0B;
     if (g_sChar.m_bActive)
     {
         charColor = 0x0A;
     }
-    g_Console.writeToBuffer(g_sChar.m_cLocation, (char)1, charColor);
+    g_Console.writeToBuffer(g_sChar.m_cLocation, (char)80, charColor);
 }
+
+void renderEnemy1()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_enemy1.m_cLocation, (char)69, charColor);
+}
+void renderEnemy2()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_enemy2.m_cLocation, (char)69, charColor);
+}
+void renderEnemy3()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_enemy3.m_cLocation, (char)69, charColor);
+}
+void renderEnemy4()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_enemy4.m_cLocation, (char)69, charColor);
+}
+void renderEnemy5()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_enemy5.m_cLocation, (char)69, charColor);
+}
+void renderEnemy6()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_enemy6.m_cLocation, (char)69, charColor);
+}
+
+
 
 void renderFramerate()
 {
@@ -413,3 +579,5 @@ void generate()
 
 	myfile.close();
 }
+
+	
