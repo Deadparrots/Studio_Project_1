@@ -299,6 +299,7 @@ void moveCharacter()
 			bSomethingHappened = true;
 		}
     }
+	myfile.close();
     if (g_abKeyPressed[K_SPACE])
     {
         g_sChar.m_bActive = !g_sChar.m_bActive;
@@ -463,15 +464,15 @@ void generate()
 			int random1 = rand() % 20 + 15;
 			int random2 = rand() % 20 + 15;
 			for (size_t i = 0; i < random1; i++)
-				myfile.write("#", 1);
+				myfile.write(".", 1);
 			for (size_t i = 0; i < 80 - random1 - random2; i++)
 				myfile.write(" ", 1);
 			for (size_t i = 0; i < random2; i++)
-				myfile.write("#", 1);
+				myfile.write(".", 1);
 		}
 		else
 			for (size_t i = 0; i < 80; i++)
-				myfile.write("#", 1);
+				myfile.write(".", 1);
 		myfile.write("\n", 1);
 	}
 	random = rand() % 5 + 37;
@@ -481,7 +482,7 @@ void generate()
 		myfile.write(" ", 1);
 		myfile.write(" ", 1);
 	}
-	point1 = (rand() % 10 + 2) + ((rand() % 8) + 8) * 82;
+	point1 = (rand() % 10 + 5) + ((rand() % 2) + 14) * 82;
 	myfile.seekp(point1);
 	random = rand() % 10 + 20;
 	point2 = point1 + random;
@@ -519,20 +520,12 @@ void generate()
 	}
 	point3 = myfile.tellp();
 	random = rand() % 3 + 2;
-	if (point3 < myfile.end / 2)
-		for (size_t f = 0; f < random; f++)
-		{
-			myfile.seekp(point3 + 82 * f + 2 * f);
-			for (size_t i = 0; i < (random * 2) + f; i++)
-				myfile.write(" ", 1);
-		}
-	else
-		for (size_t f = 0; f < random; f++)
-		{
-			myfile.seekp(point3 - (82 * f) + 2 * f);
-			for (size_t i = 0; i < (random * 2) - f; i++)
-				myfile.write(" ", 1);
-		}
+	for (size_t f = 0; f < random; f++)
+	{
+		myfile.seekp(point3 - (82 * f) + 2 * f);
+		for (size_t i = 0; i < (random * 2) - f; i++)
+			myfile.write(" ", 1);
+	}
 	random = rand() % 3 + 3;
 	if (point1 < myfile.end / 2)
 		for (size_t i = 0; i < random; i++)
@@ -553,7 +546,7 @@ void generate()
 			myfile.write(" ", 1);
 		}
 	point4 = myfile.tellp();
-	random = rand() % 3 + 1;
+	random = rand() % 3;
 	if (point4 < myfile.end / 2)
 		for (size_t i = 0; i < random; i++)
 		{
@@ -575,6 +568,56 @@ void generate()
 		myfile.seekp(point5 + (rand() % 4 + 1) * 82);
 		for (size_t i = 0; i < random; i++)
 			myfile.write(" ", 1);
+	}
+	for (size_t i = 0; i < 82*24; i++)
+	{
+		myfile.seekg(i);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == '.' && i > 82 && i < 23*82)
+		{
+			myfile.seekg(i - 82);
+			char * buffer = new char[0];
+			myfile.read(buffer, 1);
+			if (buffer[0] == ' ')
+			{
+				myfile.seekp(i);
+				myfile.write("#", 1);
+			}
+			else
+			{
+				myfile.seekg(i + 82);
+				char * buffer = new char[0];
+				myfile.read(buffer, 1);
+				if (buffer[0] == ' ')
+				{
+					myfile.seekp(i);
+					myfile.write("#", 1);
+				}
+				else
+				{
+					myfile.seekg(i + 1);
+					char * buffer = new char[0];
+					myfile.read(buffer, 1);
+					if (buffer[0] == ' ')
+					{
+						myfile.seekp(i);
+						myfile.write("#", 1);
+					}
+					else
+					{
+						myfile.seekg(i - 1);
+						char * buffer = new char[0];
+						myfile.read(buffer, 1);
+						if (buffer[0] == ' ')
+						{
+							myfile.seekp(i);
+							myfile.write("#", 1);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	myfile.close();
