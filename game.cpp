@@ -226,13 +226,6 @@ void renderGame()
 
 void renderMap()
 {
-    // Set up sample colours, and output shadings
-    const WORD colors[] = {
-        0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
-        0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
-    };
-
-    COORD c;
     for (int i = 0; i < 12; ++i)
     {
 		fstream myfile("map.txt");
@@ -243,10 +236,6 @@ void renderMap()
 				getline(myfile, sLine);
 			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
 		}
-        c.X = 0;
-        c.Y = 0;
-        colour(colors[i]);
-        g_Console.writeToBuffer(c, " °±²Û", colors[i]);
     }
 }
 
