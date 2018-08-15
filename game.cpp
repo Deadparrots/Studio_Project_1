@@ -28,6 +28,9 @@ SGameChar	g_weapon;
 SGameChar	g_door;
 size_t		deathsound = 0;
 size_t		shootsound = 0;
+size_t		reloadsound = 0;
+size_t		shootfailsound = 0;
+double		stages = 0.000;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
@@ -37,7 +40,7 @@ int Lives = 3; // Number of lives the player has left (Base Value is 3)
 int currentWeapon = 0;
 WeaponParameters Weapons[4];
 // Console object
-Console g_Console(80, 25, "SP1 Framework");
+Console g_Console(80, 24, "SP1 Framework");
 
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
@@ -264,8 +267,11 @@ void render()
 
 void splashScreenWait()    // waits for time to pass in splash screen
 {
-	if (g_abKeyPressed[K_SPACE]) // wait for 0.5 seconds to switch to game mode, else do nothing
+	if (g_abKeyPressed[K_SPACE]) // space to start game
 		g_eGameState = S_GAME;
+	if (g_abKeyPressed[K_ESCAPE]) // esc to quit without playing lol
+		g_bQuitGame = true;
+
 }
 
 void gameplay()            // gameplay logic
@@ -284,13 +290,21 @@ void moveCharacter()
 	fstream myfile("map.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
+	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
+	{
+		shootfailsound = 1;
+		bSomethingHappened = true;
+	}
 	if (Weapons[currentWeapon].Clip > 0)
 	{
 		if (g_abKeyPressed[K_UP] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireUp;
+			if (g_abKeyPressed[K_W])
+				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y - 1;
+			else
+				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
 			bSomethingHappened = true;
@@ -298,8 +312,11 @@ void moveCharacter()
 		if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireDown;
+			if (g_abKeyPressed[K_S])
+				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y + 1;
+			else
+				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
 			bSomethingHappened = true;
@@ -307,8 +324,10 @@ void moveCharacter()
 		if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireLeft;
-			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			if (g_abKeyPressed[K_A])
+				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X - 1;
+			else
+				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
 			bSomethingHappened = true;
@@ -316,8 +335,10 @@ void moveCharacter()
 		if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireRight;
-			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			if (g_abKeyPressed[K_D])
+				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X + 1;
+			else
+				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
 			bSomethingHappened = true;
@@ -444,6 +465,7 @@ void moveCharacter()
 		)
 	{
 		reload();
+		reloadsound += 2;
 	}
 	if (
 		(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == true) ||
@@ -654,7 +676,7 @@ void moveCharacter()
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
-		g_dBounceTime = g_dElapsedTime + 0.07; // 125ms should be enough
+		g_dBounceTime = g_dElapsedTime + 0.100 - stages / 100; // 125ms should be enough
 	}
 }
 void processUserInput()
@@ -668,32 +690,32 @@ void processUserInput()
 		Lives--;
 		deathsound = 5;
 	}
-	if (g_enemy1.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy1.m_cLocation.Y == g_weapon.m_cLocation.Y)
+	if (g_enemy1.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy1.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy1.m_bActive == true)
 	{
 		g_enemy1.m_bActive = false;
 		deathsound = 5;
 	}
-	if (g_enemy2.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy2.m_cLocation.Y == g_weapon.m_cLocation.Y)
+	if (g_enemy2.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy2.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy2.m_bActive == true)
 	{
 		g_enemy2.m_bActive = false;
 		deathsound = 5;
 	}
-	if (g_enemy3.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy3.m_cLocation.Y == g_weapon.m_cLocation.Y)
+	if (g_enemy3.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy3.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy3.m_bActive == true)
 	{
 		g_enemy3.m_bActive = false;
 		deathsound = 5;
 	}
-	if (g_enemy4.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy4.m_cLocation.Y == g_weapon.m_cLocation.Y)
+	if (g_enemy4.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy4.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy4.m_bActive == true)
 	{
 		g_enemy4.m_bActive = false;
 		deathsound = 5;
 	}
-	if (g_enemy5.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy5.m_cLocation.Y == g_weapon.m_cLocation.Y)
+	if (g_enemy5.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy5.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy5.m_bActive == true)
 	{
 		g_enemy5.m_bActive = false;
 		deathsound = 5;
 	}
-	if (g_enemy6.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy6.m_cLocation.Y == g_weapon.m_cLocation.Y)
+	if (g_enemy6.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy6.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy6.m_bActive == true)
 	{
 		g_enemy6.m_bActive = false;
 		deathsound = 5;
@@ -709,6 +731,7 @@ void processUserInput()
 	{
 		init();
 		g_eGameState = S_GAME;
+		stages++;
 	}
 }
 
@@ -728,6 +751,9 @@ void renderSplashScreen()  // renders the splash screen
 	c.X = g_Console.getConsoleSize().X / 2 - 12;
 	g_Console.writeToBuffer(c, "Use Arrow Keys to attack", 0x09);
 	c.Y += 1;
+	c.X = g_Console.getConsoleSize().X / 2 - 14;
+	g_Console.writeToBuffer(c, "Pick up 'R' to reload weapon", 0x09);
+	c.Y += 4;
 	c.X = g_Console.getConsoleSize().X / 2 - 9;
 	g_Console.writeToBuffer(c, "Press 'Esc' to quit", 0x09);
 	c.Y += 1;
@@ -752,13 +778,6 @@ void renderGame()
 
 void renderMap()
 {
-	// Set up sample colours, and output shadings
-	//const WORD colors[] = {
-	//    0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
-	//    0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
-	//};
-
-	//COORD c;
 	for (int i = 0; i < 12; ++i)
 	{
 		fstream myfile("map.txt");
@@ -766,21 +785,9 @@ void renderMap()
 		for (short i = 0; i < 24 * 80; i++)
 		{
 			if (i % 80 == 0)
-				//{
 				getline(myfile, sLine);
-			//for (size_t i = 0; i < 24; i++)
-			//	for (size_t j = 0; j < 80; j++)
-			//	{
-			//						if (sLine[j] == '#')
-			//							sLine[j] = 219;
-			//					}
-			//			}
 			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
 		}
-		//c.X = 0;
-		//c.Y = 0;
-		//colour(colors[i]);
-		//g_Console.writeToBuffer(c, " °±²Û", colors[i]);
 	}
 }
 void renderUI()
@@ -823,9 +830,9 @@ void renderCharacter()
 	WORD charColor = 0x05;
 	if (g_sChar.m_bActive)
 	{
-		charColor = 0x0A;
+		charColor = 0x0f;
 	}
-	g_Console.writeToBuffer(g_sChar.m_cLocation, (char)'P', charColor);
+	g_Console.writeToBuffer(g_sChar.m_cLocation, (char)3, charColor);
 }
 void renderEnemy1()
 {
@@ -901,7 +908,7 @@ void renderEnemy6()
 }
 void renderDoor()
 {
-	// Draw the location of the character
+	// Draw the location of the door
 	WORD charColor = 0x00;
 	if (g_door.m_bActive == true)
 		charColor = 0x0B;
@@ -909,7 +916,7 @@ void renderDoor()
 }
 void renderWeapon()
 {
-	// Draw the location of the character
+	// Draw the location of the weapon
 	WORD charColor = 0x0E;
 	g_Console.writeToBuffer(g_weapon.m_cLocation, (char)254, charColor);
 }
@@ -950,6 +957,16 @@ void sound()
 	{
 		Beep(shootsound * 1000, 15);
 		shootsound--;
+	}
+	if (reloadsound > 0)
+	{
+		Beep((3 - reloadsound) * 450, 15);
+		reloadsound--;
+	}
+	if (shootfailsound > 0)
+	{
+		Beep(400, 15);
+		shootfailsound--;
 	}
 }
 
@@ -1060,7 +1077,7 @@ void generate()
 	random = rand() % 20 + 8;
 	for (size_t f = 0; f < random; f++)
 	{
-		myfile.seekp(point5 + (rand() % 4 + 1) * 82);
+		myfile.seekp(point5 + (rand() % 3 + 1) * 82);
 		for (size_t i = 0; i < random; i++)
 			myfile.write(" ", 1);
 	}
