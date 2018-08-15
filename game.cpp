@@ -25,10 +25,11 @@ SGameChar	g_enemy4;
 SGameChar	g_enemy5;
 SGameChar	g_enemy6;
 SGameChar	g_weapon;
+SGameChar	g_door;
 size_t		deathsound = 0;
 size_t		shootsound = 0;
 int g_shootdist = 0;
-int g_shootmaxdist = 6; // Shooting distance of weapon. Can be changed.
+int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
 EWEAPONSTATES g_eWeaponState = Hold;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
@@ -75,7 +76,7 @@ void init(void)
 		char * buffer = new char[0];
 		myfile.seekg(enemyX + enemyY * 82);
 		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (buffer[0] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
 			break;
 	}
 	g_enemy1.m_cLocation.X = enemyX;
@@ -88,7 +89,7 @@ void init(void)
 		char * buffer = new char[0];
 		myfile.seekg(enemyX + enemyY * 82);
 		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (buffer[0] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
 			break;
 	}
 	g_enemy2.m_cLocation.X = enemyX;
@@ -101,7 +102,7 @@ void init(void)
 		char * buffer = new char[0];
 		myfile.seekg(enemyX + enemyY * 82);
 		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (buffer[0] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
 			break;
 	}
 	g_enemy3.m_cLocation.X = enemyX;
@@ -114,7 +115,7 @@ void init(void)
 		char * buffer = new char[0];
 		myfile.seekg(enemyX + enemyY * 82);
 		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (buffer[0] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
 			break;
 	}
 	g_enemy4.m_cLocation.X = enemyX;
@@ -127,7 +128,7 @@ void init(void)
 		char * buffer = new char[0];
 		myfile.seekg(enemyX + enemyY * 82);
 		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (buffer[0] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
 			break;
 	}
 	g_enemy5.m_cLocation.X = enemyX;
@@ -140,12 +141,27 @@ void init(void)
 		char * buffer = new char[0];
 		myfile.seekg(enemyX + enemyY * 82);
 		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (buffer[0] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
 			break;
 	}
 	g_enemy6.m_cLocation.X = enemyX;
 	g_enemy6.m_cLocation.Y = enemyY;
 	g_enemy6.m_bActive = true;
+	g_weapon.m_cLocation.X = 10;
+	g_weapon.m_cLocation.Y = 2;	
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_door.m_cLocation.X = enemyX;
+	g_door.m_cLocation.Y = enemyY;
+	g_door.m_bActive = false;
 	g_weapon.m_cLocation.X = 10;
 	g_weapon.m_cLocation.Y = 2;
 	myfile.close();
@@ -623,7 +639,13 @@ void processUserInput()
 		g_enemy6.m_bActive = false;
 		deathsound = 5;
 	}
-
+	if (g_enemy1.m_bActive == false &&
+		g_enemy2.m_bActive == false &&
+		g_enemy3.m_bActive == false &&
+		g_enemy4.m_bActive == false &&
+		g_enemy5.m_bActive == false &&
+		g_enemy6.m_bActive == false)
+		g_door.m_bActive = true;
 }
 
 void clearScreen()
@@ -637,10 +659,10 @@ void renderSplashScreen()  // renders the splash screen
 	COORD c = g_Console.getConsoleSize();
 	c.Y /= 3;
 	c.X = c.X / 2 - 9;
-	g_Console.writeToBuffer(c, "A game in 0.5 seconds", 0x03);
+	g_Console.writeToBuffer(c, "Use <WASD> to move", 0x03);
 	c.Y += 1;
-	c.X = g_Console.getConsoleSize().X / 2 - 20;
-	g_Console.writeToBuffer(c, "Press <Space> to change character colour", 0x09);
+	c.X = g_Console.getConsoleSize().X / 2 - 12;
+	g_Console.writeToBuffer(c, "Use Arrow Keys to attack", 0x09);
 	c.Y += 1;
 	c.X = g_Console.getConsoleSize().X / 2 - 9;
 	g_Console.writeToBuffer(c, "Press 'Esc' to quit", 0x09);
@@ -649,6 +671,7 @@ void renderSplashScreen()  // renders the splash screen
 void renderGame()
 {
 	renderMap();        // renders the map to the buffer first
+	renderDoor();
 	renderWeapon();
 	renderCharacter();  // renders the character into the buffer
 	renderEnemy1();
@@ -800,6 +823,14 @@ void renderEnemy6()
 		g_enemy6.m_cLocation.Y = 2;
 	}
 	g_Console.writeToBuffer(g_enemy6.m_cLocation, (char)'E', charColor);
+}
+void renderDoor()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0B;
+	if (g_door.m_bActive == true)
+		WORD charColor = 0x0D;
+	g_Console.writeToBuffer(g_door.m_cLocation, (char)'D', charColor);
 }
 void renderWeapon()
 {
