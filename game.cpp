@@ -513,8 +513,8 @@ void moveCharacter()
 		g_enemy6.m_cLocation.X = 0;
 		g_enemy6.m_cLocation.Y = 0;
 	}
-
-	switch (rand() % 64)
+	size_t rate = 100/(stages + 1) + 24;
+	switch (rand() % rate)
 	{
 	case 0:
 		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 + 1);
@@ -674,7 +674,7 @@ void moveCharacter()
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
-		g_dBounceTime = g_dElapsedTime + 0.100 - stages/100; // 125ms should be enough
+		g_dBounceTime = g_dElapsedTime + 0.07; // 125ms should be enough
 	}
 }
 void processUserInput()
