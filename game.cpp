@@ -26,6 +26,7 @@ SGameChar	g_enemy5;
 SGameChar	g_enemy6;
 SGameChar	g_weapon;
 size_t		deathsound = 0;
+size_t		shootsound = 0;
 int g_shootdist = 0;
 int g_shootmaxdist = 6;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
@@ -268,6 +269,7 @@ void moveCharacter()
 		g_eWeaponState = FireUp;
 		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 		g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+		shootsound++;
 		bSomethingHappened = true;
 	}
 	if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
@@ -275,6 +277,7 @@ void moveCharacter()
 		g_eWeaponState = FireDown;
 		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 		g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+		shootsound++;
 		bSomethingHappened = true;
 	}
 	if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
@@ -282,6 +285,7 @@ void moveCharacter()
 		g_eWeaponState = FireLeft;
 		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 		g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+		shootsound++;
 		bSomethingHappened = true;
 	}
 	if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
@@ -289,6 +293,7 @@ void moveCharacter()
 		g_eWeaponState = FireRight;
 		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 		g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+		shootsound++;
 		bSomethingHappened = true;
 	}
 	if (g_eWeaponState == FireUp)
@@ -403,39 +408,40 @@ void processUserInput()
 	// quits the game if player hits the escape key
 	if (g_abKeyPressed[K_ESCAPE])
 		g_bQuitGame = true;
-	if (g_abKeyPressed[K_SPACE])
+	if (g_sChar.m_bActive == false) // Took damage
 	{
-		deathsound = 10;
+		g_sChar.m_bActive = true;
+		deathsound = 5;
 	}
 	if (g_enemy1.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy1.m_cLocation.Y == g_weapon.m_cLocation.Y)
 	{
 		g_enemy1.m_bActive = false;
-		deathsound = 10;
+		deathsound = 5;
 	}
 	if (g_enemy2.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy2.m_cLocation.Y == g_weapon.m_cLocation.Y)
 	{
 		g_enemy2.m_bActive = false;
-		deathsound = 10;
+		deathsound = 5;
 	}
 	if (g_enemy3.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy3.m_cLocation.Y == g_weapon.m_cLocation.Y)
 	{
 		g_enemy3.m_bActive = false;
-		deathsound = 10;
+		deathsound = 5;
 	}
 	if (g_enemy4.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy4.m_cLocation.Y == g_weapon.m_cLocation.Y)
 	{
 		g_enemy4.m_bActive = false;
-		deathsound = 10;
+		deathsound = 5;
 	}
 	if (g_enemy5.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy5.m_cLocation.Y == g_weapon.m_cLocation.Y)
 	{
 		g_enemy5.m_bActive = false;
-		deathsound = 10;
+		deathsound = 5;
 	}
 	if (g_enemy6.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy6.m_cLocation.Y == g_weapon.m_cLocation.Y)
 	{
 		g_enemy6.m_bActive = false;
-		deathsound = 10;
+		deathsound = 5;
 	}
 
 }
@@ -651,8 +657,13 @@ void sound()
 {
 	if (deathsound > 0)
 	{
-		Beep(deathsound * 150, 20);
+		Beep(deathsound * 150, 15);
 		deathsound--;
+	}
+	if (shootsound > 0)
+	{
+		Beep(shootsound * 1000, 15);
+		shootsound--;
 	}
 }
 
