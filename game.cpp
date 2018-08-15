@@ -646,6 +646,8 @@ void processUserInput()
 		g_enemy5.m_bActive == false &&
 		g_enemy6.m_bActive == false)
 		g_door.m_bActive = true;
+	if (g_door.m_bActive == true && g_sChar.m_cLocation.X == g_door.m_cLocation.X && g_sChar.m_cLocation.Y == g_door.m_cLocation.Y)
+		init();
 }
 
 void clearScreen()
