@@ -299,25 +299,25 @@ void moveCharacter()
 	if (g_eWeaponState == FireUp)
 	{
 		g_weapon.m_cLocation.Y--;
-		bSomethingHappened = true;
+		//bSomethingHappened = true;
 		g_shootdist++;
 	}
 	if (g_eWeaponState == FireDown)
 	{
 		g_weapon.m_cLocation.Y++;
-		bSomethingHappened = true;
+		//bSomethingHappened = true;
 		g_shootdist++;
 	}
 	if (g_eWeaponState == FireLeft)
 	{
 		g_weapon.m_cLocation.X--;
-		bSomethingHappened = true;
+		//bSomethingHappened = true;
 		g_shootdist++;
 	}
 	if (g_eWeaponState == FireRight)
 	{
 		g_weapon.m_cLocation.X++;
-		bSomethingHappened = true;
+		//bSomethingHappened = true;
 		g_shootdist++;
 	}
 
