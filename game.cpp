@@ -680,7 +680,7 @@ void moveCharacter()
 void processUserInput()
 {
 	// quits the game if player hits the escape key
-	if (g_abKeyPressed[K_ESCAPE])
+	if (g_abKeyPressed[K_ESCAPE] || Lives < 0)
 		g_bQuitGame = true;
 	if (g_sChar.m_bActive == false) // Took damage
 	{
@@ -730,6 +730,8 @@ void processUserInput()
 		init();
 		g_eGameState = S_GAME;
 		stages++;
+		if (Lives != 9)
+			Lives++;
 	}
 }
 
@@ -755,7 +757,6 @@ void renderSplashScreen()  // renders the splash screen
 	c.X = g_Console.getConsoleSize().X / 2 - 11;
 	g_Console.writeToBuffer(c, "Press 'Space' to start", 0x0E);
 }
-
 void renderGame()
 {
 	renderMap();        // renders the map to the buffer first
@@ -770,7 +771,6 @@ void renderGame()
 	renderEnemy6();
 	renderUI();
 }
-
 void renderMap()
 {
 	// Set up sample colours, and output shadings
@@ -934,8 +934,6 @@ void renderWeapon()
 	WORD charColor = 0x0E;
 	g_Console.writeToBuffer(g_weapon.m_cLocation, (char)254, charColor);
 }
-
-
 void renderFramerate()
 {
 	COORD c;
@@ -983,7 +981,6 @@ void sound()
 		shootfailsound--;
 	}
 }
-
 void generate()
 {
 	int random, point1, point2, point3, point4, point5;
@@ -1148,7 +1145,6 @@ void generate()
 
 	myfile.close();
 }
-
 void weapdata()
 {
 	std::string in;
@@ -1162,7 +1158,6 @@ void weapdata()
 	}
 	weapondata.close();
 }
-
 void reload()
 {
 	Weapons[currentWeapon].AmmoTotal += Weapons[currentWeapon].Clip;	// Adds ammo left in clip to total
