@@ -304,7 +304,7 @@ void moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.Y--;
-			//bSomethingHappened = true;
+			bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -317,7 +317,7 @@ void moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.Y++;
-			//bSomethingHappened = true;
+			bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -330,7 +330,7 @@ void moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.X--;
-			//bSomethingHappened = true;
+			bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -343,7 +343,7 @@ void moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.X++;
-			//bSomethingHappened = true;
+			bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
