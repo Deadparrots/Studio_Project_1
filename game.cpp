@@ -377,7 +377,6 @@ void moveCharacter()
 			bSomethingHappened = true;
 		}
 	}
-	myfile.close();
 	if	(
 		(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y) ||
 		(g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y) ||
@@ -390,6 +389,158 @@ void moveCharacter()
 		g_sChar.m_bActive = false;
 		bSomethingHappened = true;
 	}
+
+	char * buffer2 = new char[0];
+	switch (rand() % 64)
+	{
+	case 0:
+		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 + 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy1.m_cLocation.X++;
+		break;
+	case 1:
+		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 + 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy1.m_cLocation.Y++;
+		break;
+	case 2:
+		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 - 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy1.m_cLocation.X--;
+		break;
+	case 3:
+		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 - 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy1.m_cLocation.Y--;
+		break;
+	case 4:
+		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 + 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy2.m_cLocation.X++;
+		break;
+	case 5:
+		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 + 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy2.m_cLocation.Y++;
+		break;
+	case 6:
+		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 - 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy2.m_cLocation.X--;
+		break;
+	case 7:
+		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 - 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy2.m_cLocation.Y--;
+		break;
+	case 8:
+		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 + 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy3.m_cLocation.X++;
+		break;
+	case 9:
+		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 + 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy3.m_cLocation.Y++;
+		break;
+	case 10:
+		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 - 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy3.m_cLocation.X--;
+		break;
+	case 11:
+		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 - 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy3.m_cLocation.Y--;
+		break;
+	case 12:
+		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 + 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy4.m_cLocation.X++;
+		break;
+	case 13:
+		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 + 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy4.m_cLocation.Y++;
+		break;
+	case 14:
+		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 - 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy4.m_cLocation.X--;
+		break;
+	case 15:
+		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 - 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy4.m_cLocation.Y--;
+		break;
+	case 16:
+		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 + 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy5.m_cLocation.X++;
+		break;
+	case 17:
+		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 + 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy5.m_cLocation.Y++;
+		break;
+	case 18:
+		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 - 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy5.m_cLocation.X--;
+		break;
+	case 19:
+		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 - 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy5.m_cLocation.Y--;
+		break;
+	case 20:
+		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 + 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy6.m_cLocation.X++;
+		break;
+	case 21:
+		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 + 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy6.m_cLocation.Y++;
+		break;
+	case 22:
+		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 - 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy6.m_cLocation.X--;
+		break;
+	case 23:
+		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 - 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+			g_enemy6.m_cLocation.Y--;
+		break;
+	}
+
+	myfile.close();
+
 
 	if (g_abKeyPressed[K_SPACE])
 	{
