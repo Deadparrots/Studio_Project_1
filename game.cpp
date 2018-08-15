@@ -793,29 +793,29 @@ void renderUI()
 		for (int j = 0; 3 > j; j++) // Sets UI Height to 3
 		{
 			UIBG.Y = j;
-			g_Console.writeToBuffer(UIBG, " ", 0x00);
+			g_Console.writeToBuffer(UIBG, " ", 0x90);
 		}
 	}
 	UI.Y = 1; // Sets Height of UI text
 	UI.X = g_Console.getConsoleSize().X / 3 - 8; // Start of UI text
-	g_Console.writeToBuffer(UI, "Lives : ", 0x08);
+	g_Console.writeToBuffer(UI, "Lives : ", 0x9f);
 	UI.X = g_Console.getConsoleSize().X / 3;
 	std::string display = to_string(Lives);
-	g_Console.writeToBuffer(UI, display, 0x08); // Displays the number of lives
+	g_Console.writeToBuffer(UI, display, 0x9f); // Displays the number of lives
 	UI.X = g_Console.getConsoleSize().X / 3 + 2;
-	g_Console.writeToBuffer(UI, "Weapon : ", 0x08);
+	g_Console.writeToBuffer(UI, "Weapon : ", 0x9f);
 	UI.X = UI.X + 9;
-	g_Console.writeToBuffer(UI, Weapons[currentWeapon].Name, 0x08); // Display Equipped Weapon
+	g_Console.writeToBuffer(UI, Weapons[currentWeapon].Name, 0x9f); // Display Equipped Weapon
 	UI.X = UI.X + Weapons[currentWeapon].Name.length() + 1; // Increases UI.X by text length of weapon 1's name
-	g_Console.writeToBuffer(UI, "Ammo : ", 0x08);
+	g_Console.writeToBuffer(UI, "Ammo : ", 0x9f);
 	UI.X = UI.X + 7;
 	display = to_string(Weapons[currentWeapon].Clip);
-	g_Console.writeToBuffer(UI, display, 0x07); // Display Current Clip
+	g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Clip
 	UI.X = UI.X + display.length();
-	g_Console.writeToBuffer(UI, "/", 0x08);
+	g_Console.writeToBuffer(UI, "/", 0x9f);
 	UI.X = UI.X + 1;
 	display = to_string(Weapons[currentWeapon].AmmoTotal);
-	g_Console.writeToBuffer(UI, display, 0x08); // Total Ammo not in clip
+	g_Console.writeToBuffer(UI, display, 0x9f); // Total Ammo not in clip
 }
 void renderCharacter()
 {
