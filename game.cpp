@@ -34,6 +34,7 @@ EGAMESTATES g_eGameState = S_SPLASHSCREEN;
 EWEAPONSTATES g_eWeaponState = Hold;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 int Lives = 3; // Number of lives the player has left (Base Value is 3)
+int currentWeapon = 0;
 WeaponParameters Weapons[4];
 					   // Console object
 Console g_Console(80, 25, "SP1 Framework");
@@ -48,6 +49,7 @@ Console g_Console(80, 25, "SP1 Framework");
 void init(void)
 {
 	generate();
+	weapdata();
 	// Set precision for floating point output
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
@@ -203,11 +205,11 @@ void getInput(void)
 	g_abKeyPressed[K_RIGHT] = isKeyPressed(VK_RIGHT);
 	g_abKeyPressed[K_SPACE] = isKeyPressed(VK_SPACE);
 	g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
-	g_abKeyPressed[K_ENTER] = isKeyPressed(VK_RETURN);
 	g_abKeyPressed[K_W] = isKeyPressed(87);
 	g_abKeyPressed[K_A] = isKeyPressed(65);
 	g_abKeyPressed[K_S] = isKeyPressed(83);
 	g_abKeyPressed[K_D] = isKeyPressed(68);
+	g_abKeyPressed[K_R] = isKeyPressed(82);
 }
 
 //--------------------------------------------------------------
@@ -281,91 +283,99 @@ void moveCharacter()
 	fstream myfile("map.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
-	if (g_abKeyPressed[K_UP] && g_eWeaponState == Hold)
+	if (Weapons[currentWeapon].Clip > 0)
 	{
-		g_eWeaponState = FireUp;
-		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-		g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-		shootsound++;
-		bSomethingHappened = true;
-	}
-	if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
-	{
-		g_eWeaponState = FireDown;
-		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-		g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-		shootsound++;
-		bSomethingHappened = true;
-	}
-	if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
-	{
-		g_eWeaponState = FireLeft;
-		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-		g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-		shootsound++;
-		bSomethingHappened = true;
-	}
-	if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
-	{
-		g_eWeaponState = FireRight;
-		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-		g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-		shootsound++;
-		bSomethingHappened = true;
-	}
-	char * buffer2 = new char[0];
-	if (g_eWeaponState == FireUp)
-	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
+		if (g_abKeyPressed[K_UP] && g_eWeaponState == Hold)
 		{
-			g_weapon.m_cLocation.Y--;
+			g_eWeaponState = FireUp;
+			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			shootsound++;
+			Weapons[currentWeapon].Clip--;
 			bSomethingHappened = true;
-			g_shootdist++;
 		}
-		else
-			g_shootdist = g_shootmaxdist;
-	}
-	if (g_eWeaponState == FireDown)
-	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
+		if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
 		{
-			g_weapon.m_cLocation.Y++;
+			g_eWeaponState = FireDown;
+			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			shootsound++;
+			Weapons[currentWeapon].Clip--;
 			bSomethingHappened = true;
-			g_shootdist++;
 		}
-		else
-			g_shootdist = g_shootmaxdist;
-	}
-	if (g_eWeaponState == FireLeft)
-	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
+		if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
 		{
-			g_weapon.m_cLocation.X--;
+			g_eWeaponState = FireLeft;
+			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			shootsound++;
+			Weapons[currentWeapon].Clip--;
 			bSomethingHappened = true;
-			g_shootdist++;
 		}
-		else
-			g_shootdist = g_shootmaxdist;
-	}
-	if (g_eWeaponState == FireRight)
-	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
+		if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
 		{
-			g_weapon.m_cLocation.X++;
+			g_eWeaponState = FireRight;
+			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			shootsound++;
+			Weapons[currentWeapon].Clip--;
 			bSomethingHappened = true;
-			g_shootdist++;
 		}
-		else
-			g_shootdist = g_shootmaxdist;
 	}
+		char * buffer2 = new char[0];
+		if (g_eWeaponState == FireUp)
+		{
+			myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 82);
+			myfile.read(buffer2, 1);
+			if (buffer2[0] == ' ')
+			{
+				g_weapon.m_cLocation.Y--;
+				bSomethingHappened = true;
+				g_shootdist++;
+			}
+			else
+				g_shootdist = g_shootmaxdist;
+		}
+		if (g_eWeaponState == FireDown)
+		{
+			myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 82);
+			myfile.read(buffer2, 1);
+			if (buffer2[0] == ' ')
+			{
+				g_weapon.m_cLocation.Y++;
+				bSomethingHappened = true;
+				g_shootdist++;
+			}
+			else
+				g_shootdist = g_shootmaxdist;
+		}
+		if (g_eWeaponState == FireLeft)
+		{
+			myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 1);
+			myfile.read(buffer2, 1);
+			if (buffer2[0] == ' ')
+			{
+				g_weapon.m_cLocation.X--;
+				bSomethingHappened = true;
+				g_shootdist++;
+			}
+			else
+				g_shootdist = g_shootmaxdist;
+		}
+		if (g_eWeaponState == FireRight)
+		{
+			myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 1);
+			myfile.read(buffer2, 1);
+			if (buffer2[0] == ' ')
+			{
+				g_weapon.m_cLocation.X++;
+				bSomethingHappened = true;
+				g_shootdist++;
+			}
+			else
+				g_shootdist = g_shootmaxdist;
+		}
+	
 
 	if (g_shootdist >= g_shootmaxdist)
 	{
@@ -421,6 +431,20 @@ void moveCharacter()
 			//Beep(1440, 30);
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
+		}
+	}
+	if (g_abKeyPressed[K_R])
+	{
+		Weapons[currentWeapon].AmmoTotal += Weapons[currentWeapon].Clip;	// Adds ammo left in clip to total
+		if (Weapons[currentWeapon].ClipMax >= Weapons[currentWeapon].AmmoTotal)	// if cap is higher or equal to remaining
+		{
+			Weapons[currentWeapon].Clip = Weapons[currentWeapon].AmmoTotal; // Clip is filled to remaining
+			Weapons[currentWeapon].AmmoTotal = 0; // Deducted to 0
+		}
+		else // if more ammo than clip cap
+		{
+			Weapons[currentWeapon].Clip = Weapons[currentWeapon].ClipMax;
+			Weapons[currentWeapon].AmmoTotal = Weapons[currentWeapon].AmmoTotal - Weapons[currentWeapon].ClipMax;
 		}
 	}
 	if	(
@@ -593,9 +617,6 @@ void moveCharacter()
 		bSomethingHappened = true;
 	}
 
-	if (g_abKeyPressed[K_ENTER] && g_door.m_bActive == true && g_sChar.m_cLocation.X == g_door.m_cLocation.X && g_sChar.m_cLocation.Y == g_door.m_cLocation.Y)
-		init();
-
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
@@ -650,6 +671,8 @@ void processUserInput()
 		g_enemy5.m_bActive == false &&
 		g_enemy6.m_bActive == false)
 		g_door.m_bActive = true;
+	if (g_door.m_bActive == true && g_sChar.m_cLocation.X == g_door.m_cLocation.X && g_sChar.m_cLocation.Y == g_door.m_cLocation.Y)
+		init();
 }
 
 void clearScreen()
@@ -740,20 +763,22 @@ void renderUI()
 	UI.X = g_Console.getConsoleSize().X / 3 - 8; // Start of UI text
 	g_Console.writeToBuffer(UI, "Lives : ", 0x08);
 	UI.X = g_Console.getConsoleSize().X / 3;
-	char livesdisplay = Lives + '0';
-	g_Console.writeToBuffer(UI, livesdisplay, 0x08); // Displays the number of lives
+	std::string display = to_string(Lives);
+	g_Console.writeToBuffer(UI, display, 0x08); // Displays the number of lives
 	UI.X = g_Console.getConsoleSize().X / 3 + 2;
 	g_Console.writeToBuffer(UI, "Weapon : ", 0x08);
 	UI.X = UI.X + 9;
-	g_Console.writeToBuffer(UI, Weapons[1].Name, 0x08); // Display Equipped Weapon (TO BE CHANGED TO ADJUSTABLE)
-	UI.X = UI.X + Weapons[1].Name.length() + 1; // Increases UI.X by text length of weapon 1's name
+	g_Console.writeToBuffer(UI, Weapons[currentWeapon].Name, 0x08); // Display Equipped Weapon
+	UI.X = UI.X + Weapons[currentWeapon].Name.length() + 1; // Increases UI.X by text length of weapon 1's name
 	g_Console.writeToBuffer(UI, "Ammo : ", 0x08);
 	UI.X = UI.X + 7;
-	g_Console.writeToBuffer(UI, Weapons[1].Clip, 0x07); // Display Current Clip
-	UI.X = UI.X + 1;
+	display = to_string(Weapons[currentWeapon].Clip);
+	g_Console.writeToBuffer(UI, display, 0x07); // Display Current Clip
+	UI.X = UI.X + display.length();
 	g_Console.writeToBuffer(UI, "/", 0x08);
 	UI.X = UI.X + 1;
-	g_Console.writeToBuffer(UI, Weapons[1].AmmoTotal, 0x08); // Total Ammo not in clip
+	display = to_string(Weapons[currentWeapon].AmmoTotal);
+	g_Console.writeToBuffer(UI, display, 0x08); // Total Ammo not in clip
 }
 void renderCharacter()
 {
