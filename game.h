@@ -6,7 +6,6 @@
 
 extern CStopWatch g_swTimer;
 extern bool g_bQuitGame;
-extern bool g_bNextStage;
 
 // Enumeration to store the control keys that your game will have
 enum EKEYS
@@ -22,7 +21,6 @@ enum EKEYS
 	K_S,
 	K_D,
 	K_COUNT,
-	K_R
 };
 
 // Enumeration for the different screen states
@@ -88,5 +86,6 @@ void renderToScreen();      // dump the contents of the buffer to the screen, on
 void generate();
 void sound();
 void weapdata();
+void reload();
 void ost();
 #endif // _GAME_H
