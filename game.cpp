@@ -411,6 +411,7 @@ void processUserInput()
 	if (g_sChar.m_bActive == false) // Took damage
 	{
 		g_sChar.m_bActive = true;
+		Lives--;
 		deathsound = 5;
 	}
 	if (g_enemy1.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy1.m_cLocation.Y == g_weapon.m_cLocation.Y)
