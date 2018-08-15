@@ -48,7 +48,7 @@ struct SGameChar
 
 struct WeaponParameters
 {
-	std::string Name;
+	std :: string Name;
 	int Clip; // Ammo in Clip
 	int ClipMax; // Max size of Clip
 	int AmmoTotal; // Total Ammo
@@ -83,4 +83,5 @@ void renderWeapon();
 void renderFramerate();     // renders debug information, frame rate, elapsed time, etc
 void renderToScreen();      // dump the contents of the buffer to the screen, one frame worth of game
 void generate();
+void sound();
 #endif // _GAME_H
