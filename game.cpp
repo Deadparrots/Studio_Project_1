@@ -28,7 +28,7 @@ SGameChar	g_weapon;
 size_t		deathsound = 0;
 size_t		shootsound = 0;
 int g_shootdist = 0;
-int g_shootmaxdist = 6;
+int g_shootmaxdist = 6; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
 EWEAPONSTATES g_eWeaponState = Hold;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
@@ -296,32 +296,61 @@ void moveCharacter()
 		shootsound++;
 		bSomethingHappened = true;
 	}
+	char * buffer2 = new char[0];
 	if (g_eWeaponState == FireUp)
 	{
-		g_weapon.m_cLocation.Y--;
-		//bSomethingHappened = true;
-		g_shootdist++;
+		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+		{
+			g_weapon.m_cLocation.Y--;
+			//bSomethingHappened = true;
+			g_shootdist++;
+		}
+		else
+			g_shootdist = g_shootmaxdist;
 	}
 	if (g_eWeaponState == FireDown)
 	{
-		g_weapon.m_cLocation.Y++;
-		//bSomethingHappened = true;
-		g_shootdist++;
+		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 82);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+		{
+			g_weapon.m_cLocation.Y++;
+			//bSomethingHappened = true;
+			g_shootdist++;
+		}
+		else
+			g_shootdist = g_shootmaxdist;
 	}
 	if (g_eWeaponState == FireLeft)
 	{
-		g_weapon.m_cLocation.X--;
-		//bSomethingHappened = true;
-		g_shootdist++;
+		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+		{
+			g_weapon.m_cLocation.X--;
+			//bSomethingHappened = true;
+			g_shootdist++;
+		}
+		else
+			g_shootdist = g_shootmaxdist;
 	}
 	if (g_eWeaponState == FireRight)
 	{
-		g_weapon.m_cLocation.X++;
-		//bSomethingHappened = true;
-		g_shootdist++;
+		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 1);
+		myfile.read(buffer2, 1);
+		if (buffer2[0] == ' ')
+		{
+			g_weapon.m_cLocation.X++;
+			//bSomethingHappened = true;
+			g_shootdist++;
+		}
+		else
+			g_shootdist = g_shootmaxdist;
 	}
 
-	if (g_shootdist > g_shootmaxdist)
+	if (g_shootdist >= g_shootmaxdist)
 	{
 		g_eWeaponState = Hold;
 		g_weapon.m_cLocation.X = 10;
@@ -390,7 +419,6 @@ void moveCharacter()
 		bSomethingHappened = true;
 	}
 
-	char * buffer2 = new char[0];
 	switch (rand() % 64)
 	{
 	case 0:
