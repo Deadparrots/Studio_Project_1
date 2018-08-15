@@ -827,9 +827,9 @@ void renderEnemy6()
 void renderDoor()
 {
 	// Draw the location of the character
-	WORD charColor = 0x0B;
+	WORD charColor = 0x00;
 	if (g_door.m_bActive == true)
-		WORD charColor = 0x0D;
+		charColor = 0x0B;
 	g_Console.writeToBuffer(g_door.m_cLocation, (char)'D', charColor);
 }
 void renderWeapon()
