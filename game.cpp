@@ -25,7 +25,11 @@ SGameChar	g_enemy3;
 SGameChar	g_enemy4;
 SGameChar	g_enemy5;
 SGameChar	g_enemy6;
+SGameChar	g_weapon;
+int g_shootdist = 0;
+int g_shootmaxdist = 6;
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
+EWEAPONSTATES g_eWeaponState = Hold;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 int Lives = 3; // Number of lives the player has left (Base Value is 3)
 WeaponParameters Weapons[4];
@@ -142,6 +146,8 @@ void init( void )
 	g_enemy6.m_cLocation.X = enemyX;
 	g_enemy6.m_cLocation.Y = enemyY;
 	g_enemy6.m_bActive = true;
+  g_weapon.m_cLocation.X = 10;
+	g_weapon.m_cLocation.Y = 2;
 	myfile.close();
     // sets the width, height and the font name to use in the console
     g_Console.setConsoleFont(0, 16, L"Consolas");
@@ -181,6 +187,10 @@ void getInput( void )
     g_abKeyPressed[K_RIGHT]  = isKeyPressed(VK_RIGHT);
     g_abKeyPressed[K_SPACE]  = isKeyPressed(VK_SPACE);
     g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
+    g_abKeyPressed[K_W] = isKeyPressed(87);
+	  g_abKeyPressed[K_A] = isKeyPressed(65);
+	  g_abKeyPressed[K_S] = isKeyPressed(83);
+	  g_abKeyPressed[K_D] = isKeyPressed(68);
 }
 
 //--------------------------------------------------------------
@@ -254,8 +264,69 @@ void moveCharacter()
 	fstream myfile("map.txt");
     // Updating the location of the character based on the key press
     // providing a beep sound whenver we shift the character
-    if (g_abKeyPressed[K_UP] && g_sChar.m_cLocation.Y > 0)
-    {
+    	if (g_abKeyPressed[K_UP] && g_eWeaponState == Hold)
+  {
+    g_eWeaponState = FireUp;  
+    g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+    g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+    bSomethingHappened = true;
+  }
+  if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
+  {
+    g_eWeaponState = FireDown;
+    g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+    g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+    bSomethingHappened = true;
+  }
+  if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
+  {
+    g_eWeaponState = FireLeft;
+    g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+    g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+    bSomethingHappened = true;
+  }
+  if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
+  {
+    g_eWeaponState = FireRight;
+    g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+    g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+    bSomethingHappened = true;
+  }
+  if (g_eWeaponState == FireUp)
+  {
+    g_weapon.m_cLocation.Y--;
+    bSomethingHappened = true;
+    g_shootdist++;
+  }
+  if (g_eWeaponState == FireDown)
+  {
+    g_weapon.m_cLocation.Y++;
+    bSomethingHappened = true;
+    g_shootdist++;
+  }
+  if (g_eWeaponState == FireLeft)
+  {
+    g_weapon.m_cLocation.X--;
+    bSomethingHappened = true;
+    g_shootdist++;
+  }
+  if (g_eWeaponState == FireRight)
+  {
+    g_weapon.m_cLocation.X++;
+    bSomethingHappened = true;
+    g_shootdist++;
+  }
+
+  if (g_shootdist > g_shootmaxdist)
+  {
+    g_eWeaponState = Hold;
+    g_weapon.m_cLocation.X = 10;
+    g_weapon.m_cLocation.Y = 2;
+    g_shootdist = 0;
+  }
+
+  if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
+  {
 		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82);
 		char * buffer = new char[0];
 		myfile.read(buffer, 1);
@@ -265,9 +336,9 @@ void moveCharacter()
 			g_sChar.m_cLocation.Y--;
 			bSomethingHappened = true;
 		}
-    }
-    if (g_abKeyPressed[K_LEFT] && g_sChar.m_cLocation.X > 0)
-    {
+  }
+  if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
+	{
 		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1);
 		char * buffer = new char[0];
 		myfile.read(buffer, 1);
@@ -277,9 +348,9 @@ void moveCharacter()
 			g_sChar.m_cLocation.X--;
 			bSomethingHappened = true;
 		}
-    }
-    if (g_abKeyPressed[K_DOWN] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
-    {
+	}
+	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
+	{
 		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82);
 		char * buffer = new char[0];
 		myfile.read(buffer, 1);
@@ -289,9 +360,9 @@ void moveCharacter()
 			g_sChar.m_cLocation.Y++;
 			bSomethingHappened = true;
 		}
-    }
-    if (g_abKeyPressed[K_RIGHT] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
-    {
+	}
+	if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
+	{
 		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1);
 		char * buffer = new char[0];
 		myfile.read(buffer, 1);
@@ -301,7 +372,8 @@ void moveCharacter()
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
 		}
-    }
+	}
+
 	myfile.close();
     if (g_abKeyPressed[K_SPACE])
     {
@@ -312,7 +384,7 @@ void moveCharacter()
     if (bSomethingHappened)
     {
         // set the bounce time to some time in the future to prevent accidental triggers
-        g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
+        g_dBounceTime = g_dElapsedTime + 0.05; // 5ms should be enough
     }
 }
 void processUserInput()
@@ -344,8 +416,9 @@ void renderSplashScreen()  // renders the splash screen
 
 void renderGame()
 {
-    renderMap();        // renders the map to the buffer first
-    renderCharacter();  // renders the character into the buffer
+  renderMap();        // renders the map to the buffer first
+  renderWeapon();
+  renderCharacter();  // renders the character into the buffer
   renderUI(); // renders the UI to the buffer
 	renderEnemy1();
 	renderEnemy2();
@@ -460,6 +533,12 @@ void renderEnemy6()
 	// Draw the location of the character
 	WORD charColor = 0x0C;
 	g_Console.writeToBuffer(g_enemy6.m_cLocation, (char)69, charColor);
+}
+void renderWeapon()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	g_Console.writeToBuffer(g_weapon.m_cLocation, (char)126, charColor);
 }
 
 
