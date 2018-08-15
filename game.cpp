@@ -58,10 +58,10 @@ void boss_init()
 	g_dBounceTime = 0.0;
 	g_Console.setConsoleFont(0, 16, L"Consolas");
 	reload();
-	g_sChar.m_cLocation.X = 37;
+	g_sChar.m_cLocation.X = 40;
 	g_sChar.m_cLocation.Y = 20;
 	g_sChar.m_bActive = true;
-	g_boss.m_cLocation.X = 37;
+	g_boss.m_cLocation.X = 40;
 	g_boss.m_cLocation.Y = 10;
 	g_boss.m_bActive = true;
 	int enemyX, enemyY;
