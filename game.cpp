@@ -203,6 +203,7 @@ void getInput(void)
 	g_abKeyPressed[K_RIGHT] = isKeyPressed(VK_RIGHT);
 	g_abKeyPressed[K_SPACE] = isKeyPressed(VK_SPACE);
 	g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
+	g_abKeyPressed[K_ENTER] = isKeyPressed(VK_RETURN);
 	g_abKeyPressed[K_W] = isKeyPressed(87);
 	g_abKeyPressed[K_A] = isKeyPressed(65);
 	g_abKeyPressed[K_S] = isKeyPressed(83);
@@ -592,6 +593,9 @@ void moveCharacter()
 		bSomethingHappened = true;
 	}
 
+	if (g_abKeyPressed[K_ENTER] && g_door.m_bActive == true && g_sChar.m_cLocation.X == g_door.m_cLocation.X && g_sChar.m_cLocation.Y == g_door.m_cLocation.Y)
+		init();
+
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
@@ -646,8 +650,6 @@ void processUserInput()
 		g_enemy5.m_bActive == false &&
 		g_enemy6.m_bActive == false)
 		g_door.m_bActive = true;
-	if (g_door.m_bActive == true && g_sChar.m_cLocation.X == g_door.m_cLocation.X && g_sChar.m_cLocation.Y == g_door.m_cLocation.Y)
-		init();
 }
 
 void clearScreen()
