@@ -410,26 +410,32 @@ void processUserInput()
 	if (g_enemy1.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy1.m_cLocation.Y == g_weapon.m_cLocation.Y)
 	{
 		g_enemy1.m_bActive = false;
+		deathsound = 10;
 	}
 	if (g_enemy2.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy2.m_cLocation.Y == g_weapon.m_cLocation.Y)
 	{
 		g_enemy2.m_bActive = false;
+		deathsound = 10;
 	}
 	if (g_enemy3.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy3.m_cLocation.Y == g_weapon.m_cLocation.Y)
 	{
 		g_enemy3.m_bActive = false;
+		deathsound = 10;
 	}
 	if (g_enemy4.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy4.m_cLocation.Y == g_weapon.m_cLocation.Y)
 	{
 		g_enemy4.m_bActive = false;
+		deathsound = 10;
 	}
 	if (g_enemy5.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy5.m_cLocation.Y == g_weapon.m_cLocation.Y)
 	{
 		g_enemy5.m_bActive = false;
+		deathsound = 10;
 	}
 	if (g_enemy6.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy6.m_cLocation.Y == g_weapon.m_cLocation.Y)
 	{
 		g_enemy6.m_bActive = false;
+		deathsound = 10;
 	}
 
 }
