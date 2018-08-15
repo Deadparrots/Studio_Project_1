@@ -731,9 +731,19 @@ void processUserInput()
 		g_door.m_bActive = true;
 	if (g_door.m_bActive == true && g_sChar.m_cLocation.X == g_door.m_cLocation.X && g_sChar.m_cLocation.Y == g_door.m_cLocation.Y)
 	{
-		init();
-		g_eGameState = S_GAME;
-		stages++;
+		do
+		{
+			init();
+			g_eGameState = S_GAME;
+			stages++;
+		} while (stages != 1);
+
+		if (stages == 1)
+		{
+			init();
+			g_eGameState = S_GAME;
+			renderBoss();
+		}
 	}
 }
 
@@ -792,6 +802,34 @@ void renderMap()
 		}
 	}
 }
+
+void renderBoss()
+{
+	generate();
+	weapdata();
+	// Set precision for floating point output
+	g_dElapsedTime = 0.0;
+	g_dBounceTime = 0.0;
+
+	fstream myfile("bossmapagain.txt");
+
+	for (int i = 0; i < 12; ++i)
+	{
+		
+		string sLine;
+		for (short i = 0; i < 24 * 80; i++)
+		{
+			if (i % 80 == 0)
+				getline(myfile, sLine);
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
+		}
+	}
+	myfile.close();
+
+	g_Console.setConsoleFont(0, 16, L"Consolas");
+	reload();
+}
+
 void renderUI()
 {
 	COORD UIBG;
@@ -922,8 +960,6 @@ void renderWeapon()
 	WORD charColor = 0x0E;
 	g_Console.writeToBuffer(g_weapon.m_cLocation, (char)'-', charColor);
 }
-
-
 void renderFramerate()
 {
 	COORD c;
@@ -940,7 +976,7 @@ void renderFramerate()
 	ss << g_dElapsedTime << "secs";
 	c.X = 0;
 	c.Y = 0;
-	g_Console.writeToBuffer(c, ss.str(), 0x59);
+	g_Console.writeToBuffer(c, ss.str(), 0x0f);
 }
 void renderToScreen()
 {

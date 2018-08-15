@@ -88,4 +88,5 @@ void sound();
 void weapdata();
 void reload();
 void ost();
+void renderBoss();
 #endif // _GAME_H
