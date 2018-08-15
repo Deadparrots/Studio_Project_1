@@ -436,6 +436,7 @@ void moveCharacter()
 	if (g_abKeyPressed[K_R])
 	{
 		Weapons[currentWeapon].AmmoTotal += Weapons[currentWeapon].Clip;	// Adds ammo left in clip to total
+		Weapons[currentWeapon].AmmoTotal = 10;
 		if (Weapons[currentWeapon].ClipMax >= Weapons[currentWeapon].AmmoTotal)	// if cap is higher or equal to remaining
 		{
 			Weapons[currentWeapon].Clip = Weapons[currentWeapon].AmmoTotal; // Clip is filled to remaining
@@ -1084,7 +1085,6 @@ void weapdata()
 		getline(weapondata, Weapons[i].Name); // Gets name of Weapon
 		weapondata >> Weapons[i].ClipMax;
 		weapondata >> Weapons[i].Reload;
-		weapondata >> Weapons[i].ProjectileSpeed;
 		weapondata >> Weapons[i].Range;
 	}
 	weapondata.close();
