@@ -46,6 +46,13 @@ enum EWEAPONSTATES
 	FireRight
 };
 
+enum ESONGTYPE
+{
+	EMainMenu,
+	EStage,
+	EBoss
+};
+
 // struct for the game character
 struct SGameChar
 {
