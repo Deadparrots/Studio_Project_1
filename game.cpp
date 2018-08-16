@@ -1361,7 +1361,7 @@ void moveCharacter()
 }
 void processUserInput()
 {
-	if (Lives < 0)
+	if (Lives < 0 || g_abKeyPressed[K_ESCAPE])
 		g_bQuitGame = true;
 	if (g_abKeyPressed[K_C])
 		g_boss.m_bActive = false;
