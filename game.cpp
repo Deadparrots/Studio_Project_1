@@ -25,7 +25,7 @@ size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
 double		stages = 0.000; // set to 0 normally... 9 for boss testing
 int			int_stages = stages;
-size_t		StageType = EStage;
+size_t		StageType = EMainMenu;
 bool		b_play = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
@@ -372,10 +372,16 @@ void render()
 	renderToScreen();   // dump the contents of the buffer to the screen, one frame worth of game
 }
 
-void splashScreenWait()    // waits for time to pass in splash screen
+void splashScreenWait()
 {
-	if (g_abKeyPressed[K_SPACE]) // wait for 0.5 seconds to switch to game mode, else do nothing
+	if(!b_play)
+		ost();
+	if (g_abKeyPressed[K_SPACE]) 
+	{
+		StageType = EStage;
+		b_play = false;
 		g_eGameState = S_GAME;
+	}
 }
 
 void gameplay()            // gameplay logic
@@ -660,14 +666,6 @@ void boss_moveCharacter()
 	}
 
 	myfile.close();
-
-
-	if (g_abKeyPressed[K_SPACE])
-	{
-		g_sChar.m_bActive = true;
-		bSomethingHappened = true;
-	}
-
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
@@ -1869,9 +1867,11 @@ void reload()
 }
 void ost()
 {
-	if (StageType == EBoss)
-		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
+	if (StageType == EMainMenu)
+		PlaySound(TEXT("sound/menu.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
 	else if (StageType == EStage)
 		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // change 'cave' to whatever
+	else if (StageType == EBoss)
+		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
 	b_play = true;
 }
