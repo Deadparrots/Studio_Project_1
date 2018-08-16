@@ -1150,16 +1150,25 @@ void clearScreen()
 
 void renderSplashScreen()  // renders the splash screen
 {
+	for (int i = 0; i < 12; ++i)
+	{
+		fstream myfile("title.txt");
+		string sLine;
+		for (short i = 0; i < 24 * 80; i++)
+		{
+			if (i % 80 == 0)
+				getline(myfile, sLine);
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
+		}
+		myfile.close();
+	}
 	COORD c = g_Console.getConsoleSize();
-	c.Y /= 3;
+	c.Y = 20;
 	c.X = c.X / 2 - 9;
 	g_Console.writeToBuffer(c, "Use <WASD> to move", 0x03);
 	c.Y += 1;
 	c.X = g_Console.getConsoleSize().X / 2 - 12;
 	g_Console.writeToBuffer(c, "Use Arrow Keys to attack", 0x09);
-	c.Y += 1;
-	c.X = g_Console.getConsoleSize().X / 2 - 9;
-	g_Console.writeToBuffer(c, "Press 'Esc' to quit", 0x09);
 	c.Y += 1;
 	c.X = g_Console.getConsoleSize().X / 2 - 11;
 	g_Console.writeToBuffer(c, "Press 'Space' to start", 0x0E);
