@@ -1365,7 +1365,7 @@ void moveCharacter()
 }
 void processUserInput()
 {
-	if (Lives < 0 || g_abKeyPressed[K_ESCAPE])
+	if (Lives < 1 || g_abKeyPressed[K_ESCAPE])
 	{
 		PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME);
 		g_bQuitGame = true;
