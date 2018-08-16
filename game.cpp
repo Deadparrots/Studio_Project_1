@@ -35,7 +35,7 @@ int Lives = 3; // Number of lives the player has left (Base Value is 3)
 int currentWeapon = 0;
 WeaponParameters Weapons[4];
 // Console object
-Console g_Console(80, 24, "SP1 Framework");
+Console g_Console(80, 24, "Monster Dungeon");
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
 //            Initialize variables, allocate memory, load data from file, etc. 
@@ -58,7 +58,7 @@ void boss_init()
 	g_boss.m_cLocation.Y = 10;
 	g_boss.m_bActive = true;
 	int enemyX, enemyY;
-	std::fstream myfile("bossmap.txt");
+	std::fstream myfile("map/bossmap.txt");
 	while (1)
 	{
 		enemyX = rand() % 80;
@@ -166,7 +166,7 @@ void init(void)
 	PlaySound(TEXT("sound/title.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // title screen music
 	g_boss.m_bActive = false;
 	int enemyX, enemyY;
-	std::fstream myfile("map.txt");
+	std::fstream myfile("map/map.txt");
 	while (1)
 	{
 		enemyX = rand() % 80;
@@ -317,6 +317,7 @@ void getInput(void)
 	g_abKeyPressed[K_A] = isKeyPressed(65);
 	g_abKeyPressed[K_S] = isKeyPressed(83);
 	g_abKeyPressed[K_D] = isKeyPressed(68);
+	g_abKeyPressed[K_C] = isKeyPressed(67);
 }
 //--------------------------------------------------------------
 // Purpose  : Update function
@@ -367,7 +368,7 @@ void render()
 	renderFramerate();  // renders debug information, frame rate, elapsed time, etc
 	renderToScreen();   // dump the contents of the buffer to the screen, one frame worth of game
 }
-void splashScreenWait()    // waits for time to pass in splash screen
+void splashScreenWait()
 {
 	if (g_abKeyPressed[K_SPACE]) // wait for 0.5 seconds to switch to game mode, else do nothing
 		g_eGameState = S_GAME;
@@ -388,7 +389,7 @@ void boss_moveCharacter()
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	std::fstream myfile("bossmap.txt");
+	std::fstream myfile("map/bossmap.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
@@ -672,7 +673,7 @@ void moveCharacter()
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	std::fstream myfile("map.txt");
+	std::fstream myfile("map/map.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
@@ -1331,6 +1332,8 @@ void moveCharacter()
 }
 void processUserInput()
 {
+	if (g_abKeyPressed[K_C] || Lives < 0)
+		g_boss.m_bActive = false;
 	// quits the game if player hits the escape key
 	if (g_abKeyPressed[K_ESCAPE] || Lives == 0)
 		g_bQuitGame = true;
@@ -1450,10 +1453,10 @@ void renderMap()
 	//};
 
 	//COORD c;
-	if(StageType == EStage)
+	if (StageType == EStage)
 		for (int i = 0; i < 12; ++i)
 		{
-			std::fstream myfile("map.txt");
+			std::fstream myfile("map/map.txt");
 			std::string sLine;
 			for (short i = 0; i < 24 * 80; i++)
 			{
@@ -1466,7 +1469,7 @@ void renderMap()
 	else
 		for (int i = 0; i < 12; ++i)
 		{
-			std::fstream myfile("bossmap.txt");
+			std::fstream myfile("map/bossmap.txt");
 			std::string sLine;
 			for (short i = 0; i < 24 * 80; i++)
 			{
@@ -1669,7 +1672,7 @@ void generate()
 {
 	int random, point1, point2, point3, point4, point5;
 	srand(time(NULL));
-	std::fstream myfile("map.txt");
+	std::fstream myfile("map/map.txt");
 	for (size_t i = 0; i < 24; i++)
 	{
 		if (rand() % 3 && i > 7 && i < 17)
