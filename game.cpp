@@ -26,8 +26,9 @@ size_t		deathsound = 0;
 size_t		shootsound = 0;
 size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
-int			int_stages = 0;
-double		stages = 0.000;
+double		stages = 0.000; // set to 0 normally...  9 for boss testing
+int			int_stages = stages;
+bool b_bossStage = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
@@ -54,7 +55,7 @@ void boss_init()
 	g_Console.setConsoleFont(0, 16, L"Consolas");
 	reload();
 	g_sChar.m_cLocation.X = 40;
-	g_sChar.m_cLocation.Y = 20;
+	g_sChar.m_cLocation.Y = 21;
 	g_sChar.m_bActive = true;
 	g_boss.m_cLocation.X = 40;
 	g_boss.m_cLocation.Y = 10;
@@ -375,23 +376,21 @@ void render()
 
 void splashScreenWait()    // waits for time to pass in splash screen
 {
-	if (g_abKeyPressed[K_SPACE]) // space to start game
+	if (g_abKeyPressed[K_SPACE]) // wait for 0.5 seconds to switch to game mode, else do nothing
 		g_eGameState = S_GAME;
-	if (g_abKeyPressed[K_ESCAPE]) // esc to quit without playing lol
-		g_bQuitGame = true;
 }
 
 void gameplay()            // gameplay logic
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
-
-	if (int_stages != 1)
+	if (!b_bossStage)
 		moveCharacter();// moves the character, collision detection, physics, etc
 	else
 		boss_moveCharacter();
 	sound();			// sound can be played here too.
-	ost();        // backgrund music
+	ost();
 }
+
 void boss_moveCharacter()
 {
 	bool bSomethingHappened = false;
@@ -403,7 +402,7 @@ void boss_moveCharacter()
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
 	{
 		shootfailsound = 1;
-		bSomethingHappened = true;
+		//bSomethingHappened = true;
 	}
 	if (Weapons[currentWeapon].Clip > 0)
 	{
@@ -417,7 +416,7 @@ void boss_moveCharacter()
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 		}
 		if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
 		{
@@ -429,7 +428,7 @@ void boss_moveCharacter()
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 		}
 		if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
 		{
@@ -441,7 +440,7 @@ void boss_moveCharacter()
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 		}
 		if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
 		{
@@ -453,7 +452,7 @@ void boss_moveCharacter()
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 		}
 	}
 	char * buffer2 = new char[0];
@@ -464,7 +463,7 @@ void boss_moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.Y--;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -477,7 +476,7 @@ void boss_moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.Y++;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -490,7 +489,7 @@ void boss_moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.X--;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -503,7 +502,7 @@ void boss_moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.X++;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -691,7 +690,7 @@ void moveCharacter()
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
 	{
 		shootfailsound = 1;
-		bSomethingHappened = true;
+		//bSomethingHappened = true;
 	}
 	if (Weapons[currentWeapon].Clip > 0)
 	{
@@ -705,7 +704,7 @@ void moveCharacter()
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 		}
 		if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
 		{
@@ -717,7 +716,7 @@ void moveCharacter()
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 		}
 		if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
 		{
@@ -729,7 +728,7 @@ void moveCharacter()
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 		}
 		if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
 		{
@@ -741,7 +740,7 @@ void moveCharacter()
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 		}
 	}
 	char * buffer2 = new char[0];
@@ -752,7 +751,7 @@ void moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.Y--;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -765,7 +764,7 @@ void moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.Y++;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -778,7 +777,7 @@ void moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.X--;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -791,7 +790,7 @@ void moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.X++;
-			bSomethingHappened = true;
+			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -1065,14 +1064,6 @@ void moveCharacter()
 	}
 
 	myfile.close();
-
-
-	if (g_abKeyPressed[K_SPACE])
-	{
-		g_sChar.m_bActive = true;
-		bSomethingHappened = true;
-	}
-
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
@@ -1132,10 +1123,14 @@ void processUserInput()
 	{
 		stages++;
 		int_stages = stages;
-		if (int_stages != 1)
-			init();
+		if (int_stages == 10)
+			b_bossStage = true;
 		else
+			b_bossStage = false;
+		if (b_bossStage)
 			boss_init();
+		else
+			init();
 		g_eGameState = S_GAME;
 		if (Lives != 9)
 			Lives++;
@@ -1185,7 +1180,7 @@ void renderGame()
 	renderEnemy4();
 	renderEnemy5();
 	renderEnemy6();
-	if (int_stages == 1)
+	if (int_stages == 10)
 		renderBoss();
 	renderUI();
 }
@@ -1198,7 +1193,7 @@ void renderMap()
 	//};
 
 	//COORD c;
-	if(int_stages != 1)
+	if(!b_bossStage)
 		for (int i = 0; i < 12; ++i)
 		{
 			fstream myfile("map.txt");
@@ -1265,7 +1260,7 @@ void renderCharacter()
 	WORD charColor = 0x05;
 	if (g_sChar.m_bActive)
 	{
-		charColor = 0x0f;
+		charColor = 0x0A;
 	}
 	g_Console.writeToBuffer(g_sChar.m_cLocation, (char)3, charColor);
 }
@@ -1343,7 +1338,7 @@ void renderEnemy6()
 }
 void renderBoss()
 {
-	// Draw the location of the character
+	// Draw the location of the boss
 	WORD charColor = 0x0C;
 	char character = '@';
 	if (g_boss.m_bActive == false)
@@ -1365,7 +1360,7 @@ void renderWeapon()
 {
 	// Draw the location of the weapon
 	WORD charColor = 0x0E;
-	g_Console.writeToBuffer(g_weapon.m_cLocation, (char)'-', charColor);
+	g_Console.writeToBuffer(g_weapon.m_cLocation, (char)254, charColor);
 }
 void renderFramerate()
 {
@@ -1608,8 +1603,6 @@ void reload()
 }
 void ost()
 {
-	if(!bossStage)
-	{
-		PlaySound(TEXT("sound/zelda.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP); // play sound while in boss
-	}
+	if (b_bossStage)
+		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP); // play sound while in stage
 }
