@@ -1,4 +1,4 @@
-// This is the main file for the game logic and function
+﻿// This is the main file for the game logic and function
 //
 //
 #include "game.h"
@@ -25,7 +25,7 @@ size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
 double		stages = 0.000; // set to 0 normally... 9 for boss testing
 int			int_stages = stages;
-bool		b_bossStage = false;
+size_t		StageType;
 bool		b_play = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
@@ -49,6 +49,7 @@ void boss_init()
 {
 	b_play = false;
 	weapdata();
+	StageType = EBoss;
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
 	g_Console.setConsoleFont(0, 16, L"Consolas");
@@ -158,6 +159,7 @@ void init(void)
 {
 	generate();
 	weapdata();
+	StageType = EStage;
 	// Set precision for floating point output
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
@@ -380,9 +382,9 @@ void splashScreenWait()    // waits for time to pass in splash screen
 void gameplay()            // gameplay logic
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
-	if (!b_bossStage)
+	if (StageType == EStage)
 		moveCharacter();// moves the character, collision detection, physics, etc
-	else
+	else if (StageType == EBoss)
 		boss_moveCharacter();
 	sound(); // sound can be played here too.
 	if (!b_play)
@@ -1383,10 +1385,10 @@ void processUserInput()
 		stages++;
 		int_stages = stages;
 		if (int_stages == 10)
-			b_bossStage = true;
+			StageType = EBoss;
 		else
-			b_bossStage = false;
-		if (b_bossStage)
+			StageType = EStage;
+		if (StageType = EBoss)
 			boss_init();
 		else
 			init();
@@ -1439,7 +1441,7 @@ void renderGame()
 	renderEnemy4();
 	renderEnemy5();
 	renderEnemy6();
-	if (int_stages == 10)
+	if (StageType == EBoss)
 		renderBoss();
 	renderUI();
 }
@@ -1452,7 +1454,7 @@ void renderMap()
 	//};
 
 	//COORD c;
-	if(!b_bossStage)
+	if(StageType == EStage)
 		for (int i = 0; i < 12; ++i)
 		{
 			std::fstream myfile("map.txt");
@@ -1862,9 +1864,9 @@ void reload()
 }
 void ost()
 {
-	if (b_bossStage)
+	if (StageType == EBoss)
 		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
-	else
+	else if (StageType == EStage)
 		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // change 'cave' to whatever
 	b_play = true;
 }
