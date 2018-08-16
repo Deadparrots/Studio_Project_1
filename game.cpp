@@ -36,7 +36,7 @@ int Lives = 3; // Number of lives the player has left (Base Value is 3)
 int currentWeapon = 0;
 WeaponParameters Weapons[4];
 // Console object
-Console g_Console(80, 24, "SP1 Framework");
+Console g_Console(80, 24, "Monster Dungeon");
 
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
