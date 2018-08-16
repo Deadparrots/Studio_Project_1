@@ -1388,7 +1388,11 @@ void processUserInput()
 		if (int_stages == 10)
 			StageType = EBoss;
 		else
+		{
+			if (StageType == EBoss)
+				b_play = false;
 			StageType = EStage;
+		}
 		if (StageType == EBoss)
 			boss_init();
 		else
