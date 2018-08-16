@@ -47,11 +47,19 @@ enum EWEAPONSTATES
 	FireRight
 };
 
-enum ESONGTYPE
+enum ESTAGETYPE
 {
 	EMainMenu,
 	EStage,
 	EBoss
+};
+
+enum EMAINMENU
+{
+	MMStart,
+	MMInstructions,
+	MMExit
+
 };
 
 // struct for the game character
