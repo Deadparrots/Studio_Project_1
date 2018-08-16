@@ -1862,11 +1862,9 @@ void reload()
 }
 void ost()
 {
-	if (StageType == EMainMenu)
-		PlaySound(TEXT("sound/title.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
+	if (StageType == EBoss)
+		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
 	else if (StageType == EStage)
 		PlaySound(TEXT("sound/zelda.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // change 'cave' to whatever
-	else if (StageType == EBoss)
-		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
 	b_play = true;
 }
