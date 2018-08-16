@@ -1668,7 +1668,7 @@ void renderBoss()
 	if (g_boss.m_bActive == false)
 	{
 		character = 'R';
-		charColor = 0x0E;
+		charColor = 0x00;
 	}
 	g_Console.writeToBuffer(g_boss.m_cLocation, character, charColor);
 }
