@@ -36,7 +36,8 @@ enum EGAMESTATES
 {
 	S_SPLASHSCREEN,
 	S_GAME,
-	S_COUNT
+	S_COUNT,
+	S_GAMEOVER
 };
 enum EWEAPONSTATES
 {
@@ -47,11 +48,19 @@ enum EWEAPONSTATES
 	FireRight
 };
 
-enum ESONGTYPE
+enum ESTAGETYPE
 {
 	EMainMenu,
 	EStage,
 	EBoss
+};
+
+enum EMAINMENU
+{
+	MMStart,
+	MMInstructions,
+	MMExit
+
 };
 
 // struct for the game character
@@ -106,4 +115,5 @@ void sound();
 void weapdata();
 void reload();
 void ost();
+void gameOver();
 #endif // _GAME_H
