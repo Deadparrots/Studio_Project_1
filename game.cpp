@@ -25,7 +25,6 @@ size_t		shootfailsound = 0;
 double		stages = 0.000; // set to 0 normally... 9 for boss testing
 int			int_stages = stages;
 size_t      StageType = EStage;
-bool		b_bossStage = false;
 bool		b_play = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
@@ -1853,7 +1852,7 @@ void reload()
 	}
 }
 void ost()
-{	
+{
 	if (StageType == EBoss)
 		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
 	else if (StageType == EStage)
