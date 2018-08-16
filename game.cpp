@@ -1441,7 +1441,7 @@ void renderSplashScreen()  // renders the splash screen
 {
 	for (int i = 0; i < 12; ++i)
 	{
-		std::fstream myfile("title.txt");
+		std::fstream myfile("map/title.txt");
 		std::string sLine;
 		for (short i = 0; i < 24 * 80; i++)
 		{
