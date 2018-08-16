@@ -156,7 +156,6 @@ void boss_init()
 }
 void init(void)
 {
-	b_play = false;
 	generate();
 	weapdata();
 	// Set precision for floating point output
