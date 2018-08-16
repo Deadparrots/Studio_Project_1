@@ -25,7 +25,7 @@ size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
 double		stages = 0.000; // set to 0 normally... 9 for boss testing
 int			int_stages = stages;
-size_t		StageType;
+size_t		StageType = EStage;
 bool		b_play = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
