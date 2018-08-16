@@ -58,6 +58,7 @@ struct WeaponParameters
 };
 
 void init(void);      // initialize your variables, allocate memory, etc
+void boss_init();
 void getInput(void);      // get input from player
 void update(double dt); // update the game and the state of the game
 void render(void);      // renders the current state of the game to the console
@@ -66,6 +67,7 @@ void shutdown(void);      // do clean up, free memory
 void splashScreenWait();    // waits for time to pass in splash screen
 void gameplay();            // gameplay logic
 void moveCharacter();       // moves the character, collision detection, physics, etc
+void boss_moveCharacter();
 void processUserInput();    // checks if you should change states or do something else with the game, e.g. pause, exit
 void clearScreen();         // clears the current screen and draw from scratch 
 void renderSplashScreen();  // renders the splash screen
@@ -79,6 +81,7 @@ void renderEnemy3();
 void renderEnemy4();
 void renderEnemy5();
 void renderEnemy6();
+void renderBoss();
 void renderDoor();
 void renderWeapon();
 void renderFramerate();     // renders debug information, frame rate, elapsed time, etc
@@ -88,5 +91,4 @@ void sound();
 void weapdata();
 void reload();
 void ost();
-void renderBoss();
 #endif // _GAME_H

@@ -25,11 +25,13 @@ SGameChar	g_enemy4;
 SGameChar	g_enemy5;
 SGameChar	g_enemy6;
 SGameChar	g_weapon;
+SGameChar	g_boss;
 SGameChar	g_door;
 size_t		deathsound = 0;
 size_t		shootsound = 0;
 size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
+int			int_stages = 0;
 double		stages = 0.000;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
@@ -49,6 +51,114 @@ Console g_Console(80, 24, "SP1 Framework");
 // Input    : void
 // Output   : void
 //--------------------------------------------------------------
+void boss_init()
+{
+	weapdata();
+	g_dElapsedTime = 0.0;
+	g_dBounceTime = 0.0;
+	g_Console.setConsoleFont(0, 16, L"Consolas");
+	reload();
+	g_sChar.m_cLocation.X = 40;
+	g_sChar.m_cLocation.Y = 20;
+	g_sChar.m_bActive = true;
+	g_boss.m_cLocation.X = 40;
+	g_boss.m_cLocation.Y = 10;
+	g_boss.m_bActive = true;
+	int enemyX, enemyY;
+	fstream myfile("bossmap.txt");
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy1.m_cLocation.X = enemyX;
+	g_enemy1.m_cLocation.Y = enemyY;
+	g_enemy1.m_bActive = false;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy2.m_cLocation.X = enemyX;
+	g_enemy2.m_cLocation.Y = enemyY;
+	g_enemy2.m_bActive = false;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy3.m_cLocation.X = enemyX;
+	g_enemy3.m_cLocation.Y = enemyY;
+	g_enemy3.m_bActive = false;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy4.m_cLocation.X = enemyX;
+	g_enemy4.m_cLocation.Y = enemyY;
+	g_enemy4.m_bActive = false;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy5.m_cLocation.X = enemyX;
+	g_enemy5.m_cLocation.Y = enemyY;
+	g_enemy5.m_bActive = false;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_enemy6.m_cLocation.X = enemyX;
+	g_enemy6.m_cLocation.Y = enemyY;
+	g_enemy6.m_bActive = false;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		char * buffer = new char[0];
+		myfile.seekg(enemyX + enemyY * 82);
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+			break;
+	}
+	g_door.m_cLocation.X = enemyX;
+	g_door.m_cLocation.Y = enemyY;
+	g_door.m_bActive = false;
+	myfile.close();
+}
 void init(void)
 {
 	generate();
@@ -59,6 +169,7 @@ void init(void)
 
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
+	g_boss.m_bActive = false;
 	int enemyX, enemyY;
 	fstream myfile("map.txt");
 	while (1)
@@ -271,23 +382,25 @@ void splashScreenWait()    // waits for time to pass in splash screen
 		g_eGameState = S_GAME;
 	if (g_abKeyPressed[K_ESCAPE]) // esc to quit without playing lol
 		g_bQuitGame = true;
-
 }
 
 void gameplay()            // gameplay logic
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
-	moveCharacter();    // moves the character, collision detection, physics, etc
-	sound();			// sound can be played here too.
-	ost();
-}
 
-void moveCharacter()
+	if (int_stages != 10)
+		moveCharacter();// moves the character, collision detection, physics, etc
+	else
+		boss_moveCharacter();
+	sound();			// sound can be played here too.
+	ost();        // backgrund music
+}
+void boss_moveCharacter()
 {
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	fstream myfile("map.txt");
+	fstream myfile("bossmap.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
@@ -469,14 +582,7 @@ void moveCharacter()
 		reload();
 		reloadsound += 2;
 	}
-	if (
-		(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == true) ||
-		(g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == true) ||
-		(g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == true) ||
-		(g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == true) ||
-		(g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == true) ||
-		(g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == true)
-		)
+	if (g_sChar.m_cLocation.X == g_boss.m_cLocation.X && g_sChar.m_cLocation.Y == g_boss.m_cLocation.Y && g_boss.m_bActive == true)
 	{
 		g_sChar.m_bActive = false;
 		bSomethingHappened = true;
@@ -517,153 +623,49 @@ void moveCharacter()
 		g_enemy6.m_cLocation.X = 0;
 		g_enemy6.m_cLocation.Y = 0;
 	}
-	size_t rate = 100 / (stages + 1) + 24;
-	switch (rand() % rate)
+	if (g_weapon.m_cLocation.Y == g_boss.m_cLocation.Y && g_boss.m_bActive == true)
 	{
-	case 0:
-		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy1.m_bActive == true)
-			g_enemy1.m_cLocation.X++;
-		break;
-	case 1:
-		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy1.m_bActive == true)
-			g_enemy1.m_cLocation.Y++;
-		break;
-	case 2:
-		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy1.m_bActive == true)
-			g_enemy1.m_cLocation.X--;
-		break;
-	case 3:
-		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy1.m_bActive == true)
-			g_enemy1.m_cLocation.Y--;
-		break;
-	case 4:
-		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy2.m_bActive == true)
-			g_enemy2.m_cLocation.X++;
-		break;
-	case 5:
-		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy2.m_bActive == true)
-			g_enemy2.m_cLocation.Y++;
-		break;
-	case 6:
-		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy2.m_bActive == true)
-			g_enemy2.m_cLocation.X--;
-		break;
-	case 7:
-		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy2.m_bActive == true)
-			g_enemy2.m_cLocation.Y--;
-		break;
-	case 8:
-		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy3.m_bActive == true)
-			g_enemy3.m_cLocation.X++;
-		break;
-	case 9:
-		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy3.m_bActive == true)
-			g_enemy3.m_cLocation.Y++;
-		break;
-	case 10:
-		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy3.m_bActive == true)
-			g_enemy3.m_cLocation.X--;
-		break;
-	case 11:
-		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy3.m_bActive == true)
-			g_enemy3.m_cLocation.Y--;
-		break;
-	case 12:
-		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy4.m_bActive == true)
-			g_enemy4.m_cLocation.X++;
-		break;
-	case 13:
-		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy4.m_bActive == true)
-			g_enemy4.m_cLocation.Y++;
-		break;
-	case 14:
-		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy4.m_bActive == true)
-			g_enemy4.m_cLocation.X--;
-		break;
-	case 15:
-		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy4.m_bActive == true)
-			g_enemy4.m_cLocation.Y--;
-		break;
-	case 16:
-		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy5.m_bActive == true)
-			g_enemy5.m_cLocation.X++;
-		break;
-	case 17:
-		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy5.m_bActive == true)
-			g_enemy5.m_cLocation.Y++;
-		break;
-	case 18:
-		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy5.m_bActive == true)
-			g_enemy5.m_cLocation.X--;
-		break;
-	case 19:
-		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy5.m_bActive == true)
-			g_enemy5.m_cLocation.Y--;
-		break;
-	case 20:
-		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy6.m_bActive == true)
-			g_enemy6.m_cLocation.X++;
-		break;
-	case 21:
-		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy6.m_bActive == true)
-			g_enemy6.m_cLocation.Y++;
-		break;
-	case 22:
-		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy6.m_bActive == true)
-			g_enemy6.m_cLocation.X--;
-		break;
-	case 23:
-		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy6.m_bActive == true)
-			g_enemy6.m_cLocation.Y--;
-		break;
+		switch (rand() % 2)
+		{
+		case 0:
+			myfile.seekg(g_boss.m_cLocation.X + g_boss.m_cLocation.Y * 82 + 82);
+			myfile.read(buffer2, 1);
+			if (buffer2[0] == ' ')
+				g_boss.m_cLocation.Y++;
+			else
+				g_boss.m_cLocation.Y--;
+			break;
+		case 1:
+			myfile.seekg(g_boss.m_cLocation.X + g_boss.m_cLocation.Y * 82 - 82);
+			myfile.read(buffer2, 1);
+			if (buffer2[0] == ' ')
+				g_boss.m_cLocation.Y--;
+			else
+				g_boss.m_cLocation.Y++;
+			break;
+		}
+	}
+	if (g_weapon.m_cLocation.X == g_boss.m_cLocation.X && g_boss.m_bActive == true)
+	{
+		switch (rand() % 2)
+		{
+		case 0:
+			myfile.seekg(g_boss.m_cLocation.X + g_boss.m_cLocation.Y * 82 + 1);
+			myfile.read(buffer2, 1);
+			if (buffer2[0] == ' ')
+				g_boss.m_cLocation.X++;
+			else
+				g_boss.m_cLocation.X--;
+			break;
+		case 1:
+			myfile.seekg(g_boss.m_cLocation.X + g_boss.m_cLocation.Y * 82 - 1);
+			myfile.read(buffer2, 1);
+			if (buffer2[0] == ' ')
+				g_boss.m_cLocation.X--;
+			else
+				g_boss.m_cLocation.X++;
+			break;
+		}
 	}
 
 	myfile.close();
@@ -684,7 +686,7 @@ void moveCharacter()
 void processUserInput()
 {
 	// quits the game if player hits the escape key
-	if (g_abKeyPressed[K_ESCAPE])
+	if (g_abKeyPressed[K_ESCAPE] || Lives < 0)
 		g_bQuitGame = true;
 	if (g_sChar.m_bActive == false) // Took damage
 	{
@@ -727,23 +729,20 @@ void processUserInput()
 		g_enemy3.m_bActive == false &&
 		g_enemy4.m_bActive == false &&
 		g_enemy5.m_bActive == false &&
-		g_enemy6.m_bActive == false)
+		g_enemy6.m_bActive == false &&
+		g_boss.m_bActive == false)
 		g_door.m_bActive = true;
 	if (g_door.m_bActive == true && g_sChar.m_cLocation.X == g_door.m_cLocation.X && g_sChar.m_cLocation.Y == g_door.m_cLocation.Y)
 	{
-		do
-		{
+		stages++;
+		int_stages = stages;
+		if (int_stages != 10)
 			init();
-			g_eGameState = S_GAME;
-			stages++;
-		} while (stages != 1);
-
-		if (stages == 1)
-		{
-			init();
-			g_eGameState = S_GAME;
-			renderBoss();
-		}
+		else
+			boss_init();
+		g_eGameState = S_GAME;
+		if (Lives != 9)
+			Lives++;
 	}
 }
 
@@ -755,24 +754,29 @@ void clearScreen()
 
 void renderSplashScreen()  // renders the splash screen
 {
+	for (int i = 0; i < 12; ++i)
+	{
+		fstream myfile("title.txt");
+		string sLine;
+		for (short i = 0; i < 24 * 80; i++)
+		{
+			if (i % 80 == 0)
+				getline(myfile, sLine);
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
+		}
+		myfile.close();
+	}
 	COORD c = g_Console.getConsoleSize();
-	c.Y /= 3;
+	c.Y = 20;
 	c.X = c.X / 2 - 9;
 	g_Console.writeToBuffer(c, "Use <WASD> to move", 0x03);
 	c.Y += 1;
 	c.X = g_Console.getConsoleSize().X / 2 - 12;
 	g_Console.writeToBuffer(c, "Use Arrow Keys to attack", 0x09);
 	c.Y += 1;
-	c.X = g_Console.getConsoleSize().X / 2 - 14;
-	g_Console.writeToBuffer(c, "Pick up 'R' to reload weapon", 0x09);
-	c.Y += 4;
-	c.X = g_Console.getConsoleSize().X / 2 - 9;
-	g_Console.writeToBuffer(c, "Press 'Esc' to quit", 0x09);
-	c.Y += 1;
 	c.X = g_Console.getConsoleSize().X / 2 - 11;
 	g_Console.writeToBuffer(c, "Press 'Space' to start", 0x0E);
 }
-
 void renderGame()
 {
 	renderMap();        // renders the map to the buffer first
@@ -785,51 +789,46 @@ void renderGame()
 	renderEnemy4();
 	renderEnemy5();
 	renderEnemy6();
+  if (int_stages == 10)
+		renderBoss();
 	renderUI();
 }
-
 void renderMap()
 {
-	for (int i = 0; i < 12; ++i)
-	{
-		fstream myfile("map.txt");
-		string sLine;
-		for (short i = 0; i < 24 * 80; i++)
+	// Set up sample colours, and output shadings
+	//const WORD colors[] = {
+	//    0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
+	//    0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
+	//};
+
+	//COORD c;
+	if(int_stages != 10)
+		for (int i = 0; i < 12; ++i)
 		{
-			if (i % 80 == 0)
-				getline(myfile, sLine);
-			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
+			fstream myfile("map.txt");
+			string sLine;
+			for (short i = 0; i < 24 * 80; i++)
+			{
+				if (i % 80 == 0)
+					getline(myfile, sLine);
+				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
+			}
+			myfile.close();
 		}
-	}
-}
-
-void renderBoss()
-{
-	generate();
-	weapdata();
-	// Set precision for floating point output
-	g_dElapsedTime = 0.0;
-	g_dBounceTime = 0.0;
-
-	fstream myfile("bossmapagain.txt");
-
-	for (int i = 0; i < 12; ++i)
-	{
-		
-		string sLine;
-		for (short i = 0; i < 24 * 80; i++)
+	else
+		for (int i = 0; i < 12; ++i)
 		{
-			if (i % 80 == 0)
-				getline(myfile, sLine);
-			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
+			fstream myfile("bossmap.txt");
+			string sLine;
+			for (short i = 0; i < 24 * 80; i++)
+			{
+				if (i % 80 == 0)
+					getline(myfile, sLine);
+				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
+			}
+			myfile.close();
 		}
-	}
-	myfile.close();
-
-	g_Console.setConsoleFont(0, 16, L"Consolas");
-	reload();
 }
-
 void renderUI()
 {
 	COORD UIBG;
@@ -946,6 +945,18 @@ void renderEnemy6()
 	}
 	g_Console.writeToBuffer(g_enemy6.m_cLocation, character, charColor);
 }
+void renderBoss()
+{
+	// Draw the location of the character
+	WORD charColor = 0x0C;
+	char character = '@';
+	if (g_boss.m_bActive == false)
+	{
+		character = 'R';
+		charColor = 0x0E;
+	}
+	g_Console.writeToBuffer(g_boss.m_cLocation, character, charColor);
+}
 void renderDoor()
 {
 	// Draw the location of the door
@@ -1007,7 +1018,6 @@ void sound()
 		shootfailsound--;
 	}
 }
-
 void generate()
 {
 	int random, point1, point2, point3, point4, point5;
@@ -1172,7 +1182,6 @@ void generate()
 
 	myfile.close();
 }
-
 void weapdata()
 {
 	std::string in;
@@ -1186,7 +1195,6 @@ void weapdata()
 	}
 	weapondata.close();
 }
-
 void reload()
 {
 	Weapons[currentWeapon].AmmoTotal += Weapons[currentWeapon].Clip;	// Adds ammo left in clip to total
