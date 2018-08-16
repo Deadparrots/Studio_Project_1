@@ -25,7 +25,8 @@ size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
 double		stages = 0.000; // set to 0 normally... 9 for boss testing
 int			int_stages = stages;
-bool b_bossStage = false;
+bool		b_bossStage = false;
+bool		b_play = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_SPLASHSCREEN;
@@ -46,6 +47,7 @@ Console g_Console(80, 24, "SP1 Framework");
 //--------------------------------------------------------------
 void boss_init()
 {
+	b_play = false;
 	weapdata();
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
@@ -154,6 +156,7 @@ void boss_init()
 }
 void init(void)
 {
+	b_play = false;
 	generate();
 	weapdata();
 	// Set precision for floating point output
@@ -382,7 +385,8 @@ void gameplay()            // gameplay logic
 		moveCharacter();// moves the character, collision detection, physics, etc
 	else
 		boss_moveCharacter();
-	sound();			// sound can be played here too.
+	sound(); // sound can be played here too.
+	if (!b_play)
 	ost();
 }
 
@@ -520,7 +524,6 @@ void boss_moveCharacter()
 		myfile.read(buffer, 1);
 		if (buffer[0] == ' ')
 		{
-			//Beep(1440, 30);
 			g_sChar.m_cLocation.Y--;
 			bSomethingHappened = true;
 		}
@@ -532,7 +535,6 @@ void boss_moveCharacter()
 		myfile.read(buffer, 1);
 		if (buffer[0] == ' ')
 		{
-			//Beep(1440, 30);
 			g_sChar.m_cLocation.X--;
 			bSomethingHappened = true;
 		}
@@ -544,7 +546,6 @@ void boss_moveCharacter()
 		myfile.read(buffer, 1);
 		if (buffer[0] == ' ')
 		{
-			//Beep(1440, 30);
 			g_sChar.m_cLocation.Y++;
 			bSomethingHappened = true;
 		}
@@ -556,7 +557,6 @@ void boss_moveCharacter()
 		myfile.read(buffer, 1);
 		if (buffer[0] == ' ')
 		{
-			//Beep(1440, 30);
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
 		}
@@ -808,7 +808,6 @@ void moveCharacter()
 		myfile.read(buffer, 1);
 		if (buffer[0] == ' ')
 		{
-			//Beep(1440, 30);
 			g_sChar.m_cLocation.Y--;
 			bSomethingHappened = true;
 		}
@@ -820,7 +819,6 @@ void moveCharacter()
 		myfile.read(buffer, 1);
 		if (buffer[0] == ' ')
 		{
-			//Beep(1440, 30);
 			g_sChar.m_cLocation.X--;
 			bSomethingHappened = true;
 		}
@@ -832,7 +830,6 @@ void moveCharacter()
 		myfile.read(buffer, 1);
 		if (buffer[0] == ' ')
 		{
-			//Beep(1440, 30);
 			g_sChar.m_cLocation.Y++;
 			bSomethingHappened = true;
 		}
@@ -844,7 +841,6 @@ void moveCharacter()
 		myfile.read(buffer, 1);
 		if (buffer[0] == ' ')
 		{
-			//Beep(1440, 30);
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
 		}
@@ -1868,7 +1864,8 @@ void reload()
 void ost()
 {
 	if (b_bossStage)
-	{
-		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP); // play sound while in stage
-	}
+		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC); // play sound while in stage
+	else
+		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC); // change 'cave' to whatever
+	b_play = true;
 }
