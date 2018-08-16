@@ -7,7 +7,6 @@
 double  g_dElapsedTime;
 double  g_dDeltaTime;
 bool    g_abKeyPressed[K_COUNT];
-
 // Game specific variables here
 SGameChar   g_sChar;
 SGameChar	g_enemy1;
@@ -37,7 +36,6 @@ int currentWeapon = 0;
 WeaponParameters Weapons[4];
 // Console object
 Console g_Console(80, 24, "SP1 Framework");
-
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
 //            Initialize variables, allocate memory, load data from file, etc. 
@@ -165,6 +163,7 @@ void init(void)
 
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
+	PlaySound(TEXT("sound/title.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // title screen music
 	g_boss.m_bActive = false;
 	int enemyX, enemyY;
 	std::fstream myfile("map.txt");
@@ -281,7 +280,6 @@ void init(void)
 	g_Console.setConsoleFont(0, 16, L"Consolas");
 	reload();
 }
-
 //--------------------------------------------------------------
 // Purpose  : Reset before exiting the program
 //            Do your clean up of memory here
@@ -296,7 +294,6 @@ void shutdown(void)
 
 	g_Console.clearBuffer();
 }
-
 //--------------------------------------------------------------
 // Purpose  : Getting all the key press states
 //            This function checks if any key had been pressed since the last time we checked
@@ -321,7 +318,6 @@ void getInput(void)
 	g_abKeyPressed[K_S] = isKeyPressed(83);
 	g_abKeyPressed[K_D] = isKeyPressed(68);
 }
-
 //--------------------------------------------------------------
 // Purpose  : Update function
 //            This is the update function
@@ -371,13 +367,11 @@ void render()
 	renderFramerate();  // renders debug information, frame rate, elapsed time, etc
 	renderToScreen();   // dump the contents of the buffer to the screen, one frame worth of game
 }
-
 void splashScreenWait()    // waits for time to pass in splash screen
 {
 	if (g_abKeyPressed[K_SPACE]) // wait for 0.5 seconds to switch to game mode, else do nothing
 		g_eGameState = S_GAME;
 }
-
 void gameplay()            // gameplay logic
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
@@ -387,9 +381,8 @@ void gameplay()            // gameplay logic
 		boss_moveCharacter();
 	sound(); // sound can be played here too.
 	if (!b_play)
-	ost();
+		ost();
 }
-
 void boss_moveCharacter()
 {
 	bool bSomethingHappened = false;
@@ -1396,13 +1389,11 @@ void processUserInput()
 			Lives++;
 	}
 }
-
 void clearScreen()
 {
 	// Clears the buffer with this colour attribute
 	g_Console.clearBuffer(0x00);
 }
-
 void renderSplashScreen()  // renders the splash screen
 {
 	for (int i = 0; i < 12; ++i)
@@ -1645,7 +1636,6 @@ void renderToScreen()
 	// Writes the buffer to the console, hence you will see what you have written
 	g_Console.flushBufferToConsole();
 }
-
 void sound()
 {
 	if (deathsound > 0)
@@ -1864,8 +1854,8 @@ void reload()
 void ost()
 {	
 	if (b_bossStage)
-		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC); // play sound while in stage
+		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
 	else
-		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC); // change 'cave' to whatever
+		PlaySound(TEXT("sound/zelda.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // change 'cave' to whatever
 	b_play = true;
 }
