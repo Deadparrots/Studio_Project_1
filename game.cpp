@@ -7,7 +7,6 @@
 double  g_dElapsedTime;
 double  g_dDeltaTime;
 bool    g_abKeyPressed[K_COUNT];
-
 // Game specific variables here
 SGameChar   g_sChar;
 SGameChar	g_enemy1;
@@ -25,7 +24,7 @@ size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
 double		stages = 0.000; // set to 0 normally... 9 for boss testing
 int			int_stages = stages;
-size_t		StageType = EMainMenu;
+size_t      StageType = EStage;
 bool		b_play = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
@@ -37,7 +36,6 @@ int currentWeapon = 0;
 WeaponParameters Weapons[4];
 // Console object
 Console g_Console(80, 24, "Monster Dungeon");
-
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
 //            Initialize variables, allocate memory, load data from file, etc. 
@@ -60,7 +58,7 @@ void boss_init()
 	g_boss.m_cLocation.Y = 10;
 	g_boss.m_bActive = true;
 	int enemyX, enemyY;
-	std::fstream myfile("bossmap.txt");
+	std::fstream myfile("map/bossmap.txt");
 	while (1)
 	{
 		enemyX = rand() % 80;
@@ -156,6 +154,7 @@ void boss_init()
 }
 void init(void)
 {
+	b_play = false;
 	generate();
 	weapdata();
 	// Set precision for floating point output
@@ -164,9 +163,10 @@ void init(void)
 
 	// sets the initial state for the game
 	g_eGameState = S_SPLASHSCREEN;
+	PlaySound(TEXT("sound/title.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // title screen music
 	g_boss.m_bActive = false;
 	int enemyX, enemyY;
-	std::fstream myfile("map.txt");
+	std::fstream myfile("map/map.txt");
 	while (1)
 	{
 		enemyX = rand() % 80;
@@ -280,7 +280,6 @@ void init(void)
 	g_Console.setConsoleFont(0, 16, L"Consolas");
 	reload();
 }
-
 //--------------------------------------------------------------
 // Purpose  : Reset before exiting the program
 //            Do your clean up of memory here
@@ -295,7 +294,6 @@ void shutdown(void)
 
 	g_Console.clearBuffer();
 }
-
 //--------------------------------------------------------------
 // Purpose  : Getting all the key press states
 //            This function checks if any key had been pressed since the last time we checked
@@ -321,7 +319,6 @@ void getInput(void)
 	g_abKeyPressed[K_D] = isKeyPressed(68);
 	g_abKeyPressed[K_C] = isKeyPressed(67);
 }
-
 //--------------------------------------------------------------
 // Purpose  : Update function
 //            This is the update function
@@ -371,19 +368,11 @@ void render()
 	renderFramerate();  // renders debug information, frame rate, elapsed time, etc
 	renderToScreen();   // dump the contents of the buffer to the screen, one frame worth of game
 }
-
 void splashScreenWait()
 {
-	if(!b_play)
-		ost();
-	if (g_abKeyPressed[K_SPACE]) 
-	{
-		StageType = EStage;
-		b_play = false;
+	if (g_abKeyPressed[K_SPACE]) // wait for 0.5 seconds to switch to game mode, else do nothing
 		g_eGameState = S_GAME;
-	}
 }
-
 void gameplay()            // gameplay logic
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
@@ -395,13 +384,12 @@ void gameplay()            // gameplay logic
 	if (!b_play)
 		ost();
 }
-
 void boss_moveCharacter()
 {
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	std::fstream myfile("bossmap.txt");
+	std::fstream myfile("map/bossmap.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
@@ -666,6 +654,14 @@ void boss_moveCharacter()
 	}
 
 	myfile.close();
+
+
+	if (g_abKeyPressed[K_SPACE])
+	{
+		g_sChar.m_bActive = true;
+		bSomethingHappened = true;
+	}
+
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
@@ -677,7 +673,7 @@ void moveCharacter()
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	std::fstream myfile("map.txt");
+	std::fstream myfile("map/map.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
@@ -872,36 +868,42 @@ void moveCharacter()
 		g_enemy1.m_bActive = false;
 		g_enemy1.m_cLocation.X = 0;
 		g_enemy1.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y)
 	{
 		g_enemy2.m_bActive = false;
 		g_enemy2.m_cLocation.X = 0;
 		g_enemy2.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y)
 	{
 		g_enemy3.m_bActive = false;
 		g_enemy3.m_cLocation.X = 0;
 		g_enemy3.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y)
 	{
 		g_enemy4.m_bActive = false;
 		g_enemy4.m_cLocation.X = 0;
 		g_enemy4.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y)
 	{
 		g_enemy5.m_bActive = false;
 		g_enemy5.m_cLocation.X = 0;
 		g_enemy5.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y)
 	{
 		g_enemy6.m_bActive = false;
 		g_enemy6.m_cLocation.X = 0;
 		g_enemy6.m_cLocation.Y = 0;
+		reload();
 	}
 	size_t rate = 100 / (stages + 1) + 24;
 	switch (rand() % rate)
@@ -1333,7 +1335,7 @@ void processUserInput()
 	if (g_abKeyPressed[K_C] || Lives < 0)
 		g_boss.m_bActive = false;
 	// quits the game if player hits the escape key
-	if (g_abKeyPressed[K_ESCAPE] || Lives < 0)
+	if (g_abKeyPressed[K_ESCAPE] || Lives == 0)
 		g_bQuitGame = true;
 	if (g_sChar.m_bActive == false) // Took damage
 	{
@@ -1383,14 +1385,10 @@ void processUserInput()
 	{
 		stages++;
 		int_stages = stages;
-		if (int_stages == 10)
+		if (int_stages == 1)
 			StageType = EBoss;
 		else
-		{
-			if (StageType == EBoss)
-				b_play = false;
 			StageType = EStage;
-		}
 		if (StageType == EBoss)
 			boss_init();
 		else
@@ -1400,13 +1398,11 @@ void processUserInput()
 			Lives++;
 	}
 }
-
 void clearScreen()
 {
 	// Clears the buffer with this colour attribute
 	g_Console.clearBuffer(0x00);
 }
-
 void renderSplashScreen()  // renders the splash screen
 {
 	for (int i = 0; i < 12; ++i)
@@ -1460,7 +1456,7 @@ void renderMap()
 	if (StageType == EStage)
 		for (int i = 0; i < 12; ++i)
 		{
-			std::fstream myfile("map.txt");
+			std::fstream myfile("map/map.txt");
 			std::string sLine;
 			for (short i = 0; i < 24 * 80; i++)
 			{
@@ -1473,7 +1469,7 @@ void renderMap()
 	else
 		for (int i = 0; i < 12; ++i)
 		{
-			std::fstream myfile("bossmap.txt");
+			std::fstream myfile("map/bossmap.txt");
 			std::string sLine;
 			for (short i = 0; i < 24 * 80; i++)
 			{
@@ -1498,16 +1494,16 @@ void renderUI()
 		}
 	}
 	UI.Y = 1; // Sets Height of UI text
-	UI.X = g_Console.getConsoleSize().X / 3 - 8; // Start of UI text
+	UI.X = g_Console.getConsoleSize().X / 3 - 13; // Start of UI text
 	g_Console.writeToBuffer(UI, "Lives : ", 0x9f);
-	UI.X = g_Console.getConsoleSize().X / 3;
+	UI.X = g_Console.getConsoleSize().X / 4 + 1;
 	std::string display = std::to_string(Lives);
 	g_Console.writeToBuffer(UI, display, 0x9f); // Displays the number of lives
-	UI.X = g_Console.getConsoleSize().X / 3 + 2;
+	UI.X = g_Console.getConsoleSize().X / 3;
 	g_Console.writeToBuffer(UI, "Weapon : ", 0x9f);
 	UI.X = UI.X + 9;
 	g_Console.writeToBuffer(UI, Weapons[currentWeapon].Name, 0x9f); // Display Equipped Weapon
-	UI.X = UI.X + Weapons[currentWeapon].Name.length() + 1; // Increases UI.X by text length of weapon 1's name
+	UI.X = UI.X + Weapons[currentWeapon].Name.length() + 3; // Increases UI.X by text length of weapon 1's name
 	g_Console.writeToBuffer(UI, "Ammo : ", 0x9f);
 	UI.X = UI.X + 7;
 	display = std::to_string(Weapons[currentWeapon].Clip);
@@ -1649,7 +1645,6 @@ void renderToScreen()
 	// Writes the buffer to the console, hence you will see what you have written
 	g_Console.flushBufferToConsole();
 }
-
 void sound()
 {
 	if (deathsound > 0)
@@ -1677,7 +1672,7 @@ void generate()
 {
 	int random, point1, point2, point3, point4, point5;
 	srand(time(NULL));
-	std::fstream myfile("map.txt");
+	std::fstream myfile("map/map.txt");
 	for (size_t i = 0; i < 24; i++)
 	{
 		if (rand() % 3 && i > 7 && i < 17)
@@ -1841,7 +1836,7 @@ void weapdata()
 {
 	std::string in;
 	std::ifstream weapondata("weapons.txt");
-	for (int i = 0; 4 > i; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		std::getline(weapondata, Weapons[i].Name); // Gets name of Weapon
 		weapondata >> Weapons[i].ClipMax;
@@ -1868,9 +1863,9 @@ void reload()
 void ost()
 {
 	if (StageType == EMainMenu)
-		PlaySound(TEXT("sound/menu.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
+		PlaySound(TEXT("sound/title.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
 	else if (StageType == EStage)
-		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // change 'cave' to whatever
+		PlaySound(TEXT("sound/zelda.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // change 'cave' to whatever
 	else if (StageType == EBoss)
 		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
 	b_play = true;

@@ -47,7 +47,7 @@ enum EWEAPONSTATES
 	FireRight
 };
 
-enum ESTAGETYPE
+enum ESONGTYPE
 {
 	EMainMenu,
 	EStage,
