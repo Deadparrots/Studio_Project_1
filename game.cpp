@@ -1366,7 +1366,10 @@ void moveCharacter()
 void processUserInput()
 {
 	if (Lives < 0 || g_abKeyPressed[K_ESCAPE])
+	{
+		PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME);
 		g_bQuitGame = true;
+	}
 	if (g_abKeyPressed[K_C])
 		g_boss.m_bActive = false;
 	if (g_sChar.m_bActive == false) // Took damage
