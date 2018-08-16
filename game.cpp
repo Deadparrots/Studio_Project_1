@@ -1,4 +1,4 @@
-﻿// This is the main file for the game logic and function
+// This is the main file for the game logic and function
 //
 //
 #include "game.h"
@@ -319,6 +319,7 @@ void getInput(void)
 	g_abKeyPressed[K_A] = isKeyPressed(65);
 	g_abKeyPressed[K_S] = isKeyPressed(83);
 	g_abKeyPressed[K_D] = isKeyPressed(68);
+	g_abKeyPressed[K_C] = isKeyPressed(67);
 }
 
 //--------------------------------------------------------------
@@ -386,7 +387,7 @@ void gameplay()            // gameplay logic
 		boss_moveCharacter();
 	sound(); // sound can be played here too.
 	if (!b_play)
-	ost();
+		ost();
 }
 
 void boss_moveCharacter()
@@ -1331,6 +1332,8 @@ void moveCharacter()
 }
 void processUserInput()
 {
+	if (g_abKeyPressed[K_C] || Lives < 0)
+		g_boss.m_bActive = false;
 	// quits the game if player hits the escape key
 	if (g_abKeyPressed[K_ESCAPE] || Lives < 0)
 		g_bQuitGame = true;
@@ -1452,7 +1455,7 @@ void renderMap()
 	//};
 
 	//COORD c;
-	if(StageType == EStage)
+	if (StageType == EStage)
 		for (int i = 0; i < 12; ++i)
 		{
 			std::fstream myfile("map.txt");
