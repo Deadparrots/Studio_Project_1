@@ -90,4 +90,5 @@ void generate();
 void sound();
 void weapdata();
 void reload();
+void ost();
 #endif // _GAME_H

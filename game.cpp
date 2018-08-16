@@ -378,20 +378,23 @@ void render()
 
 void splashScreenWait()    // waits for time to pass in splash screen
 {
-	if (g_abKeyPressed[K_SPACE]) // wait for 0.5 seconds to switch to game mode, else do nothing
+	if (g_abKeyPressed[K_SPACE]) // space to start game
 		g_eGameState = S_GAME;
+	if (g_abKeyPressed[K_ESCAPE]) // esc to quit without playing lol
+		g_bQuitGame = true;
 }
 
 void gameplay()            // gameplay logic
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
+
 	if (int_stages != 10)
 		moveCharacter();// moves the character, collision detection, physics, etc
 	else
 		boss_moveCharacter();
 	sound();			// sound can be played here too.
+	ost();        // backgrund music
 }
-
 void boss_moveCharacter()
 {
 	bool bSomethingHappened = false;
@@ -680,405 +683,6 @@ void boss_moveCharacter()
 		g_dBounceTime = g_dElapsedTime + 0.07; // 125ms should be enough
 	}
 }
-void moveCharacter()
-{
-	bool bSomethingHappened = false;
-	if (g_dBounceTime > g_dElapsedTime)
-		return;
-	fstream myfile("map.txt");
-	// Updating the location of the character based on the key press
-	// providing a beep sound whenver we shift the character
-	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
-	{
-		shootfailsound = 1;
-		bSomethingHappened = true;
-	}
-	if (Weapons[currentWeapon].Clip > 0)
-	{
-		if (g_abKeyPressed[K_UP] && g_eWeaponState == Hold)
-		{
-			g_eWeaponState = FireUp;
-			if (g_abKeyPressed[K_W])
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y - 1;
-			else
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			shootsound++;
-			Weapons[currentWeapon].Clip--;
-			bSomethingHappened = true;
-		}
-		if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
-		{
-			g_eWeaponState = FireDown;
-			if (g_abKeyPressed[K_S])
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y + 1;
-			else
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			shootsound++;
-			Weapons[currentWeapon].Clip--;
-			bSomethingHappened = true;
-		}
-		if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
-		{
-			g_eWeaponState = FireLeft;
-			if (g_abKeyPressed[K_A])
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X - 1;
-			else
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-			shootsound++;
-			Weapons[currentWeapon].Clip--;
-			bSomethingHappened = true;
-		}
-		if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
-		{
-			g_eWeaponState = FireRight;
-			if (g_abKeyPressed[K_D])
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X + 1;
-			else
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-			shootsound++;
-			Weapons[currentWeapon].Clip--;
-			bSomethingHappened = true;
-		}
-	}
-	char * buffer2 = new char[0];
-	if (g_eWeaponState == FireUp)
-	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
-		{
-			g_weapon.m_cLocation.Y--;
-			bSomethingHappened = true;
-			g_shootdist++;
-		}
-		else
-			g_shootdist = g_shootmaxdist;
-	}
-	if (g_eWeaponState == FireDown)
-	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
-		{
-			g_weapon.m_cLocation.Y++;
-			bSomethingHappened = true;
-			g_shootdist++;
-		}
-		else
-			g_shootdist = g_shootmaxdist;
-	}
-	if (g_eWeaponState == FireLeft)
-	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
-		{
-			g_weapon.m_cLocation.X--;
-			bSomethingHappened = true;
-			g_shootdist++;
-		}
-		else
-			g_shootdist = g_shootmaxdist;
-	}
-	if (g_eWeaponState == FireRight)
-	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
-		{
-			g_weapon.m_cLocation.X++;
-			bSomethingHappened = true;
-			g_shootdist++;
-		}
-		else
-			g_shootdist = g_shootmaxdist;
-	}
-
-
-	if (g_shootdist >= g_shootmaxdist)
-	{
-		g_eWeaponState = Hold;
-		g_weapon.m_cLocation.X = 10;
-		g_weapon.m_cLocation.Y = 2;
-		g_shootdist = 0;
-	}
-
-	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
-	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
-		{
-			//Beep(1440, 30);
-			g_sChar.m_cLocation.Y--;
-			bSomethingHappened = true;
-		}
-	}
-	if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
-	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
-		{
-			//Beep(1440, 30);
-			g_sChar.m_cLocation.X--;
-			bSomethingHappened = true;
-		}
-	}
-	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
-	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
-		{
-			//Beep(1440, 30);
-			g_sChar.m_cLocation.Y++;
-			bSomethingHappened = true;
-		}
-	}
-	if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
-	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
-		{
-			//Beep(1440, 30);
-			g_sChar.m_cLocation.X++;
-			bSomethingHappened = true;
-		}
-	}
-	if (
-		(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == false)
-		)
-	{
-		reload();
-		reloadsound += 2;
-	}
-	if (
-		(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == true) ||
-		(g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == true) ||
-		(g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == true) ||
-		(g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == true) ||
-		(g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == true) ||
-		(g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == true)
-		)
-	{
-		g_sChar.m_bActive = false;
-		bSomethingHappened = true;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y)
-	{
-		g_enemy1.m_bActive = false;
-		g_enemy1.m_cLocation.X = 0;
-		g_enemy1.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y)
-	{
-		g_enemy2.m_bActive = false;
-		g_enemy2.m_cLocation.X = 0;
-		g_enemy2.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y)
-	{
-		g_enemy3.m_bActive = false;
-		g_enemy3.m_cLocation.X = 0;
-		g_enemy3.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y)
-	{
-		g_enemy4.m_bActive = false;
-		g_enemy4.m_cLocation.X = 0;
-		g_enemy4.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y)
-	{
-		g_enemy5.m_bActive = false;
-		g_enemy5.m_cLocation.X = 0;
-		g_enemy5.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y)
-	{
-		g_enemy6.m_bActive = false;
-		g_enemy6.m_cLocation.X = 0;
-		g_enemy6.m_cLocation.Y = 0;
-	}
-	size_t rate = 100 / (stages + 1) + 24;
-	switch (rand() % rate)
-	{
-	case 0:
-		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy1.m_bActive == true)
-			g_enemy1.m_cLocation.X++;
-		break;
-	case 1:
-		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy1.m_bActive == true)
-			g_enemy1.m_cLocation.Y++;
-		break;
-	case 2:
-		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy1.m_bActive == true)
-			g_enemy1.m_cLocation.X--;
-		break;
-	case 3:
-		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy1.m_bActive == true)
-			g_enemy1.m_cLocation.Y--;
-		break;
-	case 4:
-		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy2.m_bActive == true)
-			g_enemy2.m_cLocation.X++;
-		break;
-	case 5:
-		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy2.m_bActive == true)
-			g_enemy2.m_cLocation.Y++;
-		break;
-	case 6:
-		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy2.m_bActive == true)
-			g_enemy2.m_cLocation.X--;
-		break;
-	case 7:
-		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy2.m_bActive == true)
-			g_enemy2.m_cLocation.Y--;
-		break;
-	case 8:
-		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy3.m_bActive == true)
-			g_enemy3.m_cLocation.X++;
-		break;
-	case 9:
-		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy3.m_bActive == true)
-			g_enemy3.m_cLocation.Y++;
-		break;
-	case 10:
-		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy3.m_bActive == true)
-			g_enemy3.m_cLocation.X--;
-		break;
-	case 11:
-		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy3.m_bActive == true)
-			g_enemy3.m_cLocation.Y--;
-		break;
-	case 12:
-		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy4.m_bActive == true)
-			g_enemy4.m_cLocation.X++;
-		break;
-	case 13:
-		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy4.m_bActive == true)
-			g_enemy4.m_cLocation.Y++;
-		break;
-	case 14:
-		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy4.m_bActive == true)
-			g_enemy4.m_cLocation.X--;
-		break;
-	case 15:
-		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy4.m_bActive == true)
-			g_enemy4.m_cLocation.Y--;
-		break;
-	case 16:
-		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy5.m_bActive == true)
-			g_enemy5.m_cLocation.X++;
-		break;
-	case 17:
-		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy5.m_bActive == true)
-			g_enemy5.m_cLocation.Y++;
-		break;
-	case 18:
-		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy5.m_bActive == true)
-			g_enemy5.m_cLocation.X--;
-		break;
-	case 19:
-		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy5.m_bActive == true)
-			g_enemy5.m_cLocation.Y--;
-		break;
-	case 20:
-		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy6.m_bActive == true)
-			g_enemy6.m_cLocation.X++;
-		break;
-	case 21:
-		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy6.m_bActive == true)
-			g_enemy6.m_cLocation.Y++;
-		break;
-	case 22:
-		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy6.m_bActive == true)
-			g_enemy6.m_cLocation.X--;
-		break;
-	case 23:
-		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy6.m_bActive == true)
-			g_enemy6.m_cLocation.Y--;
-		break;
-	}
-
-	myfile.close();
-
-
-	if (g_abKeyPressed[K_SPACE])
-	{
-		g_sChar.m_bActive = true;
-		bSomethingHappened = true;
-	}
-
-	if (bSomethingHappened)
-	{
-		// set the bounce time to some time in the future to prevent accidental triggers
-		g_dBounceTime = g_dElapsedTime + 0.07; // 125ms should be enough
-	}
-}
 void processUserInput()
 {
 	// quits the game if player hits the escape key
@@ -1145,7 +749,7 @@ void processUserInput()
 void clearScreen()
 {
 	// Clears the buffer with this colour attribute
-	g_Console.clearBuffer(0x1F);
+	g_Console.clearBuffer(0x00);
 }
 
 void renderSplashScreen()  // renders the splash screen
@@ -1185,7 +789,7 @@ void renderGame()
 	renderEnemy4();
 	renderEnemy5();
 	renderEnemy6();
-	if (int_stages == 10)
+  if (int_stages == 10)
 		renderBoss();
 	renderUI();
 }
@@ -1235,29 +839,29 @@ void renderUI()
 		for (int j = 0; 3 > j; j++) // Sets UI Height to 3
 		{
 			UIBG.Y = j;
-			g_Console.writeToBuffer(UIBG, " ", 0x00);
+			g_Console.writeToBuffer(UIBG, " ", 0x90);
 		}
 	}
 	UI.Y = 1; // Sets Height of UI text
 	UI.X = g_Console.getConsoleSize().X / 3 - 8; // Start of UI text
-	g_Console.writeToBuffer(UI, "Lives : ", 0x08);
+	g_Console.writeToBuffer(UI, "Lives : ", 0x9f);
 	UI.X = g_Console.getConsoleSize().X / 3;
 	std::string display = to_string(Lives);
-	g_Console.writeToBuffer(UI, display, 0x08); // Displays the number of lives
+	g_Console.writeToBuffer(UI, display, 0x9f); // Displays the number of lives
 	UI.X = g_Console.getConsoleSize().X / 3 + 2;
-	g_Console.writeToBuffer(UI, "Weapon : ", 0x08);
+	g_Console.writeToBuffer(UI, "Weapon : ", 0x9f);
 	UI.X = UI.X + 9;
-	g_Console.writeToBuffer(UI, Weapons[currentWeapon].Name, 0x08); // Display Equipped Weapon
+	g_Console.writeToBuffer(UI, Weapons[currentWeapon].Name, 0x9f); // Display Equipped Weapon
 	UI.X = UI.X + Weapons[currentWeapon].Name.length() + 1; // Increases UI.X by text length of weapon 1's name
-	g_Console.writeToBuffer(UI, "Ammo : ", 0x08);
+	g_Console.writeToBuffer(UI, "Ammo : ", 0x9f);
 	UI.X = UI.X + 7;
 	display = to_string(Weapons[currentWeapon].Clip);
-	g_Console.writeToBuffer(UI, display, 0x07); // Display Current Clip
+	g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Clip
 	UI.X = UI.X + display.length();
-	g_Console.writeToBuffer(UI, "/", 0x08);
+	g_Console.writeToBuffer(UI, "/", 0x9f);
 	UI.X = UI.X + 1;
 	display = to_string(Weapons[currentWeapon].AmmoTotal);
-	g_Console.writeToBuffer(UI, display, 0x08); // Total Ammo not in clip
+	g_Console.writeToBuffer(UI, display, 0x9f); // Total Ammo not in clip
 }
 void renderCharacter()
 {
@@ -1265,9 +869,9 @@ void renderCharacter()
 	WORD charColor = 0x05;
 	if (g_sChar.m_bActive)
 	{
-		charColor = 0x0A;
+		charColor = 0x0f;
 	}
-	g_Console.writeToBuffer(g_sChar.m_cLocation, (char)'P', charColor);
+	g_Console.writeToBuffer(g_sChar.m_cLocation, (char)3, charColor);
 }
 void renderEnemy1()
 {
@@ -1355,7 +959,7 @@ void renderBoss()
 }
 void renderDoor()
 {
-	// Draw the location of the character
+	// Draw the location of the door
 	WORD charColor = 0x00;
 	if (g_door.m_bActive == true)
 		charColor = 0x0B;
@@ -1363,9 +967,9 @@ void renderDoor()
 }
 void renderWeapon()
 {
-	// Draw the location of the character
+	// Draw the location of the weapon
 	WORD charColor = 0x0E;
-	g_Console.writeToBuffer(g_weapon.m_cLocation, (char)254, charColor);
+	g_Console.writeToBuffer(g_weapon.m_cLocation, (char)'-', charColor);
 }
 void renderFramerate()
 {
@@ -1383,7 +987,7 @@ void renderFramerate()
 	ss << g_dElapsedTime << "secs";
 	c.X = 0;
 	c.Y = 0;
-	g_Console.writeToBuffer(c, ss.str(), 0x59);
+	g_Console.writeToBuffer(c, ss.str(), 0x0f);
 }
 void renderToScreen()
 {
@@ -1604,5 +1208,12 @@ void reload()
 	{
 		Weapons[currentWeapon].Clip = Weapons[currentWeapon].ClipMax;
 		Weapons[currentWeapon].AmmoTotal = Weapons[currentWeapon].AmmoTotal - Weapons[currentWeapon].ClipMax;
+	}
+}
+void ost()
+{
+	if (S_GAME)
+	{
+		PlaySound(TEXT("sound/counterattack.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP); // play sound while in stage
 	}
 }
