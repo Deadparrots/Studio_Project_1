@@ -3,18 +3,13 @@
 //
 #include "game.h"
 #include "Framework\console.h"
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <fstream>
-#include <cstdlib>
-#include <ctime>
-#include <string>
+
 using namespace std;
 
 double  g_dElapsedTime;
 double  g_dDeltaTime;
 bool    g_abKeyPressed[K_COUNT];
+extern bool bossStage = false;
 
 // Game specific variables here
 SGameChar   g_sChar;
@@ -159,6 +154,8 @@ void boss_init()
 	g_door.m_cLocation.Y = enemyY;
 	g_door.m_bActive = false;
 	myfile.close();
+
+	bossStage = true;
 }
 void init(void)
 {
@@ -1067,7 +1064,6 @@ void moveCharacter()
 	}
 
 	myfile.close();
-
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
@@ -1608,7 +1604,5 @@ void reload()
 void ost()
 {
 	if (b_bossStage)
-	{
 		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP); // play sound while in stage
-	}
 }
