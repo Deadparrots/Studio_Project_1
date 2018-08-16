@@ -31,7 +31,7 @@ size_t		deathsound = 0;
 size_t		shootsound = 0;
 size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
-double		stages = 9.000; // set to 0 normally... now 9 for boss testing
+double		stages = 0.000; // set to 0 normally...  9 for boss testing
 int			int_stages = stages;
 bool b_bossStage = false;
 int g_shootdist = 0;
@@ -391,6 +391,7 @@ void gameplay()            // gameplay logic
 	else
 		boss_moveCharacter();
 	sound();			// sound can be played here too.
+	ost();
 }
 
 void boss_moveCharacter()
@@ -1608,6 +1609,6 @@ void ost()
 {
 	if (b_bossStage)
 	{
-		PlaySound(TEXT("sound/counterattack.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP); // play sound while in stage
+		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_NOSTOP); // play sound while in stage
 	}
 }
