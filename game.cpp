@@ -49,7 +49,6 @@ void boss_init()
 {
 	b_play = false;
 	weapdata();
-	StageType = EBoss;
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
 	g_Console.setConsoleFont(0, 16, L"Consolas");
@@ -159,7 +158,6 @@ void init(void)
 {
 	generate();
 	weapdata();
-	StageType = EStage;
 	// Set precision for floating point output
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
@@ -1388,7 +1386,7 @@ void processUserInput()
 			StageType = EBoss;
 		else
 			StageType = EStage;
-		if (StageType = EBoss)
+		if (StageType == EBoss)
 			boss_init();
 		else
 			init();
