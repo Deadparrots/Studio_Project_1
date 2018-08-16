@@ -867,36 +867,42 @@ void moveCharacter()
 		g_enemy1.m_bActive = false;
 		g_enemy1.m_cLocation.X = 0;
 		g_enemy1.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y)
 	{
 		g_enemy2.m_bActive = false;
 		g_enemy2.m_cLocation.X = 0;
 		g_enemy2.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y)
 	{
 		g_enemy3.m_bActive = false;
 		g_enemy3.m_cLocation.X = 0;
 		g_enemy3.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y)
 	{
 		g_enemy4.m_bActive = false;
 		g_enemy4.m_cLocation.X = 0;
 		g_enemy4.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y)
 	{
 		g_enemy5.m_bActive = false;
 		g_enemy5.m_cLocation.X = 0;
 		g_enemy5.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y)
 	{
 		g_enemy6.m_bActive = false;
 		g_enemy6.m_cLocation.X = 0;
 		g_enemy6.m_cLocation.Y = 0;
+		reload();
 	}
 	size_t rate = 100 / (stages + 1) + 24;
 	switch (rand() % rate)
@@ -1376,7 +1382,7 @@ void processUserInput()
 	{
 		stages++;
 		int_stages = stages;
-		if (int_stages == 10)
+		if (int_stages == 1)
 			StageType = EBoss;
 		else
 			StageType = EStage;
@@ -1485,16 +1491,16 @@ void renderUI()
 		}
 	}
 	UI.Y = 1; // Sets Height of UI text
-	UI.X = g_Console.getConsoleSize().X / 3 - 8; // Start of UI text
+	UI.X = g_Console.getConsoleSize().X / 3 - 13; // Start of UI text
 	g_Console.writeToBuffer(UI, "Lives : ", 0x9f);
-	UI.X = g_Console.getConsoleSize().X / 3;
+	UI.X = g_Console.getConsoleSize().X / 4 + 1;
 	std::string display = std::to_string(Lives);
 	g_Console.writeToBuffer(UI, display, 0x9f); // Displays the number of lives
-	UI.X = g_Console.getConsoleSize().X / 3 + 2;
+	UI.X = g_Console.getConsoleSize().X / 3;
 	g_Console.writeToBuffer(UI, "Weapon : ", 0x9f);
 	UI.X = UI.X + 9;
 	g_Console.writeToBuffer(UI, Weapons[currentWeapon].Name, 0x9f); // Display Equipped Weapon
-	UI.X = UI.X + Weapons[currentWeapon].Name.length() + 1; // Increases UI.X by text length of weapon 1's name
+	UI.X = UI.X + Weapons[currentWeapon].Name.length() + 3; // Increases UI.X by text length of weapon 1's name
 	g_Console.writeToBuffer(UI, "Ammo : ", 0x9f);
 	UI.X = UI.X + 7;
 	display = std::to_string(Weapons[currentWeapon].Clip);
@@ -1827,7 +1833,7 @@ void weapdata()
 {
 	std::string in;
 	std::ifstream weapondata("weapons.txt");
-	for (int i = 0; 4 > i; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		std::getline(weapondata, Weapons[i].Name); // Gets name of Weapon
 		weapondata >> Weapons[i].ClipMax;
