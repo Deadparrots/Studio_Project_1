@@ -1333,7 +1333,7 @@ void moveCharacter()
 void processUserInput()
 {
 	// quits the game if player hits the escape key
-	if (g_abKeyPressed[K_ESCAPE] || Lives < 0)
+	if (g_abKeyPressed[K_ESCAPE] || Lives == 0)
 		g_bQuitGame = true;
 	if (g_sChar.m_bActive == false) // Took damage
 	{
@@ -1383,7 +1383,7 @@ void processUserInput()
 	{
 		stages++;
 		int_stages = stages;
-		if (int_stages == 10)
+		if (int_stages == 1)
 			b_bossStage = true;
 		else
 			b_bossStage = false;
@@ -1440,7 +1440,7 @@ void renderGame()
 	renderEnemy4();
 	renderEnemy5();
 	renderEnemy6();
-	if (int_stages == 10)
+	if (int_stages == 1)
 		renderBoss();
 	renderUI();
 }
@@ -1862,7 +1862,7 @@ void reload()
 	}
 }
 void ost()
-{
+{	
 	if (b_bossStage)
 		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC); // play sound while in stage
 	else
