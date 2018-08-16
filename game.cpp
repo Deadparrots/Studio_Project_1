@@ -31,7 +31,7 @@ size_t		deathsound = 0;
 size_t		shootsound = 0;
 size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
-double		stages = 0.000; // set to 0 normally... 9 for boss testing
+double		stages = 9.000; // set to 0 normally... now 9 for boss testing
 int			int_stages = stages;
 bool b_bossStage = false;
 int g_shootdist = 0;
@@ -390,7 +390,7 @@ void gameplay()            // gameplay logic
 		b_bossStage = true;
 	else
 		b_bossStage = false;
-	if (b_bossStage)
+	if (!b_bossStage)
 		moveCharacter();// moves the character, collision detection, physics, etc
 	else
 		boss_moveCharacter();
