@@ -386,10 +386,6 @@ void splashScreenWait()    // waits for time to pass in splash screen
 void gameplay()            // gameplay logic
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
-	if (int_stages == 10)
-		b_bossStage = true;
-	else
-		b_bossStage = false;
 	if (!b_bossStage)
 		moveCharacter();// moves the character, collision detection, physics, etc
 	else
@@ -1130,10 +1126,14 @@ void processUserInput()
 	{
 		stages++;
 		int_stages = stages;
-		if (!b_bossStage)
-			init();
+		if (int_stages == 10)
+			b_bossStage = true;
 		else
+			b_bossStage = false;
+		if (b_bossStage)
 			boss_init();
+		else
+			init();
 		g_eGameState = S_GAME;
 		if (Lives != 9)
 			Lives++;
