@@ -24,7 +24,7 @@ size_t		shootsound = 0;
 size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
 int			MMSelect = MMStart;
-double		stages = 0.000; // set to 0 normally... 9 for boss testing
+double		stages = 9.000; // set to 0 normally... 9 for boss testing
 int			int_stages = stages;
 size_t		StageType = EMainMenu;
 bool		b_play = false;
@@ -399,12 +399,16 @@ void splashScreenWait()
 		bSomethingHappened = true;
 	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit)
+	{
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		g_bQuitGame = true;
+	}
 	if(!b_play)
 		ost();
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart) 
 	{
 		StageType = EStage;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 		g_eGameState = S_GAME;
 	}
