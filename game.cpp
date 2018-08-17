@@ -1427,7 +1427,8 @@ void processUserInput()
 		g_enemy4.m_bActive = false;
 		g_enemy5.m_bActive = false;
 		g_enemy6.m_bActive = false;
-		g_dElapsedTime = 20;
+		if(SongType == EBossBattle)
+			g_dElapsedTime = 20;
 	}
 	if (g_sChar.m_bActive == false) // Took damage
 	{
