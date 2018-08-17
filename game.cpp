@@ -456,7 +456,7 @@ void bossbattle_moveCharacter()
 	}
 	else if (g_dElapsedTime > 30 && g_dElapsedTime <= 31) // ATTACK 3
 	{
-		g_gaster2.m_cLocation.X = 20;
+		g_gaster2.m_cLocation.X = 15;
 		g_gaster2.m_bActive = true;
 		g_gaster2.m_cLocation.Y = 9 * (g_dElapsedTime - 30);
 	}
@@ -485,6 +485,59 @@ void bossbattle_moveCharacter()
 		g_gaster2.m_cLocation.Y = 10;
 		g_gaster2.m_cLocation.X = 20 - 20 * (g_dElapsedTime - 35);
 		g_gaster2.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 37 && g_dElapsedTime <= 38) // ATTACK 4
+	{
+
+		g_gaster4.m_bActive = true;
+		g_gaster4.m_cLocation.Y = 9;
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X * (g_dElapsedTime - 39);
+		g_gaster2.m_cLocation.X = 15;
+		g_gaster2.m_bActive = true;
+		g_gaster2.m_cLocation.Y = 24 - 10 * (g_dElapsedTime - 37);
+	}
+	else if (g_dElapsedTime > 38 && g_dElapsedTime <= 39)
+	{
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X;
+		g_gaster2.m_bFire = true;
+		g_gaster3.m_cLocation.X = 66;
+		g_gaster3.m_bActive = true;
+		g_gaster3.m_cLocation.Y = 21 * (g_dElapsedTime - 38);
+	}
+	else if (g_dElapsedTime > 39 && g_dElapsedTime <= 40)
+	{
+		g_gaster1.m_bActive = true; 
+		g_gaster1.m_cLocation.Y = 9;
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X;
+		g_gaster3.m_bFire = true;
+		g_gaster1.m_cLocation.X = 20 * (g_dElapsedTime - 39);
+		g_gaster3.m_cLocation.Y = 21 - 2 * (g_dElapsedTime - 39);
+		g_gaster2.m_cLocation.Y = 14 + 2 * (g_dElapsedTime - 39);
+	}
+	else if (g_dElapsedTime > 40 && g_dElapsedTime <= 43)
+	{
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X;
+		g_gaster1.m_bFire = true;
+		g_gaster1.m_cLocation.X = 20 + 10 * (g_dElapsedTime - 40);
+	}
+	else if (g_dElapsedTime > 43 && g_dElapsedTime <= 45)
+	{
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X;
+		g_gaster1.m_bFire = true;
+		g_gaster1.m_cLocation.X = 50 - 30 * (g_dElapsedTime - 43);
+	}
+	else if (g_dElapsedTime > 45 && g_dElapsedTime <= 46)
+	{
+		g_gaster4.m_cLocation.Y = 10; 
+		g_gaster2.m_cLocation.Y = 16 - 3 * (g_dElapsedTime - 45);
+		g_gaster3.m_cLocation.Y = 19 + 3 * (g_dElapsedTime - 45);
+	}
+	else if (g_dElapsedTime > 46 && g_dElapsedTime <= 47)
+	{
+		g_gaster4.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 46);
+		g_gaster4.m_bFire = true;
+		g_gaster2.m_cLocation.Y = 13 - 13 * (g_dElapsedTime - 46);
+		g_gaster3.m_cLocation.Y = 21 + 3 * (g_dElapsedTime - 46);
 	}
 	else
 	{
