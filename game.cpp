@@ -454,6 +454,12 @@ void bossbattle_moveCharacter()
 		g_gaster4.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 28);
 		g_gaster4.m_bFire = true;
 	}
+	else if (g_dElapsedTime > 30 && g_dElapsedTime <= 31) // ATTACK 3
+	{
+		g_gaster2.m_cLocation.X = 20;
+		g_gaster2.m_bActive = true;
+		g_gaster2.m_cLocation.Y = 20 * (g_dElapsedTime - 30);
+	}
 	else
 	{
 		g_gaster1.m_bActive = false;
@@ -1971,7 +1977,7 @@ void renderGaster4() // Up2
 		if (g_gaster4.m_bFire)
 			character = '|';
 		else
-			character = '/';
+			character = 92;
 		c.X = g_gaster4.m_cLocation.X - 1;
 		c.Y = g_gaster4.m_cLocation.Y + 1;
 		g_Console.writeToBuffer(c, character, charColor);
@@ -2453,5 +2459,6 @@ void gameOver()
 		b_play = false;
 		g_eGameState = S_GAME;
 		init();
+		Lives = 3;
 	}
 }
