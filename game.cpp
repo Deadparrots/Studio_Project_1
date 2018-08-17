@@ -547,6 +547,52 @@ void bossbattle_moveCharacter()
 		g_gaster2.m_cLocation.X = 15 - 15 * (g_dElapsedTime - 46);
 		g_gaster3.m_cLocation.X = 66 + 15 * (g_dElapsedTime - 46);
 	}
+	else if (g_dElapsedTime > 48 && g_dElapsedTime <= 49) // ATTACK 5
+	{
+		g_gaster1.m_cLocation.X = 20;
+		g_gaster4.m_cLocation.X = 60;
+		g_gaster1.m_bActive = true;
+		g_gaster4.m_bActive = true;
+		g_gaster1.m_cLocation.Y = 10 * (g_dElapsedTime - 48);
+		g_gaster4.m_cLocation.Y = 10 * (g_dElapsedTime - 48);
+	}
+	else if (g_dElapsedTime > 49 && g_dElapsedTime <= 51)
+	{
+		g_gaster1.m_cLocation.X = 20 + 9 * (g_dElapsedTime - 49);
+		g_gaster4.m_cLocation.X = 61 - 9 * (g_dElapsedTime - 49);
+		g_gaster1.m_bFire = true;
+		g_gaster4.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 51 && g_dElapsedTime <= 52)
+	{
+		g_gaster1.m_cLocation.X = 38;
+		g_gaster4.m_cLocation.X = 43;
+		g_gaster1.m_bFire = true;
+		g_gaster4.m_bFire = true;
+		g_gaster2.m_bActive = true;
+		g_gaster2.m_bFire = true;
+		g_gaster2.m_cLocation.X = 15;
+		g_gaster2.m_cLocation.Y = 24 - 7 * (g_dElapsedTime - 51);
+	}
+	else if (g_dElapsedTime > 52 && g_dElapsedTime <= 53)
+	{
+		g_gaster1.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 52);
+		g_gaster1.m_bFire = true;
+		g_gaster4.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 52);
+		g_gaster4.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 53 && g_dElapsedTime <= 54)
+	{
+		g_gaster1.m_cLocation.Y = 10 * (g_dElapsedTime - 53);
+		g_gaster1.m_bFire = true;
+		g_gaster4.m_cLocation.Y = 10 * (g_dElapsedTime - 53);
+		g_gaster4.m_bFire = true;
+		g_gaster1.m_cLocation.X = 38 - 10 * (g_dElapsedTime - 53);
+	}
+	else if (g_dElapsedTime > 54 && g_dElapsedTime <= 55)
+	{
+		g_gaster4.m_cLocation.X = 43 - 10 * (g_dElapsedTime - 54);
+	}
 	else
 	{
 		g_gaster1.m_bActive = false;
@@ -2013,7 +2059,7 @@ void renderGaster3() // Right
 		{
 			for (int j = -1; j <= 1; j++)
 			{
-				for (size_t i = g_gaster3.m_cLocation.X + 1; i > 0; i--)
+				for (size_t i = g_gaster3.m_cLocation.X - 1; i > 0; i--)
 				{
 					character = 177;
 					c.Y = g_gaster3.m_cLocation.Y + j;
