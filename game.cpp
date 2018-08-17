@@ -316,6 +316,8 @@ void render()
 		break;
 	case S_GAMEOVER: gameOver();
 		break;
+	case S_INTRUCTIONS: instructions();
+		break;
 	}
 	renderFramerate();  // renders debug information, frame rate, elapsed time, etc
 	renderToScreen();   // dump the contents of the buffer to the screen, one frame worth of game
@@ -358,6 +360,10 @@ void splashScreenWait()
 	{
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		g_bQuitGame = true;
+	}
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMInstructions && g_eGameState == S_TITLE)
+	{
+		g_eGameState = S_INTRUCTIONS;
 	}
 	if(!b_play)
 		ost();
@@ -2426,4 +2432,22 @@ void gameOver()
 		init();
 		stages = 9.000; // 9.000 ONLY FOR TESTING 
 	}
+}
+
+void instructions()
+{
+	for (int i = 0; i < 24; ++i)
+	{
+		std::fstream myfile("map/instructions.txt");
+		std::string sLine;
+		for (short i = 0; i < 24 * 80; i++)
+		{
+			if (i % 80 == 0)
+				std::getline(myfile, sLine);
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
+		}
+		myfile.close();
+	}
+	if (g_abKeyPressed[K_ESCAPE])
+		g_eGameState = S_TITLE;
 }
