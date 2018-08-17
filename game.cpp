@@ -563,7 +563,18 @@ void bossbattle_moveCharacter()
 		else
 			g_shootdist = g_shootmaxdist;
 	}
-
+	if (g_abKeyPressed[K_E])
+	{
+		if (currentWeapon < 3)
+		{
+			currentWeapon++;
+		}
+		else
+		{
+			currentWeapon = 0;
+		}
+		g_dBounceTime = g_dElapsedTime + 0.2;
+	}
 
 	if (g_shootdist >= g_shootmaxdist)
 	{
@@ -1624,7 +1635,6 @@ void renderGame()
 {
 	renderMap();        // renders the map to the buffer first
 	renderDoor();
-	renderWeapon();
 	renderCharacter();  // renders the character into the buffer
 	if (SongType == EStage)
 	{
@@ -1634,6 +1644,7 @@ void renderGame()
 		renderEnemy4();
 		renderEnemy5();
 		renderEnemy6();
+		renderWeapon();
 	}
 	if (SongType == EBossBattle)
 	{
@@ -1642,6 +1653,7 @@ void renderGame()
 		renderGaster3();
 		renderGaster4();
 		renderBossSpeech();
+		renderWeapon();
 	}
 	renderUI();
 }
