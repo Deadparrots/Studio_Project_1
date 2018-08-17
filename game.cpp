@@ -544,8 +544,8 @@ void bossbattle_moveCharacter()
 	{
 		g_gaster4.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 46);
 		g_gaster4.m_bFire = true;
-		g_gaster2.m_cLocation.Y = 13 - 13 * (g_dElapsedTime - 46);
-		g_gaster3.m_cLocation.Y = 21 + 3 * (g_dElapsedTime - 46);
+		g_gaster2.m_cLocation.X = 15 - 15 * (g_dElapsedTime - 46);
+		g_gaster3.m_cLocation.X = 66 + 15 * (g_dElapsedTime - 46);
 	}
 	else
 	{
