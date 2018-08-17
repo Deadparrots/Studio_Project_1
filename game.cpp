@@ -2379,4 +2379,40 @@ void gameOver()
 		}
 		myfile.close();
 	}
+	COORD m = g_Console.getConsoleSize();
+	switch (MMSelect)
+	{
+	case MMStart:
+		m.Y = 20;
+		m.X = m.X / 2 - 4;
+		g_Console.writeToBuffer(m, "TRY AGAIN", 0x0E);
+		m.Y += 2;
+		m.X = g_Console.getConsoleSize().X / 2 - 2;
+		g_Console.writeToBuffer(m, "Exit", 0x03);
+		break;
+	case MMExit:
+		m.Y = 20;
+		m.X = m.X / 2 - 4;
+		g_Console.writeToBuffer(m, "TRY AGAIN", 0x03);
+		m.Y += 2;
+		m.X = g_Console.getConsoleSize().X / 2 - 2;
+		g_Console.writeToBuffer(m, "Exit", 0x0E);
+		break;
+	}
+	if (MMSelect == MMStart && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_GAMEOVER) // MENU FOR GAME_OVER
+		MMSelect = MMExit;
+	else if (MMSelect == MMExit && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_GAMEOVER)
+		MMSelect = MMStart;
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit && g_eGameState == S_GAMEOVER) // QUIT_GAME
+	{
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		g_bQuitGame = true;
+	}
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_GAMEOVER) // CONTINUE_GAME
+	{
+		SongType = EStage;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		b_play = false;
+		g_eGameState = S_GAME;
+	}
 }
