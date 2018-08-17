@@ -258,6 +258,7 @@ void getInput(void)
 	g_abKeyPressed[K_RIGHT] = isKeyPressed(VK_RIGHT);
 	g_abKeyPressed[K_SPACE] = isKeyPressed(VK_SPACE);
 	g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
+	g_abKeyPressed[K_ENTER] = isKeyPressed(13);
 	g_abKeyPressed[K_W] = isKeyPressed(87);
 	g_abKeyPressed[K_A] = isKeyPressed(65);
 	g_abKeyPressed[K_S] = isKeyPressed(83);
@@ -317,6 +318,8 @@ void render()
 	case S_GAMEOVER: gameOver();
 		break;
 	case S_INTRUCTIONS: instructions();
+		break;
+	case S_SAVE: save();
 		break;
 	}
 	renderFramerate();  // renders debug information, frame rate, elapsed time, etc
@@ -401,11 +404,11 @@ void bossbattle_moveCharacter()
 
 
 	// Boss stuff go here
-	if ((g_dElapsedTime > 2 && g_dElapsedTime < 5) || 
-		(g_dElapsedTime > 6 && g_dElapsedTime < 9) || 
-		(g_dElapsedTime > 10 && g_dElapsedTime < 14) ||
-		(g_dElapsedTime > 15 && g_dElapsedTime < 18) ||
-		(g_dElapsedTime > 19 && g_dElapsedTime < 21))
+	if ((g_dElapsedTime > 2 && g_dElapsedTime <= 5) ||
+		(g_dElapsedTime > 6 && g_dElapsedTime <= 9) ||
+		(g_dElapsedTime > 10 && g_dElapsedTime <= 14) ||
+		(g_dElapsedTime > 15 && g_dElapsedTime <= 18) ||
+		(g_dElapsedTime > 19 && g_dElapsedTime <= 21))
 		bossSpeech = true;
 	else
 		bossSpeech = false;
@@ -462,7 +465,7 @@ void bossbattle_moveCharacter()
 	}
 	else if (g_dElapsedTime > 30 && g_dElapsedTime <= 31) // ATTACK 3
 	{
-		g_gaster2.m_cLocation.X = 20;
+		g_gaster2.m_cLocation.X = 15;
 		g_gaster2.m_bActive = true;
 		g_gaster2.m_cLocation.Y = 9 * (g_dElapsedTime - 30);
 	}
@@ -491,6 +494,59 @@ void bossbattle_moveCharacter()
 		g_gaster2.m_cLocation.Y = 10;
 		g_gaster2.m_cLocation.X = 20 - 20 * (g_dElapsedTime - 35);
 		g_gaster2.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 37 && g_dElapsedTime <= 38) // ATTACK 4
+	{
+
+		g_gaster4.m_bActive = true;
+		g_gaster4.m_cLocation.Y = 9;
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X * (g_dElapsedTime - 39);
+		g_gaster2.m_cLocation.X = 15;
+		g_gaster2.m_bActive = true;
+		g_gaster2.m_cLocation.Y = 24 - 10 * (g_dElapsedTime - 37);
+	}
+	else if (g_dElapsedTime > 38 && g_dElapsedTime <= 39)
+	{
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X;
+		g_gaster2.m_bFire = true;
+		g_gaster3.m_cLocation.X = 66;
+		g_gaster3.m_bActive = true;
+		g_gaster3.m_cLocation.Y = 21 * (g_dElapsedTime - 38);
+	}
+	else if (g_dElapsedTime > 39 && g_dElapsedTime <= 40)
+	{
+		g_gaster1.m_bActive = true;
+		g_gaster1.m_cLocation.Y = 9;
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X;
+		g_gaster3.m_bFire = true;
+		g_gaster1.m_cLocation.X = 20 * (g_dElapsedTime - 39);
+		g_gaster3.m_cLocation.Y = 21 - 2 * (g_dElapsedTime - 39);
+		g_gaster2.m_cLocation.Y = 14 + 2 * (g_dElapsedTime - 39);
+	}
+	else if (g_dElapsedTime > 40 && g_dElapsedTime <= 43)
+	{
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X;
+		g_gaster1.m_bFire = true;
+		g_gaster1.m_cLocation.X = 20 + 10 * (g_dElapsedTime - 40);
+	}
+	else if (g_dElapsedTime > 43 && g_dElapsedTime <= 45)
+	{
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X;
+		g_gaster1.m_bFire = true;
+		g_gaster1.m_cLocation.X = 50 - 30 * (g_dElapsedTime - 43);
+	}
+	else if (g_dElapsedTime > 45 && g_dElapsedTime <= 46)
+	{
+		g_gaster4.m_cLocation.Y = 10;
+		g_gaster2.m_cLocation.Y = 16 - 3 * (g_dElapsedTime - 45);
+		g_gaster3.m_cLocation.Y = 19 + 3 * (g_dElapsedTime - 45);
+	}
+	else if (g_dElapsedTime > 46 && g_dElapsedTime <= 47)
+	{
+		g_gaster4.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 46);
+		g_gaster4.m_bFire = true;
+		g_gaster2.m_cLocation.Y = 13 - 13 * (g_dElapsedTime - 46);
+		g_gaster3.m_cLocation.Y = 21 + 3 * (g_dElapsedTime - 46);
 	}
 	else
 	{
@@ -1481,6 +1537,10 @@ void processUserInput()
 		PlaySound(TEXT("sound/die.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 		g_eGameState = S_GAMEOVER;
 	}
+	if (g_abKeyPressed[K_ENTER])
+	{
+		g_eGameState = S_SAVE;
+	}
 	if (g_abKeyPressed[K_C])
 	{
 		g_enemy1.m_bActive = false;
@@ -2204,7 +2264,6 @@ void renderToScreen()
 	// Writes the buffer to the console, hence you will see what you have written
 	g_Console.flushBufferToConsole();
 }
-
 void sound()
 {
 	if (deathsound > 0)
@@ -2505,4 +2564,18 @@ void instructions()
 	}
 	if (g_abKeyPressed[K_ESCAPE])
 		g_eGameState = S_TITLE;
+}
+void save()
+{
+	if (SongType = EStage && g_abKeyPressed[K_ENTER])
+	{
+		Beep(1000, 500);
+		ifstream myfile("map/save.txt");
+		/*for (short i = 0; i < 24 * 80; i++)
+		{
+			if (i % 80 == 0)
+				std::getline(myfile, sLine);
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
+		}*/
+	}
 }

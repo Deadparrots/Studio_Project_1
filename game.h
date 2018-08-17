@@ -29,7 +29,8 @@ enum EKEYS
 	K_D,
 	K_C,
 	K_E,
-	K_COUNT,
+	K_ENTER,
+	K_COUNT
 };
 
 // Enumeration for the different screen states
@@ -40,7 +41,8 @@ enum EGAMESTATES
 	S_GAME,
 	S_GAMEOVER,
 	S_COUNT,
-	S_INTRUCTIONS
+	S_INTRUCTIONS,
+	S_SAVE
 };
 enum EWEAPONSTATES
 {
@@ -134,4 +136,5 @@ void reload();
 void ost();
 void gameOver();
 void instructions();
+void save();
 #endif // _GAME_H
