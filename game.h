@@ -28,6 +28,7 @@ enum EKEYS
 	K_S,
 	K_D,
 	K_C,
+	K_E,
 	K_COUNT,
 };
 
