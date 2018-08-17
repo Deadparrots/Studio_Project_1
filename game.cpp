@@ -464,7 +464,7 @@ void bossbattle_moveCharacter()
 	}
 	else if (g_dElapsedTime > 30 && g_dElapsedTime <= 31) // ATTACK 3
 	{
-		g_gaster2.m_cLocation.X = 15;
+		g_gaster2.m_cLocation.X = 14;
 		g_gaster2.m_bActive = true;
 		g_gaster2.m_cLocation.Y = 9 * (g_dElapsedTime - 30);
 	}
