@@ -26,11 +26,11 @@ size_t		shootfailsound = 0;
 int			MMSelect = MMStart;
 double		stages = 0.000; // set to 0 normally... 9 for boss testing
 int			int_stages = stages;
-size_t		SongType = EMainMenu;
+size_t		StageType = EMainMenu;
 bool		b_play = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
-EGAMESTATES g_eGameState = S_INTRO;
+EGAMESTATES g_eGameState = S_SPLASHSCREEN;
 EWEAPONSTATES g_eWeaponState = Hold;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 int Lives = 3; // Number of lives the player has left (Base Value is 3)
@@ -164,7 +164,7 @@ void init(void)
 	g_dBounceTime = 0.0;
 
 	// sets the initial state for the game
-	g_eGameState = S_TITLE;
+	g_eGameState = S_SPLASHSCREEN;
 	g_boss.m_bActive = false;
 	int enemyX, enemyY;
 	std::fstream myfile("map/map.txt");
@@ -345,8 +345,7 @@ void update(double dt)
 
 	switch (g_eGameState)
 	{
-	case S_INTRO: intro();
-	case S_TITLE: splashScreenWait(); // game logic for the splash screen
+	case S_SPLASHSCREEN: splashScreenWait(); // game logic for the splash screen
 		break;
 	case S_GAME: gameplay(); // gameplay logic when we are in the game
 		break;
@@ -365,61 +364,49 @@ void render()
 	clearScreen();      // clears the current screen and draw from scratch 
 	switch (g_eGameState)
 	{
-	case S_INTRO: renderIntro();
-		break;
-	case S_TITLE: renderSplashScreen();
+	case S_SPLASHSCREEN: renderSplashScreen();
 		break;
 	case S_GAME: renderGame();
+		break;
+	case S_GAMEOVER: gameOver();
 		break;
 	}
 	renderFramerate();  // renders debug information, frame rate, elapsed time, etc
 	renderToScreen();   // dump the contents of the buffer to the screen, one frame worth of game
 }
-void intro()
-{
-	if ((g_dElapsedTime > 35) || g_abKeyPressed[K_W] || g_abKeyPressed[K_A] || g_abKeyPressed[K_S] || g_abKeyPressed[K_D] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_RIGHT])
-	{
-		g_eGameState = S_TITLE;
-		SongType = EMainMenu;
-		init();
-	}
-}
+
 void splashScreenWait() 
 {
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	if ((MMSelect == MMStart || MMSelect == MMInstructions) && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	if ((MMSelect == MMStart || MMSelect == MMInstructions) && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]))
 	{
 		MMSelect++;
 		bSomethingHappened = true;
 	}
-	else if ((MMSelect == MMExit || MMSelect == MMInstructions) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if ((MMSelect == MMExit || MMSelect == MMInstructions) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]))
 	{
 		MMSelect--;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMStart && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMStart && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]))
 	{
 		MMSelect = MMExit;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMExit && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMExit && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]))
 	{
 		MMSelect = MMStart;
 		bSomethingHappened = true;
 	}
-	if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit && g_eGameState == S_TITLE)
-	{
-		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit)
 		g_bQuitGame = true;
-	}
 	if(!b_play)
 		ost();
-	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_TITLE)
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart) 
 	{
-		SongType = EStage;
-		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		StageType = EStage;
 		b_play = false;
 		g_eGameState = S_GAME;
 	}
@@ -429,12 +416,13 @@ void splashScreenWait()
 		g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
 	}
 }
+
 void gameplay()            // gameplay logic
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
-	if (SongType == EStage)
+	if (StageType == EStage)
 		moveCharacter();// moves the character, collision detection, physics, etc
-	else if (SongType == EBoss)
+	else if (StageType == EBoss)
 		boss_moveCharacter();
 	sound(); // sound can be played here too.
 	if (!b_play)
@@ -1375,11 +1363,8 @@ void moveCharacter()
 }
 void processUserInput()
 {
-	if (Lives < 1 || g_abKeyPressed[K_ESCAPE])
-	{
-		PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME);
-		g_bQuitGame = true;
-	}
+	if (Lives == 0 || g_abKeyPressed[K_ESCAPE])
+		g_eGameState = S_GAMEOVER;
 	if (g_abKeyPressed[K_C])
 		g_boss.m_bActive = false;
 	if (g_sChar.m_bActive == false) // Took damage
@@ -1431,14 +1416,14 @@ void processUserInput()
 		stages++;
 		int_stages = stages;
 		if (int_stages == 10)
-			SongType = EBoss;
+			StageType = EBoss;
 		else
 		{
-			if (SongType == EBoss)
+			if (StageType == EBoss)
 				b_play = false;
-			SongType = EStage;
+			StageType = EStage;
 		}
-		if (SongType == EBoss)
+		if (StageType == EBoss)
 			boss_init();
 		else
 			init();
@@ -1453,75 +1438,7 @@ void clearScreen()
 	// Clears the buffer with this colour attribute
 	g_Console.clearBuffer(0x00);
 }
-void renderIntro()
-{
-	if (g_dElapsedTime <= 7)
-		for (int i = 0; i < 12; ++i)
-		{
-			std::fstream myfile("map/scene1.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
-		}
-	if (g_dElapsedTime > 7 && g_dElapsedTime <= 14)
-		for (int i = 0; i < 12; ++i)
-		{
-			std::fstream myfile("map/scene2.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
-		}
-	if (g_dElapsedTime > 14 && g_dElapsedTime <= 21)
-		for (int i = 0; i < 12; ++i)
-		{
-			std::fstream myfile("map/scene3.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
-		}
-	if (g_dElapsedTime > 21 && g_dElapsedTime <= 28)
-		for (int i = 0; i < 12; ++i)
-		{
-			std::fstream myfile("map/scene4.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
-		}
 
-	if (g_dElapsedTime > 28 && g_dElapsedTime <= 35)
-		for (int i = 0; i < 12; ++i)
-		{
-			std::fstream myfile("map/scene5.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
-		}
-}
 void renderSplashScreen()  // renders the splash screen
 {
 	for (int i = 0; i < 12; ++i)
@@ -1589,7 +1506,7 @@ void renderGame()
 	renderEnemy4();
 	renderEnemy5();
 	renderEnemy6();
-	if (SongType == EBoss)
+	if (StageType == EBoss)
 		renderBoss();
 	renderUI();
 }
@@ -1602,7 +1519,7 @@ void renderMap()
 	//};
 
 	//COORD c;
-	if (SongType == EStage)
+	if (StageType == EStage)
 		for (int i = 0; i < 12; ++i)
 		{
 			std::fstream myfile("map/map.txt");
@@ -2012,11 +1929,27 @@ void reload()
 }
 void ost()
 {
-	if (SongType == EMainMenu)
-		PlaySound(TEXT("sound/menu.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
-	else if (SongType == EStage)
-		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // change 'cave' to whatever
-	else if (SongType == EBoss)
+	if (StageType == EMainMenu)
+		PlaySound(TEXT("sound/title.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
+	else if (StageType == EStage)
+		PlaySound(TEXT("sound/zelda.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // change 'cave' to whatever
+	else if (StageType == EBoss)
 		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
 	b_play = true;
+}
+
+void gameOver()
+{
+	for (int i = 0; i < 24; ++i)
+	{
+		std::fstream myfile("tryAgain.txt");
+		std::string sLine;
+		for (short i = 0; i < 24 * 80; i++)
+		{
+			if (i % 80 == 0)
+				std::getline(myfile, sLine);
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
+		}
+		myfile.close();
+	}
 }
