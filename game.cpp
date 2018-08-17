@@ -403,7 +403,7 @@ void bossbattle_moveCharacter()
 		bossSpeech = true;
 	else
 		bossSpeech = false;
-	if (g_dElapsedTime > 21 && g_dElapsedTime < 21.5)
+	if (g_dElapsedTime > 21 && g_dElapsedTime < 21.5) // ATTACK 1
 	{
 		g_gaster1.m_bActive = true;
 		g_gaster1.m_bFire = false;
@@ -431,10 +431,13 @@ void bossbattle_moveCharacter()
 		g_gaster2.m_cLocation.X = 5 - 10 * (g_dElapsedTime - 22.5);
 		g_gaster2.m_bFire = true;
 	}
+	else if (g_dElapsedTime > 25 && g_dElapsedTime < 26) // ATTACK 2
+	{
+
+	}
 	else if (g_dElapsedTime > 23.5 && g_dElapsedTime < 24)
 	{
-		g_gaster1.m_bFire = false;
-		g_gaster2.m_bFire = false;
+
 	}
 	else
 	{
@@ -676,7 +679,14 @@ void bossbattle_moveCharacter()
 		g_enemy6.m_cLocation.X = 0;
 		g_enemy6.m_cLocation.Y = 0;
 	}
-
+	if (((g_sChar.m_cLocation.X == g_gaster1.m_cLocation.X - 1 || g_sChar.m_cLocation.X == g_gaster1.m_cLocation.X || g_sChar.m_cLocation.X == g_gaster1.m_cLocation.X + 1) && g_gaster1.m_bFire) ||
+		((g_sChar.m_cLocation.Y == g_gaster2.m_cLocation.Y - 1 || g_sChar.m_cLocation.Y == g_gaster2.m_cLocation.Y || g_sChar.m_cLocation.Y == g_gaster2.m_cLocation.Y + 1) && g_gaster2.m_bFire) ||
+		((g_sChar.m_cLocation.Y == g_gaster3.m_cLocation.Y - 1 || g_sChar.m_cLocation.Y == g_gaster3.m_cLocation.Y || g_sChar.m_cLocation.Y == g_gaster3.m_cLocation.Y + 1) && g_gaster3.m_bFire) ||
+		((g_sChar.m_cLocation.X == g_gaster4.m_cLocation.X - 1 || g_sChar.m_cLocation.X == g_gaster4.m_cLocation.X || g_sChar.m_cLocation.X == g_gaster4.m_cLocation.X + 1) && g_gaster4.m_bFire))
+	{
+		g_sChar.m_bActive = false;
+		bSomethingHappened = true;
+	}
 	myfile.close();
 	if (bSomethingHappened)
 	{
