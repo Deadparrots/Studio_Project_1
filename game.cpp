@@ -2369,7 +2369,7 @@ void gameOver()
 {
 	for (int i = 0; i < 24; ++i)
 	{
-		std::fstream myfile("map/tryAgain.txt");
+		std::fstream myfile("map/gameover.txt");
 		std::string sLine;
 		for (short i = 0; i < 24 * 80; i++)
 		{
