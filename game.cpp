@@ -9,7 +9,7 @@ double  g_dDeltaTime;
 bool    g_abKeyPressed[K_COUNT];
 
 // Game specific variables here
-SGameChar   g_sChar;
+SGameChar   g_sChar; // Player Character
 SGameChar	g_enemy1;
 SGameChar	g_enemy2;
 SGameChar	g_enemy3;
@@ -33,8 +33,8 @@ EGAMESTATES g_eGameState = S_INTRO;
 EWEAPONSTATES g_eWeaponState = Hold;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 int Lives = 3; // Number of lives the player has left (Base Value is 3)
-int currentWeapon = 0;
-WeaponParameters Weapons[4];
+int currentWeapon = 0; // Current Weapon
+WeaponParameters Weapons[4]; // Number of Weapons
 // Console object
 Console g_Console(80, 24, "Monster Dungeon");
 
@@ -249,6 +249,7 @@ void getInput(void)
 	g_abKeyPressed[K_S] = isKeyPressed(83);
 	g_abKeyPressed[K_D] = isKeyPressed(68);
 	g_abKeyPressed[K_C] = isKeyPressed(67);
+	g_abKeyPressed[K_E] = isKeyPressed(69); // For Weapon Switching
 }
 
 //--------------------------------------------------------------
@@ -829,6 +830,18 @@ void moveCharacter()
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
 		}
+	}
+	if (g_abKeyPressed[K_E])
+	{
+		if (currentWeapon < 3)
+		{
+			currentWeapon++;
+		}
+		else
+		{
+			currentWeapon = 0;
+		}
+		g_dBounceTime = g_dElapsedTime + 0.2;
 	}
 	if (
 		(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == false) ||
@@ -1627,11 +1640,6 @@ void renderUI()
 	UI.X = UI.X + 7;
 	display = std::to_string(Weapons[currentWeapon].Clip);
 	g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Clip
-	UI.X = UI.X + display.length();
-	g_Console.writeToBuffer(UI, "/", 0x9f);
-	UI.X = UI.X + 1;
-	display = std::to_string(Weapons[currentWeapon].AmmoTotal);
-	g_Console.writeToBuffer(UI, display, 0x9f); // Total Ammo not in clip
 }
 void renderCharacter()
 {
@@ -1942,31 +1950,39 @@ void generate()
 }
 void weapdata()
 {
+	int i = 0;
 	std::string in;
 	std::ifstream weapondata("weapons.txt");
-	for (int i = 0; 4 > i; i++)
-	{
-		std::getline(weapondata, Weapons[i].Name); // Gets name of Weapon
-		weapondata >> Weapons[i].ClipMax;
-		weapondata >> Weapons[i].Reload;
-		weapondata >> Weapons[i].Range;
-	}
+	getline(weapondata, Weapons[i].Name); // Gets Pistol
+	weapondata >> Weapons[i].ClipMax;
+	weapondata >> Weapons[i].Reload;
+	weapondata >> Weapons[i].Range;
+	i++;
+	weapondata.ignore();
+	getline(weapondata, Weapons[i].Name); // Gets Crossbow
+	weapondata >> Weapons[i].ClipMax;
+	weapondata >> Weapons[i].Reload;
+	weapondata >> Weapons[i].Range;
+	i++;
+	weapondata.ignore();
+	getline(weapondata, Weapons[i].Name); // Gets Spear
+	weapondata >> Weapons[i].ClipMax;
+	weapondata >> Weapons[i].Reload;
+	weapondata >> Weapons[i].Range;
+	i++;
+	weapondata.ignore();
+	getline(weapondata, Weapons[i].Name); // Gets Rifle
+	weapondata >> Weapons[i].ClipMax;
+	weapondata >> Weapons[i].Reload;
+	weapondata >> Weapons[i].Range;
+	i++;
+
 	weapondata.close();
 }
 void reload()
 {
-	Weapons[currentWeapon].AmmoTotal += Weapons[currentWeapon].Clip;	// Adds ammo left in clip to total
-	Weapons[currentWeapon].AmmoTotal = 6;
-	if (Weapons[currentWeapon].ClipMax >= Weapons[currentWeapon].AmmoTotal)	// if cap is higher or equal to remaining
-	{
-		Weapons[currentWeapon].Clip = Weapons[currentWeapon].AmmoTotal; // Clip is filled to remaining
-		Weapons[currentWeapon].AmmoTotal = 0; // Deducted to 0
-	}
-	else // if more ammo than clip cap
-	{
-		Weapons[currentWeapon].Clip = Weapons[currentWeapon].ClipMax;
-		Weapons[currentWeapon].AmmoTotal = Weapons[currentWeapon].AmmoTotal - Weapons[currentWeapon].ClipMax;
-	}
+	Weapons[currentWeapon].Clip += Weapons[currentWeapon].ClipMax;	// Adds ammo left in clip to total
+
 }
 void ost()
 {
