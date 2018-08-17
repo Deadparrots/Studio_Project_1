@@ -17,6 +17,10 @@ SGameChar	g_enemy4;
 SGameChar	g_enemy5;
 SGameChar	g_enemy6;
 SGameChar	g_weapon;
+SBossGaster	g_gaster1;
+SBossGaster	g_gaster2;
+SBossGaster	g_gaster3;
+SBossGaster	g_gaster4;
 SGameChar	g_door;
 size_t		deathsound = 0;
 size_t		shootsound = 0;
@@ -27,6 +31,7 @@ double		stages = 9.000; // set to 0 normally... 9 for boss testing
 int			int_stages = stages;
 size_t		SongType = EMainMenu;
 bool		b_play = false;
+bool		bossSpeech = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_INTRO;
@@ -83,6 +88,7 @@ void boss_battle_init()
 	reload();
 	g_door.m_cLocation.X = 40;
 	g_door.m_cLocation.Y = 14;
+	g_door.m_bActive = false;
 }
 void init(void)
 {
@@ -204,6 +210,14 @@ void init(void)
 	g_door.m_bActive = false;
 	g_weapon.m_cLocation.X = 10;
 	g_weapon.m_cLocation.Y = 2;
+	g_gaster1.m_bActive = false;
+	g_gaster2.m_bActive = false;
+	g_gaster3.m_bActive = false;
+	g_gaster4.m_bActive = false;
+	g_gaster1.m_bFire = false;
+	g_gaster2.m_bFire = false;
+	g_gaster3.m_bFire = false;
+	g_gaster4.m_bFire = false;
 	myfile.close();
 	// sets the width, height and the font name to use in the console
 	g_Console.setConsoleFont(0, 16, L"Consolas");
@@ -378,6 +392,65 @@ void bossbattle_moveCharacter()
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
+
+
+	// Boss stuff go here
+	if ((g_dElapsedTime > 2 && g_dElapsedTime < 5) || 
+		(g_dElapsedTime > 6 && g_dElapsedTime < 9) || 
+		(g_dElapsedTime > 10 && g_dElapsedTime < 14) ||
+		(g_dElapsedTime > 15 && g_dElapsedTime < 18) ||
+		(g_dElapsedTime > 19 && g_dElapsedTime < 21))
+		bossSpeech = true;
+	else
+		bossSpeech = false;
+	if (g_dElapsedTime > 21 && g_dElapsedTime < 21.5)
+	{
+		g_gaster1.m_bActive = true;
+		g_gaster1.m_bFire = false;
+		g_gaster1.m_cLocation.X = (g_dElapsedTime - 21) * g_sChar.m_cLocation.X * 2 + 1;
+		g_gaster1.m_cLocation.Y = 10;
+		g_gaster2.m_bActive = true;
+		g_gaster2.m_bFire = false;
+		g_gaster2.m_cLocation.Y = (g_dElapsedTime - 21) * g_sChar.m_cLocation.Y * 2 + 1;
+		g_gaster2.m_cLocation.X = 5;
+	}
+	else if (g_dElapsedTime > 21.5 && g_dElapsedTime < 22)
+	{
+		g_gaster1.m_cLocation.X = g_sChar.m_cLocation.X;
+		g_gaster2.m_cLocation.Y = g_sChar.m_cLocation.Y;
+	}
+	else if (g_dElapsedTime > 22 && g_dElapsedTime < 22.5)
+	{
+		g_gaster1.m_cLocation.Y = 11;
+		g_gaster2.m_cLocation.X = 6;
+	}
+	else if (g_dElapsedTime > 22.5 && g_dElapsedTime < 23.5)
+	{
+		g_gaster1.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 22.5);
+		g_gaster1.m_bFire = true;
+		g_gaster2.m_cLocation.X = 5 - 10 * (g_dElapsedTime - 22.5);
+		g_gaster2.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 23.5 && g_dElapsedTime < 24)
+	{
+		g_gaster1.m_bFire = false;
+		g_gaster2.m_bFire = false;
+	}
+	else
+	{
+		g_gaster1.m_bActive = false;
+		g_gaster1.m_bFire = false;
+		g_gaster2.m_bActive = false;
+		g_gaster2.m_bFire = false;
+		g_gaster3.m_bActive = false;
+		g_gaster3.m_bFire = false;
+		g_gaster4.m_bActive = false;
+		g_gaster4.m_bFire = false;
+	}
+	// End Boss stuff
+
+
+
 	std::fstream myfile("map/bossscreen.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
@@ -490,7 +563,18 @@ void bossbattle_moveCharacter()
 		else
 			g_shootdist = g_shootmaxdist;
 	}
-
+	if (g_abKeyPressed[K_E])
+	{
+		if (currentWeapon < 3)
+		{
+			currentWeapon++;
+		}
+		else
+		{
+			currentWeapon = 0;
+		}
+		g_dBounceTime = g_dElapsedTime + 0.2;
+	}
 
 	if (g_shootdist >= g_shootmaxdist)
 	{
@@ -1332,7 +1416,7 @@ void processUserInput()
 {
 	if (Lives < 1 || g_abKeyPressed[K_ESCAPE])
 	{
-		PlaySound(TEXT("sound/die.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+		PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME);
 		g_eGameState = S_GAMEOVER;
 	}
 	if (g_abKeyPressed[K_C])
@@ -1343,6 +1427,7 @@ void processUserInput()
 		g_enemy4.m_bActive = false;
 		g_enemy5.m_bActive = false;
 		g_enemy6.m_bActive = false;
+		g_dElapsedTime = 20;
 	}
 	if (g_sChar.m_bActive == false) // Took damage
 	{
@@ -1385,7 +1470,8 @@ void processUserInput()
 		g_enemy3.m_bActive == false &&
 		g_enemy4.m_bActive == false &&
 		g_enemy5.m_bActive == false &&
-		g_enemy6.m_bActive == false)
+		g_enemy6.m_bActive == false &&
+		SongType == EStage)
 		g_door.m_bActive = true;
 	if (g_door.m_bActive == true && g_sChar.m_cLocation.X == g_door.m_cLocation.X && g_sChar.m_cLocation.Y == g_door.m_cLocation.Y)
 	{
@@ -1416,11 +1502,9 @@ void processUserInput()
 		}
 	}
 }
-
 void clearScreen()
 {
-	// Clears the buffer with this colour attribute
-	g_Console.clearBuffer(0x00);
+	g_Console.clearBuffer(0x00); // Clears the buffer with this colour attribute
 }
 void renderIntro()
 {
@@ -1520,7 +1604,6 @@ void renderSplashScreen()  // renders the splash screen
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
-
 	case MMInstructions:
 		m.Y = 20;
 		m.X = m.X / 2 - 2;
@@ -1532,7 +1615,6 @@ void renderSplashScreen()  // renders the splash screen
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
-
 	case MMExit:
 		m.Y = 20;
 		m.X = m.X / 2 - 2;
@@ -1550,7 +1632,6 @@ void renderGame()
 {
 	renderMap();        // renders the map to the buffer first
 	renderDoor();
-	renderWeapon();
 	renderCharacter();  // renders the character into the buffer
 	if (SongType == EStage)
 	{
@@ -1560,6 +1641,16 @@ void renderGame()
 		renderEnemy4();
 		renderEnemy5();
 		renderEnemy6();
+		renderWeapon();
+	}
+	if (SongType == EBossBattle)
+	{
+		renderGaster1();
+		renderGaster2();
+		renderGaster3();
+		renderGaster4();
+		renderBossSpeech();
+		renderWeapon();
 	}
 	renderUI();
 }
@@ -1651,6 +1742,239 @@ void renderCharacter()
 	}
 	g_Console.writeToBuffer(g_sChar.m_cLocation, (char)3, charColor);
 }
+void renderGaster1() // Up
+{
+	if (g_gaster1.m_bActive == true)
+	{
+		COORD c;
+		WORD charColor = 0x0E;
+		char character = '_';
+		c.X = g_gaster1.m_cLocation.X;
+		c.Y = g_gaster1.m_cLocation.Y - 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		character = '/';
+		c.X = g_gaster1.m_cLocation.X - 1;
+		c.Y = g_gaster1.m_cLocation.Y;
+		g_Console.writeToBuffer(c, character, charColor);
+		character = 92;
+		c.X = g_gaster1.m_cLocation.X + 1;
+		c.Y = g_gaster1.m_cLocation.Y;
+		g_Console.writeToBuffer(c, character, charColor);
+		character = 'O';
+		c.X = g_gaster1.m_cLocation.X;
+		c.Y = g_gaster1.m_cLocation.Y;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster1.m_bFire)
+			character = '|';
+		else
+			character = 92;
+		c.X = g_gaster1.m_cLocation.X - 1;
+		c.Y = g_gaster1.m_cLocation.Y + 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster1.m_bFire)
+			character = '|';
+		else
+			character = '/';
+		c.X = g_gaster1.m_cLocation.X + 1;
+		c.Y = g_gaster1.m_cLocation.Y + 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster1.m_bFire)
+			character = 177;
+		else
+			character = 176;
+		c.X = g_gaster1.m_cLocation.X;
+		c.Y = g_gaster1.m_cLocation.Y + 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster1.m_bFire)
+		{
+			for (int j = -1; j <= 1; j++)
+			{
+				for (size_t i = g_gaster1.m_cLocation.Y + 1; i < 24; i++)
+				{
+					character = 177;
+					c.X = g_gaster1.m_cLocation.X + j;
+					c.Y = i+1;
+					g_Console.writeToBuffer(c, character, charColor);
+				}
+			}
+		}
+		
+	}
+}
+void renderGaster2() // Left
+{
+	if (g_gaster2.m_bActive == true)
+	{
+		COORD c;
+		WORD charColor = 0x0E;
+		char character = '|';
+		c.X = g_gaster2.m_cLocation.X - 1;
+		c.Y = g_gaster2.m_cLocation.Y;
+		g_Console.writeToBuffer(c, character, charColor);
+		character = '/';
+		c.X = g_gaster2.m_cLocation.X - 1;
+		c.Y = g_gaster2.m_cLocation.Y - 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		character = 92;
+		c.X = g_gaster2.m_cLocation.X - 1;
+		c.Y = g_gaster2.m_cLocation.Y + 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		character = 'O';
+		c.X = g_gaster2.m_cLocation.X;
+		c.Y = g_gaster2.m_cLocation.Y;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster2.m_bFire)
+			character = '-';
+		else
+			character = '/';
+		c.X = g_gaster2.m_cLocation.X + 1;
+		c.Y = g_gaster2.m_cLocation.Y + 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster2.m_bFire)
+			character = '-';
+		else
+			character = 92;
+		c.X = g_gaster2.m_cLocation.X + 1;
+		c.Y = g_gaster2.m_cLocation.Y - 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster2.m_bFire)
+			character = 177;
+		else
+			character = 176;
+		c.X = g_gaster2.m_cLocation.X + 1;
+		c.Y = g_gaster2.m_cLocation.Y;
+		g_Console.writeToBuffer(c, character, charColor); 
+		if (g_gaster2.m_bFire)
+		{
+			for (int j = -1; j <= 1; j++)
+			{
+				for (size_t i = g_gaster2.m_cLocation.X + 1; i < 80; i++)
+				{
+					character = 177;
+					c.Y = g_gaster2.m_cLocation.Y + j;
+					c.X = i + 1;
+					g_Console.writeToBuffer(c, character, charColor);
+				}
+			}
+		}
+	}
+}
+void renderGaster3() // Right
+{
+	if (g_gaster3.m_bActive == true)
+	{
+		COORD c;
+		WORD charColor = 0x0E;
+		char character = '|';
+		c.X = g_gaster3.m_cLocation.X + 1;
+		c.Y = g_gaster3.m_cLocation.Y;
+		g_Console.writeToBuffer(c, character, charColor);
+		character = '/';
+		c.X = g_gaster3.m_cLocation.X + 1;
+		c.Y = g_gaster3.m_cLocation.Y + 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		character = 92;
+		c.X = g_gaster3.m_cLocation.X + 1;
+		c.Y = g_gaster3.m_cLocation.Y - 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		character = 'O';
+		c.X = g_gaster3.m_cLocation.X;
+		c.Y = g_gaster3.m_cLocation.Y;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster3.m_bFire)
+			character = '-';
+		else
+			character = 92;
+		c.X = g_gaster3.m_cLocation.X - 1;
+		c.Y = g_gaster3.m_cLocation.Y + 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster3.m_bFire)
+			character = '-';
+		else
+			character = '/';
+		c.X = g_gaster3.m_cLocation.X - 1;
+		c.Y = g_gaster3.m_cLocation.Y - 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster3.m_bFire)
+			character = 177;
+		else
+			character = 176;
+		c.X = g_gaster3.m_cLocation.X - 1;
+		c.Y = g_gaster3.m_cLocation.Y;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster3.m_bFire)
+		{
+			for (int j = -1; j <= 1; j++)
+			{
+				for (size_t i = g_gaster3.m_cLocation.X + 1; i > 0; i--)
+				{
+					character = 177;
+					c.Y = g_gaster3.m_cLocation.Y + j;
+					c.X = i - 1;
+					g_Console.writeToBuffer(c, character, charColor);
+				}
+			}
+		}
+	}
+}
+void renderGaster4() // Up2
+{
+	if (g_gaster4.m_bActive == true)
+	{
+		COORD c;
+		WORD charColor = 0x0E;
+		char character = '_';
+		c.X = g_gaster4.m_cLocation.X;
+		c.Y = g_gaster4.m_cLocation.Y - 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		character = '/';
+		c.X = g_gaster4.m_cLocation.X - 1;
+		c.Y = g_gaster4.m_cLocation.Y;
+		g_Console.writeToBuffer(c, character, charColor);
+		character = 92;
+		c.X = g_gaster4.m_cLocation.X + 1;
+		c.Y = g_gaster4.m_cLocation.Y;
+		g_Console.writeToBuffer(c, character, charColor);
+		character = 'O';
+		c.X = g_gaster4.m_cLocation.X;
+		c.Y = g_gaster4.m_cLocation.Y;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster4.m_bFire)
+			character = '|';
+		else
+			character = '/';
+		c.X = g_gaster4.m_cLocation.X - 1;
+		c.Y = g_gaster4.m_cLocation.Y + 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster4.m_bFire)
+			character = '|';
+		else
+			character = '/';
+		c.X = g_gaster4.m_cLocation.X + 1;
+		c.Y = g_gaster4.m_cLocation.Y + 1;
+		g_Console.writeToBuffer(c, character, charColor);
+		if (g_gaster4.m_bFire)
+			character = 177;
+		else
+			character = 176;
+		c.X = g_gaster4.m_cLocation.X;
+		c.Y = g_gaster4.m_cLocation.Y + 1;
+		g_Console.writeToBuffer(c, character, charColor); 
+		if (g_gaster4.m_bFire)
+		{
+			for (int j = -1; j <= 1; j++)
+			{
+				for (size_t i = g_gaster4.m_cLocation.Y + 1; i < 24; i++)
+				{
+					character = 177;
+					c.X = g_gaster4.m_cLocation.X + j;
+					c.Y = i + 1;
+					g_Console.writeToBuffer(c, character, charColor);
+				}
+			}
+		}
+	}
+}
 void renderEnemy1()
 {
 	// Draw the location of the character
@@ -1736,6 +2060,64 @@ void renderWeapon()
 	// Draw the location of the weapon
 	WORD charColor = 0x0E;
 	g_Console.writeToBuffer(g_weapon.m_cLocation, (char)254, charColor);
+}
+void renderBossSpeech()
+{
+	if (bossSpeech == true)
+	{
+		for (int i = 0; i < 12; ++i)
+		{
+			std::fstream myfile("map/bossSpeechBubble.txt");
+			std::string sLine;
+			for (short i = 0; i < 8 * 27; i++)
+			{
+				if (i % 27 == 0)
+					std::getline(myfile, sLine);
+				g_Console.writeToBuffer(COORD{ i % 27 + 52, i / 27 + 3 }, sLine[i % 27], 0x0F);
+			}
+			myfile.close();
+		}
+	}
+	if (g_dElapsedTime > 2 && g_dElapsedTime < 5)
+	{
+		char text[] = "So...";
+		for (short i = 0; i < 5; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 5 + 62, 7 }, text[i % 5], 0x0F);
+		}
+	}
+	if (g_dElapsedTime > 6 && g_dElapsedTime < 9)
+	{
+		char text[] = "You've made it this far.";
+		for (short i = 0; i < 24; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 12 + 60, i / 12 + 6 }, text[i % 24], 0x0F);
+		}
+	}
+	if (g_dElapsedTime > 10 && g_dElapsedTime < 14)
+	{
+		char text[] = "I am the one who destroyed your town.";
+		for (short i = 0; i < 37; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 13 + 60, i / 13 + 6 }, text[i % 37], 0x0F);
+		}
+	}
+	if (g_dElapsedTime > 15 && g_dElapsedTime < 18)
+	{
+		char text[] = "I assume you'rehere to destroyme too.";
+		for (short i = 0; i < 37; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 15 + 59, i / 15 + 6 }, text[i % 37], 0x0F);
+		}
+	}
+	if (g_dElapsedTime > 19 && g_dElapsedTime < 21)
+	{
+		char text[] = "Not if I canhelp it!";
+		for (short i = 0; i < 20; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 12 + 60, i / 12 + 6 }, text[i % 20], 0x0F);
+		}
+	}
 }
 void renderFramerate()
 {
@@ -1981,7 +2363,6 @@ void weapdata()
 void reload()
 {
 	Weapons[currentWeapon].Clip += Weapons[currentWeapon].ClipMax;	// Adds ammo left in clip to total
-
 }
 void ost()
 {
@@ -2036,11 +2417,13 @@ void gameOver()
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		g_bQuitGame = true;
 	}
-	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_GAMEOVER) // CONTINUE_GAME
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_GAMEOVER) // CONTINUE_GAME FROM MAIN MENU
 	{
 		SongType = EStage;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 		g_eGameState = S_GAME;
+		init();
+		stages = 9.000; // 9.000 ONLY FOR TESTING 
 	}
 }
