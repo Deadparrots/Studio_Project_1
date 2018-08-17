@@ -395,15 +395,15 @@ void bossbattle_moveCharacter()
 
 
 	// Boss stuff go here
-	if ((g_dElapsedTime > 2 && g_dElapsedTime < 5) || 
-		(g_dElapsedTime > 6 && g_dElapsedTime < 9) || 
-		(g_dElapsedTime > 10 && g_dElapsedTime < 14) ||
-		(g_dElapsedTime > 15 && g_dElapsedTime < 18) ||
-		(g_dElapsedTime > 19 && g_dElapsedTime < 21))
+	if ((g_dElapsedTime > 2 && g_dElapsedTime <= 5) || 
+		(g_dElapsedTime > 6 && g_dElapsedTime <= 9) || 
+		(g_dElapsedTime > 10 && g_dElapsedTime <= 14) ||
+		(g_dElapsedTime > 15 && g_dElapsedTime <= 18) ||
+		(g_dElapsedTime > 19 && g_dElapsedTime <= 21))
 		bossSpeech = true;
 	else
 		bossSpeech = false;
-	if (g_dElapsedTime > 21 && g_dElapsedTime < 21.5) // ATTACK 1
+	if (g_dElapsedTime > 21 && g_dElapsedTime <= 21.5) // ATTACK 1
 	{
 		g_gaster1.m_bActive = true;
 		g_gaster1.m_bFire = false;
@@ -414,30 +414,45 @@ void bossbattle_moveCharacter()
 		g_gaster2.m_cLocation.Y = (g_dElapsedTime - 21) * g_sChar.m_cLocation.Y * 2 + 1;
 		g_gaster2.m_cLocation.X = 5;
 	}
-	else if (g_dElapsedTime > 21.5 && g_dElapsedTime < 22)
+	else if (g_dElapsedTime > 21.5 && g_dElapsedTime <= 22)
 	{
 		g_gaster1.m_cLocation.X = g_sChar.m_cLocation.X;
 		g_gaster2.m_cLocation.Y = g_sChar.m_cLocation.Y;
 	}
-	else if (g_dElapsedTime > 22 && g_dElapsedTime < 22.5)
+	else if (g_dElapsedTime > 22 && g_dElapsedTime <= 22.5)
 	{
 		g_gaster1.m_cLocation.Y = 11;
 		g_gaster2.m_cLocation.X = 6;
 	}
-	else if (g_dElapsedTime > 22.5 && g_dElapsedTime < 23.5)
+	else if (g_dElapsedTime > 22.5 && g_dElapsedTime <= 23.5)
 	{
 		g_gaster1.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 22.5);
 		g_gaster1.m_bFire = true;
 		g_gaster2.m_cLocation.X = 5 - 10 * (g_dElapsedTime - 22.5);
 		g_gaster2.m_bFire = true;
 	}
-	else if (g_dElapsedTime > 25 && g_dElapsedTime < 26) // ATTACK 2
+	else if (g_dElapsedTime > 25 && g_dElapsedTime <= 26) // ATTACK 2
 	{
-
+		g_gaster1.m_cLocation.X = 20;
+		g_gaster4.m_cLocation.X = 60;
+		g_gaster1.m_bActive = true;
+		g_gaster4.m_bActive = true;
+		g_gaster1.m_cLocation.Y = 10 * (g_dElapsedTime - 25);
+		g_gaster4.m_cLocation.Y = 10 * (g_dElapsedTime - 25);
 	}
-	else if (g_dElapsedTime > 23.5 && g_dElapsedTime < 24)
+	else if (g_dElapsedTime > 26 && g_dElapsedTime <= 28)
 	{
-
+		g_gaster1.m_cLocation.X = 20 + 9 * (g_dElapsedTime - 26);
+		g_gaster4.m_cLocation.X = 61 - 9 * (g_dElapsedTime - 26);
+		g_gaster1.m_bFire = true;
+		g_gaster4.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 28 && g_dElapsedTime <= 29)
+	{
+		g_gaster1.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 28);
+		g_gaster1.m_bFire = true;
+		g_gaster4.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 28);
+		g_gaster4.m_bFire = true;
 	}
 	else
 	{
@@ -2092,7 +2107,7 @@ void renderBossSpeech()
 			myfile.close();
 		}
 	}
-	if (g_dElapsedTime > 2 && g_dElapsedTime < 5)
+	if (g_dElapsedTime > 2 && g_dElapsedTime <= 5)
 	{
 		char text[] = "So...";
 		for (short i = 0; i < 5; i++)
@@ -2100,7 +2115,7 @@ void renderBossSpeech()
 			g_Console.writeToBuffer(COORD{ i % 5 + 62, 7 }, text[i % 5], 0x0F);
 		}
 	}
-	if (g_dElapsedTime > 6 && g_dElapsedTime < 9)
+	if (g_dElapsedTime > 6 && g_dElapsedTime <= 9)
 	{
 		char text[] = "You've made it this far.";
 		for (short i = 0; i < 24; i++)
@@ -2108,7 +2123,7 @@ void renderBossSpeech()
 			g_Console.writeToBuffer(COORD{ i % 12 + 60, i / 12 + 6 }, text[i % 24], 0x0F);
 		}
 	}
-	if (g_dElapsedTime > 10 && g_dElapsedTime < 14)
+	if (g_dElapsedTime > 10 && g_dElapsedTime <= 14)
 	{
 		char text[] = "I am the one who destroyed your town.";
 		for (short i = 0; i < 37; i++)
@@ -2116,7 +2131,7 @@ void renderBossSpeech()
 			g_Console.writeToBuffer(COORD{ i % 13 + 60, i / 13 + 6 }, text[i % 37], 0x0F);
 		}
 	}
-	if (g_dElapsedTime > 15 && g_dElapsedTime < 18)
+	if (g_dElapsedTime > 15 && g_dElapsedTime <= 18)
 	{
 		char text[] = "I assume you'rehere to destroyme too.";
 		for (short i = 0; i < 37; i++)
@@ -2124,7 +2139,7 @@ void renderBossSpeech()
 			g_Console.writeToBuffer(COORD{ i % 15 + 59, i / 15 + 6 }, text[i % 37], 0x0F);
 		}
 	}
-	if (g_dElapsedTime > 19 && g_dElapsedTime < 21)
+	if (g_dElapsedTime > 19 && g_dElapsedTime <= 21)
 	{
 		char text[] = "Not if I canhelp it!";
 		for (short i = 0; i < 20; i++)
