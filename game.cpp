@@ -2414,5 +2414,6 @@ void gameOver()
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 		g_eGameState = S_GAME;
+		init();
 	}
 }
