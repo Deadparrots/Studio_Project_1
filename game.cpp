@@ -409,7 +409,7 @@ void bossbattle_moveCharacter()
 		bossSpeech = true;
 	else
 		bossSpeech = false;
-	if (g_dElapsedTime > 21 && g_dElapsedTime < 21.5)
+	if (g_dElapsedTime > 21 && g_dElapsedTime <= 21.5) // ATTACK 1
 	{
 		g_gaster1.m_bActive = true;
 		g_gaster1.m_bFire = false;
@@ -420,27 +420,77 @@ void bossbattle_moveCharacter()
 		g_gaster2.m_cLocation.Y = (g_dElapsedTime - 21) * g_sChar.m_cLocation.Y * 2 + 1;
 		g_gaster2.m_cLocation.X = 5;
 	}
-	else if (g_dElapsedTime > 21.5 && g_dElapsedTime < 22)
+	else if (g_dElapsedTime > 21.5 && g_dElapsedTime <= 22)
 	{
 		g_gaster1.m_cLocation.X = g_sChar.m_cLocation.X;
 		g_gaster2.m_cLocation.Y = g_sChar.m_cLocation.Y;
 	}
-	else if (g_dElapsedTime > 22 && g_dElapsedTime < 22.5)
+	else if (g_dElapsedTime > 22 && g_dElapsedTime <= 22.5)
 	{
 		g_gaster1.m_cLocation.Y = 11;
 		g_gaster2.m_cLocation.X = 6;
 	}
-	else if (g_dElapsedTime > 22.5 && g_dElapsedTime < 23.5)
+	else if (g_dElapsedTime > 22.5 && g_dElapsedTime <= 23.5)
 	{
 		g_gaster1.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 22.5);
 		g_gaster1.m_bFire = true;
 		g_gaster2.m_cLocation.X = 5 - 10 * (g_dElapsedTime - 22.5);
 		g_gaster2.m_bFire = true;
 	}
-	else if (g_dElapsedTime > 23.5 && g_dElapsedTime < 24)
+	else if (g_dElapsedTime > 25 && g_dElapsedTime <= 26) // ATTACK 2
 	{
-		g_gaster1.m_bFire = false;
+		g_gaster1.m_cLocation.X = 20;
+		g_gaster4.m_cLocation.X = 60;
+		g_gaster1.m_bActive = true;
+		g_gaster4.m_bActive = true;
+		g_gaster1.m_cLocation.Y = 10 * (g_dElapsedTime - 25);
+		g_gaster4.m_cLocation.Y = 10 * (g_dElapsedTime - 25);
+	}
+	else if (g_dElapsedTime > 26 && g_dElapsedTime <= 28)
+	{
+		g_gaster1.m_cLocation.X = 20 + 9 * (g_dElapsedTime - 26);
+		g_gaster4.m_cLocation.X = 61 - 9 * (g_dElapsedTime - 26);
+		g_gaster1.m_bFire = true;
+		g_gaster4.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 28 && g_dElapsedTime <= 29)
+	{
+		g_gaster1.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 28);
+		g_gaster1.m_bFire = true;
+		g_gaster4.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 28);
+		g_gaster4.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 30 && g_dElapsedTime <= 31) // ATTACK 3
+	{
+		g_gaster2.m_cLocation.X = 20;
+		g_gaster2.m_bActive = true;
+		g_gaster2.m_cLocation.Y = 9 * (g_dElapsedTime - 30);
+	}
+	else if (g_dElapsedTime > 31 && g_dElapsedTime <= 32)
+	{
+		g_gaster2.m_cLocation.Y = 9 + 5 * (g_dElapsedTime - 31);
+		g_gaster2.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 32 && g_dElapsedTime <= 33)
+	{
+		g_gaster2.m_cLocation.Y = 14 + 5 * (g_dElapsedTime - 32);
 		g_gaster2.m_bFire = false;
+	}
+	else if (g_dElapsedTime > 33 && g_dElapsedTime <= 34)
+	{
+		g_gaster2.m_cLocation.Y = 19;
+		g_gaster2.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 34 && g_dElapsedTime <= 35)
+	{
+		g_gaster2.m_cLocation.Y = 19 - 9 * (g_dElapsedTime - 34);
+		g_gaster2.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 35 && g_dElapsedTime <= 36)
+	{
+		g_gaster2.m_cLocation.Y = 10;
+		g_gaster2.m_cLocation.X = 20 - 20 * (g_dElapsedTime - 35);
+		g_gaster2.m_bFire = true;
 	}
 	else
 	{
