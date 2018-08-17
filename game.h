@@ -96,7 +96,7 @@ void gameplay();            // gameplay logic
 void moveCharacter();       // moves the character, collision detection, physics, etc
 void boss_moveCharacter();
 void bossbattle_moveCharacter();
-void processUserInput();    // checks if you should change states or do something else with the game, e.g. pause, 
+void processUserInput();    // checks if you should change states or do something else with the game, e.g. pause, exit
 void clearScreen();         // clears the current screen and draw from scratch 
 void renderIntro();
 void renderSplashScreen();  // renders the splash screen
