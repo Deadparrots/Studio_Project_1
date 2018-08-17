@@ -1478,7 +1478,7 @@ void processUserInput()
 {
 	if (Lives < 1 || g_abKeyPressed[K_ESCAPE])
 	{
-		PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME);
+		PlaySound(TEXT("sound/die.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 		g_eGameState = S_GAMEOVER;
 	}
 	if (g_abKeyPressed[K_C])
