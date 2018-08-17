@@ -59,7 +59,7 @@ void boss_init()
 	g_Console.setConsoleFont(0, 16, L"Consolas");
 	reload();
 	g_sChar.m_cLocation.X = 40;
-	g_sChar.m_cLocation.Y = 21;
+	g_sChar.m_cLocation.Y = 11;
 	g_sChar.m_bActive = true;
 	g_door.m_cLocation.X = 40;
 	g_door.m_cLocation.Y = 5;
@@ -458,7 +458,12 @@ void bossbattle_moveCharacter()
 	{
 		g_gaster2.m_cLocation.X = 20;
 		g_gaster2.m_bActive = true;
-		g_gaster2.m_cLocation.Y = 20 * (g_dElapsedTime - 30);
+		g_gaster2.m_cLocation.Y = 10 * (g_dElapsedTime - 30);
+	}
+	else if (g_dElapsedTime > 31 && g_dElapsedTime <= 32)
+	{
+		g_gaster2.m_cLocation.Y = 10 * (g_dElapsedTime - 31);
+
 	}
 	else
 	{
