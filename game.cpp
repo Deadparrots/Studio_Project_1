@@ -1332,7 +1332,7 @@ void processUserInput()
 {
 	if (Lives < 1 || g_abKeyPressed[K_ESCAPE])
 	{
-		PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME);
+		PlaySound(TEXT("sound/die.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 		g_eGameState = S_GAMEOVER;
 	}
 	if (g_abKeyPressed[K_C])
@@ -1976,7 +1976,6 @@ void weapdata()
 	weapondata >> Weapons[i].Reload;
 	weapondata >> Weapons[i].Range;
 	i++;
-
 	weapondata.close();
 }
 void reload()
@@ -1998,7 +1997,7 @@ void gameOver()
 {
 	for (int i = 0; i < 24; ++i)
 	{
-		std::fstream myfile("map/tryAgain.txt");
+		std::fstream myfile("map/gameover.txt");
 		std::string sLine;
 		for (short i = 0; i < 24 * 80; i++)
 		{
@@ -2007,5 +2006,41 @@ void gameOver()
 			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
 		}
 		myfile.close();
+	}
+	COORD m = g_Console.getConsoleSize();
+	switch (MMSelect)
+	{
+	case MMStart:
+		m.Y = 20;
+		m.X = m.X / 2 - 4;
+		g_Console.writeToBuffer(m, "TRY AGAIN", 0x0E);
+		m.Y += 2;
+		m.X = g_Console.getConsoleSize().X / 2 - 2;
+		g_Console.writeToBuffer(m, "Exit", 0x03);
+		break;
+	case MMExit:
+		m.Y = 20;
+		m.X = m.X / 2 - 4;
+		g_Console.writeToBuffer(m, "TRY AGAIN", 0x03);
+		m.Y += 2;
+		m.X = g_Console.getConsoleSize().X / 2 - 2;
+		g_Console.writeToBuffer(m, "Exit", 0x0E);
+		break;
+	}
+	if (MMSelect == MMStart && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_GAMEOVER) // MENU FOR GAME_OVER
+		MMSelect = MMExit;
+	else if (MMSelect == MMExit && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_GAMEOVER)
+		MMSelect = MMStart;
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit && g_eGameState == S_GAMEOVER) // QUIT_GAME
+	{
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		g_bQuitGame = true;
+	}
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_GAMEOVER) // CONTINUE_GAME
+	{
+		SongType = EStage;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		b_play = false;
+		g_eGameState = S_GAME;
 	}
 }
