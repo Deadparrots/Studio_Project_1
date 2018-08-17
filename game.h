@@ -39,6 +39,7 @@ enum EGAMESTATES
 	S_TITLE,
 	S_GAME,
 	S_GAMEOVER,
+	S_INTRUCTIONS,
 	S_COUNT
 };
 enum EWEAPONSTATES
@@ -132,4 +133,5 @@ void weapdata();
 void reload();
 void ost();
 void gameOver();
+void instructions();
 #endif // _GAME_H
