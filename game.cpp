@@ -458,12 +458,33 @@ void bossbattle_moveCharacter()
 	{
 		g_gaster2.m_cLocation.X = 20;
 		g_gaster2.m_bActive = true;
-		g_gaster2.m_cLocation.Y = 10 * (g_dElapsedTime - 30);
+		g_gaster2.m_cLocation.Y = 9 * (g_dElapsedTime - 30);
 	}
 	else if (g_dElapsedTime > 31 && g_dElapsedTime <= 32)
 	{
-		g_gaster2.m_cLocation.Y = 10 * (g_dElapsedTime - 31);
-
+		g_gaster2.m_cLocation.Y = 9 + 5 * (g_dElapsedTime - 31);
+		g_gaster2.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 32 && g_dElapsedTime <= 33)
+	{
+		g_gaster2.m_cLocation.Y = 14 + 5 * (g_dElapsedTime - 32);
+		g_gaster2.m_bFire = false;
+	}
+	else if (g_dElapsedTime > 33 && g_dElapsedTime <= 34)
+	{
+		g_gaster2.m_cLocation.Y = 19;
+		g_gaster2.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 34 && g_dElapsedTime <= 35)
+	{
+		g_gaster2.m_cLocation.Y = 19 - 9 * (g_dElapsedTime - 34);
+		g_gaster2.m_bFire = true;
+	}
+	else if (g_dElapsedTime > 35 && g_dElapsedTime <= 36)
+	{
+		g_gaster2.m_cLocation.Y = 10;
+		g_gaster2.m_cLocation.X = 20 - 20 * (g_dElapsedTime - 35);
+		g_gaster2.m_bFire = true;
 	}
 	else
 	{
@@ -2465,5 +2486,6 @@ void gameOver()
 		g_eGameState = S_GAME;
 		init();
 		Lives = 3;
+		stages = 0;
 	}
 }
