@@ -1012,36 +1012,42 @@ void moveCharacter()
 		g_enemy1.m_bActive = false;
 		g_enemy1.m_cLocation.X = 0;
 		g_enemy1.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y)
 	{
 		g_enemy2.m_bActive = false;
 		g_enemy2.m_cLocation.X = 0;
 		g_enemy2.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y)
 	{
 		g_enemy3.m_bActive = false;
 		g_enemy3.m_cLocation.X = 0;
 		g_enemy3.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y)
 	{
 		g_enemy4.m_bActive = false;
 		g_enemy4.m_cLocation.X = 0;
 		g_enemy4.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y)
 	{
 		g_enemy5.m_bActive = false;
 		g_enemy5.m_cLocation.X = 0;
 		g_enemy5.m_cLocation.Y = 0;
+		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y)
 	{
 		g_enemy6.m_bActive = false;
 		g_enemy6.m_cLocation.X = 0;
 		g_enemy6.m_cLocation.Y = 0;
+		reload();
 	}
 	size_t rate = 100 / (stages + 1) + 24;
 	switch (rand() % rate)
@@ -2483,7 +2489,6 @@ void gameOver()
 		stages = 9.000; // 9.000 ONLY FOR TESTING 
 	}
 }
-
 void instructions()
 {
 	for (int i = 0; i < 24; ++i)
