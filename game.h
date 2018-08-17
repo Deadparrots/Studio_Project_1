@@ -29,7 +29,7 @@ enum EKEYS
 	K_D,
 	K_C,
 	K_E,
-	K_COUNT
+	K_COUNT,
 };
 
 // Enumeration for the different screen states
@@ -72,6 +72,12 @@ struct SGameChar
 	COORD m_cLocation;
 	bool  m_bActive;
 };
+struct SBossGaster
+{
+	COORD m_cLocation;
+	bool  m_bActive;
+	bool  m_bFire;
+};
 
 struct WeaponParameters
 {
@@ -105,6 +111,10 @@ void renderGame();          // renders the game stuff
 void renderMap();           // renders the map to the buffer first
 void renderUI();			// renders the ui to the buffer
 void renderCharacter();     // renders the character into the buffer
+void renderGaster1();
+void renderGaster2();
+void renderGaster3();
+void renderGaster4();
 void renderEnemy1();
 void renderEnemy2();
 void renderEnemy3();
@@ -113,6 +123,7 @@ void renderEnemy5();
 void renderEnemy6();
 void renderDoor();
 void renderWeapon();
+void renderBossSpeech();
 void renderFramerate();     // renders debug information, frame rate, elapsed time, etc
 void renderToScreen();      // dump the contents of the buffer to the screen, one frame worth of game
 void generate();
