@@ -22,6 +22,7 @@ SBossGaster	g_gaster2;
 SBossGaster	g_gaster3;
 SBossGaster	g_gaster4;
 SGameChar	g_door;
+std::vector<char>	Map;
 size_t		deathsound = 0;
 size_t		shootsound = 0;
 size_t		reloadsound = 0;
@@ -101,15 +102,11 @@ void init(void)
 	// sets the initial state for the game
 	g_eGameState = S_TITLE;
 	int enemyX, enemyY;
-	std::fstream myfile("map/map.txt");
 	while (1)
 	{
 		enemyX = rand() % 80;
 		enemyY = rand() % 24;
-		char * buffer = new char[0];
-		myfile.seekg(enemyX + enemyY * 82);
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[enemyX + enemyY * 80] == ' ')
 			break;
 	}
 	g_sChar.m_cLocation.X = enemyX;
@@ -119,10 +116,7 @@ void init(void)
 	{
 		enemyX = rand() % 80;
 		enemyY = rand() % 24;
-		char * buffer = new char[0];
-		myfile.seekg(enemyX + enemyY * 82);
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
+		if (Map[enemyX + enemyY * 80] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
 			break;
 	}
 	g_enemy1.m_cLocation.X = enemyX;
@@ -132,10 +126,7 @@ void init(void)
 	{
 		enemyX = rand() % 80;
 		enemyY = rand() % 24;
-		char * buffer = new char[0];
-		myfile.seekg(enemyX + enemyY * 82);
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
+		if (Map[enemyX + enemyY * 80] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
 			break;
 	}
 	g_enemy2.m_cLocation.X = enemyX;
@@ -145,10 +136,7 @@ void init(void)
 	{
 		enemyX = rand() % 80;
 		enemyY = rand() % 24;
-		char * buffer = new char[0];
-		myfile.seekg(enemyX + enemyY * 82);
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
+		if (Map[enemyX + enemyY * 80] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
 			break;
 	}
 	g_enemy3.m_cLocation.X = enemyX;
@@ -158,10 +146,7 @@ void init(void)
 	{
 		enemyX = rand() % 80;
 		enemyY = rand() % 24;
-		char * buffer = new char[0];
-		myfile.seekg(enemyX + enemyY * 82);
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
+		if (Map[enemyX + enemyY * 80] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
 			break;
 	}
 	g_enemy4.m_cLocation.X = enemyX;
@@ -171,10 +156,7 @@ void init(void)
 	{
 		enemyX = rand() % 80;
 		enemyY = rand() % 24;
-		char * buffer = new char[0];
-		myfile.seekg(enemyX + enemyY * 82);
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
+		if (Map[enemyX + enemyY * 80] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
 			break;
 	}
 	g_enemy5.m_cLocation.X = enemyX;
@@ -184,10 +166,7 @@ void init(void)
 	{
 		enemyX = rand() % 80;
 		enemyY = rand() % 24;
-		char * buffer = new char[0];
-		myfile.seekg(enemyX + enemyY * 82);
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
+		if (Map[enemyX + enemyY * 80] == ' ' && (g_sChar.m_cLocation.X != enemyX || g_sChar.m_cLocation.Y != enemyY))
 			break;
 	}
 	g_enemy6.m_cLocation.X = enemyX;
@@ -199,10 +178,7 @@ void init(void)
 	{
 		enemyX = rand() % 80;
 		enemyY = rand() % 24;
-		char * buffer = new char[0];
-		myfile.seekg(enemyX + enemyY * 82);
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[enemyX + enemyY * 80] == ' ')
 			break;
 	}
 	g_door.m_cLocation.X = enemyX;
@@ -218,7 +194,6 @@ void init(void)
 	g_gaster2.m_bFire = false;
 	g_gaster3.m_bFire = false;
 	g_gaster4.m_bFire = false;
-	myfile.close();
 	// sets the width, height and the font name to use in the console
 	g_Console.setConsoleFont(0, 16, L"Consolas");
 	reload();
@@ -731,9 +706,6 @@ void bossbattle_moveCharacter()
 	}
 	// End Boss stuff
 
-
-
-	std::fstream myfile("map/bossscreen.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
@@ -795,12 +767,9 @@ void bossbattle_moveCharacter()
 	char * buffer2 = new char[0];
 	if (g_eWeaponState == FireUp)
 	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
+		if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 80] == ' ')
 		{
 			g_weapon.m_cLocation.Y--;
-			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -808,12 +777,9 @@ void bossbattle_moveCharacter()
 	}
 	if (g_eWeaponState == FireDown)
 	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
+		if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 80] == ' ')
 		{
 			g_weapon.m_cLocation.Y++;
-			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -821,12 +787,9 @@ void bossbattle_moveCharacter()
 	}
 	if (g_eWeaponState == FireLeft)
 	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
+		if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 1] == ' ')
 		{
 			g_weapon.m_cLocation.X--;
-			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -834,12 +797,9 @@ void bossbattle_moveCharacter()
 	}
 	if (g_eWeaponState == FireRight)
 	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
+		if (buffer2[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 1] == ' ')
 		{
 			g_weapon.m_cLocation.X++;
-			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -868,10 +828,7 @@ void bossbattle_moveCharacter()
 
 	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
 		{
 			g_sChar.m_cLocation.Y--;
 			bSomethingHappened = true;
@@ -879,10 +836,7 @@ void bossbattle_moveCharacter()
 	}
 	if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 1] == ' ')
 		{
 			g_sChar.m_cLocation.X--;
 			bSomethingHappened = true;
@@ -890,10 +844,7 @@ void bossbattle_moveCharacter()
 	}
 	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 80] == ' ')
 		{
 			g_sChar.m_cLocation.Y++;
 			bSomethingHappened = true;
@@ -901,10 +852,7 @@ void bossbattle_moveCharacter()
 	}
 	if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 1] == ' ')
 		{
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
@@ -966,7 +914,6 @@ void bossbattle_moveCharacter()
 		g_sChar.m_bActive = false;
 		bSomethingHappened = true;
 	}
-	myfile.close();
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
@@ -978,16 +925,12 @@ void boss_moveCharacter()
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	std::fstream myfile("map/bossmap.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
 	
 	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
 		{
 			g_sChar.m_cLocation.Y--;
 			bSomethingHappened = true;
@@ -995,10 +938,7 @@ void boss_moveCharacter()
 	}
 	if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 1] == ' ')
 		{
 			g_sChar.m_cLocation.X--;
 			bSomethingHappened = true;
@@ -1006,10 +946,7 @@ void boss_moveCharacter()
 	}
 	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 80] == ' ')
 		{
 			g_sChar.m_cLocation.Y++;
 			bSomethingHappened = true;
@@ -1017,16 +954,12 @@ void boss_moveCharacter()
 	}
 	if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 1] == ' ')
 		{
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
 		}
 	}
-	myfile.close();
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
@@ -1038,7 +971,6 @@ void moveCharacter()
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	std::fstream myfile("map/map.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
@@ -1097,15 +1029,11 @@ void moveCharacter()
 			//bSomethingHappened = true;
 		}
 	}
-	char * buffer2 = new char[0];
 	if (g_eWeaponState == FireUp)
 	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
+		if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 80] == ' ')
 		{
 			g_weapon.m_cLocation.Y--;
-			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -1113,12 +1041,9 @@ void moveCharacter()
 	}
 	if (g_eWeaponState == FireDown)
 	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
+		if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 80] == ' ')
 		{
 			g_weapon.m_cLocation.Y++;
-			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -1126,12 +1051,9 @@ void moveCharacter()
 	}
 	if (g_eWeaponState == FireLeft)
 	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
+		if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 1] == ' ')
 		{
 			g_weapon.m_cLocation.X--;
-			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -1139,12 +1061,9 @@ void moveCharacter()
 	}
 	if (g_eWeaponState == FireRight)
 	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
+		if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 1] == ' ')
 		{
 			g_weapon.m_cLocation.X++;
-			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -1162,10 +1081,7 @@ void moveCharacter()
 
 	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
 		{
 			g_sChar.m_cLocation.Y--;
 			bSomethingHappened = true;
@@ -1173,10 +1089,7 @@ void moveCharacter()
 	}
 	if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 1] == ' ')
 		{
 			g_sChar.m_cLocation.X--;
 			bSomethingHappened = true;
@@ -1184,10 +1097,7 @@ void moveCharacter()
 	}
 	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 80] == ' ')
 		{
 			g_sChar.m_cLocation.Y++;
 			bSomethingHappened = true;
@@ -1195,10 +1105,7 @@ void moveCharacter()
 	}
 	if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 1] == ' ')
 		{
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
@@ -1286,147 +1193,99 @@ void moveCharacter()
 	switch (rand() % rate)
 	{
 	case 0:
-		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy1.m_bActive == true)
+		if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 1] == ' ')
 			g_enemy1.m_cLocation.X++;
 		break;
 	case 1:
-		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy1.m_bActive == true)
+		if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 80] == ' ')
 			g_enemy1.m_cLocation.Y++;
 		break;
 	case 2:
-		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy1.m_bActive == true)
+		if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 1] == ' ')
 			g_enemy1.m_cLocation.X--;
 		break;
 	case 3:
-		myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy1.m_bActive == true)
+		if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 80] == ' ')
 			g_enemy1.m_cLocation.Y--;
 		break;
 	case 4:
-		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy2.m_bActive == true)
+		if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 1] == ' ')
 			g_enemy2.m_cLocation.X++;
 		break;
 	case 5:
-		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy2.m_bActive == true)
+		if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 80] == ' ')
 			g_enemy2.m_cLocation.Y++;
 		break;
 	case 6:
-		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy2.m_bActive == true)
+		if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 1] == ' ')
 			g_enemy2.m_cLocation.X--;
 		break;
 	case 7:
-		myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy2.m_bActive == true)
+		if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 80] == ' ')
 			g_enemy2.m_cLocation.Y--;
 		break;
 	case 8:
-		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy3.m_bActive == true)
+		if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 1] == ' ')
 			g_enemy3.m_cLocation.X++;
 		break;
 	case 9:
-		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy3.m_bActive == true)
+		if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 80] == ' ')
 			g_enemy3.m_cLocation.Y++;
 		break;
 	case 10:
-		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy3.m_bActive == true)
+		if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 1] == ' ')
 			g_enemy3.m_cLocation.X--;
 		break;
 	case 11:
-		myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy3.m_bActive == true)
+		if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 80] == ' ')
 			g_enemy3.m_cLocation.Y--;
 		break;
 	case 12:
-		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy4.m_bActive == true)
+		if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 1] == ' ')
 			g_enemy4.m_cLocation.X++;
 		break;
 	case 13:
-		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy4.m_bActive == true)
+		if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 80] == ' ')
 			g_enemy4.m_cLocation.Y++;
 		break;
 	case 14:
-		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy4.m_bActive == true)
+		if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 1] == ' ')
 			g_enemy4.m_cLocation.X--;
 		break;
 	case 15:
-		myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy4.m_bActive == true)
+		if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 80] == ' ')
 			g_enemy4.m_cLocation.Y--;
 		break;
 	case 16:
-		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy5.m_bActive == true)
+		if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 1] == ' ')
 			g_enemy5.m_cLocation.X++;
 		break;
 	case 17:
-		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy5.m_bActive == true)
+		if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 80] == ' ')
 			g_enemy5.m_cLocation.Y++;
 		break;
 	case 18:
-		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy5.m_bActive == true)
+		if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 1] == ' ')
 			g_enemy5.m_cLocation.X--;
 		break;
 	case 19:
-		myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy5.m_bActive == true)
+		if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 80] == ' ')
 			g_enemy5.m_cLocation.Y--;
 		break;
 	case 20:
-		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy6.m_bActive == true)
+		if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 1] == ' ')
 			g_enemy6.m_cLocation.X++;
 		break;
 	case 21:
-		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy6.m_bActive == true)
+		if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 80] == ' ')
 			g_enemy6.m_cLocation.Y++;
 		break;
 	case 22:
-		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy6.m_bActive == true)
+		if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 1] == ' ')
 			g_enemy6.m_cLocation.X--;
 		break;
 	case 23:
-		myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ' && g_enemy6.m_bActive == true)
+		if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 80] == ' ')
 			g_enemy6.m_cLocation.Y--;
 		break;
 	}	
@@ -1435,18 +1294,14 @@ void moveCharacter()
 		switch (rand() % 100 / (int_stages + 1) + 5)
 		{
 		case 0:
-			myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 + 82);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 80] == ' ')
 				g_enemy1.m_cLocation.X++;
 			else
 				g_enemy1.m_cLocation.X--;
 
 			break;
 		case 1:
-			myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 - 82);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 80] == ' ')
 				g_enemy1.m_cLocation.X--;
 			else
 				g_enemy1.m_cLocation.X++;
@@ -1458,17 +1313,13 @@ void moveCharacter()
 		switch (rand() % 100 / (int_stages + 1) + 5)
 		{
 		case 0:
-			myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 + 1);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 1] == ' ')
 				g_enemy1.m_cLocation.Y++;
 			else
 				g_enemy1.m_cLocation.Y--;
 			break;
 		case 1:
-			myfile.seekg(g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 82 - 1);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 1] == ' ')
 				g_enemy1.m_cLocation.Y--;
 			else
 				g_enemy1.m_cLocation.Y--;
@@ -1480,18 +1331,14 @@ void moveCharacter()
 		switch (rand() % 100 / (int_stages + 1) + 5)
 		{
 		case 0:
-			myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 + 1);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 1] == ' ')
 				g_enemy2.m_cLocation.X++;
 			else
 				g_enemy2.m_cLocation.X--;
 
 			break;
 		case 1:
-			myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 - 1);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 1] == ' ')
 				g_enemy2.m_cLocation.X--;
 			else
 				g_enemy2.m_cLocation.X++;
@@ -1503,17 +1350,13 @@ void moveCharacter()
 		switch (rand() % 100 / (int_stages + 1) + 5)
 		{
 		case 0:
-			myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 + 82);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 80] == ' ')
 				g_enemy2.m_cLocation.Y++;
 			else
 				g_enemy2.m_cLocation.Y--;
 			break;
 		case 1:
-			myfile.seekg(g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 82 - 82);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 80] == ' ')
 				g_enemy2.m_cLocation.Y--;
 			else
 				g_enemy2.m_cLocation.Y++;
@@ -1524,16 +1367,12 @@ void moveCharacter()
 	{
 		if (g_sChar.m_cLocation.Y > g_enemy3.m_cLocation.Y)
 		{
-			myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 + 82);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 80] == ' ')
 				g_enemy3.m_cLocation.Y++;
 		}
 		else
 		{
-			myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 - 82);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 80] == ' ')
 				g_enemy3.m_cLocation.Y--;
 		}
 	}
@@ -1541,16 +1380,12 @@ void moveCharacter()
 	{
 		if (g_sChar.m_cLocation.X > g_enemy3.m_cLocation.X)
 		{
-			myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 + 1);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 1] == ' ')
 				g_enemy3.m_cLocation.X++;
 		}
 		else
 		{
-			myfile.seekg(g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 82 - 1);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 1] == ' ')
 				g_enemy3.m_cLocation.X--;
 		}
 	}
@@ -1558,16 +1393,12 @@ void moveCharacter()
 	{
 		if (g_sChar.m_cLocation.Y > g_enemy4.m_cLocation.Y)
 		{
-			myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 + 82);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 80] == ' ')
 				g_enemy4.m_cLocation.Y++;
 		}
 		else
 		{
-			myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 - 82);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 80] == ' ')
 				g_enemy4.m_cLocation.Y--;
 		}
 	}
@@ -1575,16 +1406,12 @@ void moveCharacter()
 	{
 		if (g_sChar.m_cLocation.X > g_enemy4.m_cLocation.X)
 		{
-			myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 + 1);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 1] == ' ')
 				g_enemy4.m_cLocation.X++;
 		}
 		else
 		{
-			myfile.seekg(g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 82 - 1);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 1] == ' ')
 				g_enemy4.m_cLocation.X--;
 		}
 	}
@@ -1593,18 +1420,14 @@ void moveCharacter()
 		switch (rand() % 100 / (int_stages + 1) + 5)
 		{
 		case 0:
-			myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 + 82);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 80] == ' ')
 				g_enemy5.m_cLocation.X++;
 			else
 				g_enemy5.m_cLocation.X--;
 
 			break;
 		case 1:
-			myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 - 82);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 80] == ' ')
 				g_enemy5.m_cLocation.X--;
 			else
 				g_enemy5.m_cLocation.X++;
@@ -1616,17 +1439,13 @@ void moveCharacter()
 		switch (rand() % 100 / (int_stages + 1) + 5)
 		{
 		case 0:
-			myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 + 1);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 1] == ' ')
 				g_enemy5.m_cLocation.Y++;
 			else
 				g_enemy5.m_cLocation.Y--;
 			break;
 		case 1:
-			myfile.seekg(g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 82 - 1);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 1] == ' ')
 				g_enemy5.m_cLocation.Y--;
 			else
 				g_enemy5.m_cLocation.Y--;
@@ -1638,18 +1457,14 @@ void moveCharacter()
 		switch (rand() % 100 / (int_stages + 1) + 5)
 		{
 		case 0:
-			myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 + 82);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 80] == ' ')
 				g_enemy6.m_cLocation.X++;
 			else
 				g_enemy6.m_cLocation.X--;
 
 			break;
 		case 1:
-			myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 - 82);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 80] == ' ')
 				g_enemy6.m_cLocation.X--;
 			else
 				g_enemy6.m_cLocation.X++;
@@ -1661,24 +1476,19 @@ void moveCharacter()
 		switch (rand() % 100 / (int_stages + 1) + 5)
 		{
 		case 0:
-			myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 + 1);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 1] == ' ')
 				g_enemy6.m_cLocation.Y++;
 			else
 				g_enemy6.m_cLocation.Y--;
 			break;
 		case 1:
-			myfile.seekg(g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 82 - 1);
-			myfile.read(buffer2, 1);
-			if (buffer2[0] == ' ')
+			if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 1] == ' ')
 				g_enemy6.m_cLocation.Y--;
 			else
 				g_enemy6.m_cLocation.Y--;
 			break;
 		}
 	}
-	myfile.close();
 
 	if (bSomethingHappened)
 	{
@@ -1941,19 +1751,13 @@ void renderMap()
 	//};
 
 	//COORD c;
+	std::vector<char>::iterator it = Map.begin();
 	if (StageType == EStage)
-		for (int i = 0; i < 12; ++i)
+		for (short i = 0; i < 80*24; ++i)
 		{
-			std::fstream myfile("map/map.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i] , 0x0F);
 		}
+	
 	else if (StageType == EBoss)
 		for (int i = 0; i < 12; ++i)
 		{
@@ -2508,238 +2312,6 @@ void renderToScreen()
 	// Writes the buffer to the console, hence you will see what you have written
 	g_Console.flushBufferToConsole();
 }
-
-void sound()
-{
-	if (deathsound > 0)
-	{
-		Beep(deathsound * 150, 15);
-		deathsound--;
-	}
-	if (shootsound > 0)
-	{
-		Beep(shootsound * 1000, 15);
-		shootsound--;
-	}
-	if (reloadsound > 0)
-	{
-		Beep((3 - reloadsound) * 450, 15);
-		reloadsound--;
-	}
-	if (shootfailsound > 0)
-	{
-		Beep(400, 15);
-		shootfailsound--;
-	}
-}
-void generate()
-{
-	int random, point1, point2, point3, point4, point5;
-	srand(time(NULL));
-	std::fstream myfile("map/map.txt");
-	for (size_t i = 0; i < 24; i++)
-	{
-		if (rand() % 3 && i > 7 && i < 17)
-		{
-			int random1 = rand() % 20 + 15;
-			int random2 = rand() % 20 + 15;
-			for (size_t i = 0; i < random1; i++)
-				myfile.write("`", 1);
-			for (size_t i = 0; i < 80 - random1 - random2; i++)
-				myfile.write(" ", 1);
-			for (size_t i = 0; i < random2; i++)
-				myfile.write("`", 1);
-		}
-		else
-			for (size_t i = 0; i < 80; i++)
-				myfile.write("`", 1);
-		myfile.write("\n", 1);
-	}
-	random = rand() % 5 + 37;
-	for (size_t i = 0; i < 10; i++)
-	{
-		myfile.seekp(random + 82 * (i + 7));
-		myfile.write(" ", 1);
-		myfile.write(" ", 1);
-	}
-	point1 = (rand() % 10 + 5) + ((rand() % 2) + 13) * 82;
-	myfile.seekp(point1);
-	random = rand() % 10 + 20;
-	point2 = point1 + random;
-	for (size_t i = 0; i < random; i++)
-		myfile.write(" ", 1);
-	random = rand() % 4 + 8;
-	for (size_t f = 0; f < random; f++)
-	{
-		myfile.seekp(point1 + (4 - f) * 82);
-		if (f > 3)
-			for (size_t i = 0; i < random + 5 - f; i++)
-				myfile.write(" ", 1);
-		else
-			for (size_t i = 0; i < random + 5 + f; i++)
-				myfile.write(" ", 1);
-	}
-	random = rand() % 5 + 3;
-	if (rand() % 2)
-	{
-		for (size_t f = 0; f < random; f++)
-		{
-			myfile.seekp(point2 + f * 82 - f);
-			for (size_t i = 0; i < random + 5 + f; i++)
-				myfile.write(" ", 1);
-		}
-	}
-	else
-	{
-		for (size_t f = 0; f < random; f++)
-		{
-			myfile.seekp(point2 - f * 82 + f);
-			for (size_t i = 0; i < random + 8 - f; i++)
-				myfile.write(" ", 1);
-		}
-	}
-	point3 = myfile.tellp();
-	random = rand() % 3 + 2;
-	for (size_t f = 0; f < random; f++)
-	{
-		myfile.seekp(point3 - (82 * f) + 2 * f);
-		for (size_t i = 0; i < (random * 2) - f; i++)
-			myfile.write(" ", 1);
-	}
-	random = rand() % 3 + 2;
-	if (rand() % 2)
-		for (size_t i = 0; i < random; i++)
-		{
-			myfile.seekp(point1 - 1 + i * 82);
-			myfile.write(" ", 1);
-		}
-	else
-		for (size_t i = 0; i < random; i++)
-		{
-			myfile.seekp(point1 - 1 - i * 82 + 82);
-			myfile.write(" ", 1);
-		}
-	point4 = myfile.tellp();
-	random = rand() % 3;
-	if (point4 < myfile.end / 2)
-		for (size_t i = 0; i < random; i++)
-		{
-			myfile.seekp(point4 + 82 * i);
-			for (size_t i = 0; i < (random); i++)
-				myfile.write(" ", 1);
-		}
-	else
-		for (size_t i = 0; i < random; i++)
-		{
-			myfile.seekp(point4 - (82 * i));
-			for (size_t i = 0; i < (random); i++)
-				myfile.write(" ", 1);
-		}
-	point5 = myfile.tellp();
-	random = rand() % 20 + 8;
-	for (size_t f = 0; f < random; f++)
-	{
-		myfile.seekp(point5 + (rand() % 3 + 1) * 82);
-		for (size_t i = 0; i < random; i++)
-			myfile.write(" ", 1);
-	}
-	for (size_t i = 0; i < 82 * 24; i++)
-	{
-		myfile.seekg(i);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == '`' && i > 82 && i < 23 * 82)
-		{
-			myfile.seekg(i - 82);
-			char * buffer = new char[0];
-			myfile.read(buffer, 1);
-			if (buffer[0] == ' ')
-			{
-				myfile.seekp(i);
-				myfile.write("\228", 1);
-			}
-			else
-			{
-				myfile.seekg(i + 82);
-				char * buffer = new char[0];
-				myfile.read(buffer, 1);
-				if (buffer[0] == ' ')
-				{
-					myfile.seekp(i);
-					myfile.write("\228", 1);
-				}
-				else
-				{
-					myfile.seekg(i + 1);
-					char * buffer = new char[0];
-					myfile.read(buffer, 1);
-					if (buffer[0] == ' ')
-					{
-						myfile.seekp(i);
-						myfile.write("\228", 1);
-					}
-					else
-					{
-						myfile.seekg(i - 1);
-						char * buffer = new char[0];
-						myfile.read(buffer, 1);
-						if (buffer[0] == ' ')
-						{
-							myfile.seekp(i);
-							myfile.write("\228", 1);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	myfile.close();
-}
-void weapdata()
-{
-	int i = 0;
-	std::string in;
-	std::ifstream weapondata("weapons.txt");
-	getline(weapondata, Weapons[i].Name); // Gets Pistol
-	weapondata >> Weapons[i].ClipMax;
-	weapondata >> Weapons[i].Reload;
-	weapondata >> Weapons[i].Range;
-	i++;
-	weapondata.ignore();
-	getline(weapondata, Weapons[i].Name); // Gets Crossbow
-	weapondata >> Weapons[i].ClipMax;
-	weapondata >> Weapons[i].Reload;
-	weapondata >> Weapons[i].Range;
-	i++;
-	weapondata.ignore();
-	getline(weapondata, Weapons[i].Name); // Gets Spear
-	weapondata >> Weapons[i].ClipMax;
-	weapondata >> Weapons[i].Reload;
-	weapondata >> Weapons[i].Range;
-	i++;
-	weapondata.ignore();
-	getline(weapondata, Weapons[i].Name); // Gets Rifle
-	weapondata >> Weapons[i].ClipMax;
-	weapondata >> Weapons[i].Reload;
-	weapondata >> Weapons[i].Range;
-	i++;
-	weapondata.close();
-}
-void reload()
-{
-	Weapons[currentWeapon].Clip += Weapons[currentWeapon].ClipMax;	// Adds ammo left in clip to total
-}
-void ost()
-{
-	if (StageType == EMainMenu)
-		PlaySound(TEXT("sound/menu.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
-	else if (StageType == EStage)
-		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // change 'cave' to whatever
-	else if (StageType == EBoss)
-		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
-	b_play = true;
-}
 void gameOver()
 {
 	for (int i = 0; i < 24; ++i)
@@ -2810,4 +2382,194 @@ void instructions()
 	}
 	if (g_abKeyPressed[K_ESCAPE])
 		g_eGameState = S_TITLE;
+}
+void sound()
+{
+	if (deathsound > 0)
+	{
+		Beep(deathsound * 150, 15);
+		deathsound--;
+	}
+	if (shootsound > 0)
+	{
+		Beep(shootsound * 1000, 15);
+		shootsound--;
+	}
+	if (reloadsound > 0)
+	{
+		Beep((3 - reloadsound) * 450, 15);
+		reloadsound--;
+	}
+	if (shootfailsound > 0)
+	{
+		Beep(400, 15);
+		shootfailsound--;
+	}
+}
+void generate()
+{
+	size_t random, point1, point2, point3, point4, point5;
+	srand(time(NULL));
+	for (size_t i = 0; i < 24; i++)
+	{
+		if (rand() % 3 && i > 7 && i < 17)
+		{
+			int random1 = rand() % 20 + 15;
+			int random2 = rand() % 20 + 15;
+			for (size_t i = 0; i < random1; i++)
+				Map.push_back('`');
+			for (size_t i = 0; i < 80 - random1 - random2; i++)
+				Map.push_back(' ');
+			for (size_t i = 0; i < random2; i++)
+				Map.push_back('`');
+		}
+		else
+			for (size_t i = 0; i < 80; i++)
+				Map.push_back('`');
+	}
+	random = rand() % 5 + 37;
+	for (size_t i = 0; i < 10; i++)
+	{
+		Map[random + 80 * (i + 7)] = ' ';
+		Map[random + 80 * (i + 7) + 1] = ' ';
+	}
+	point1 = (rand() % 10 + 5) + ((rand() % 2) + 13) * 80;
+	random = rand() % 10 + 20;
+	point2 = point1 + random;
+	for (size_t i = 0; i < random; i++)
+	{
+		Map[point1 + i] = ' ';
+	}
+	random = rand() % 4 + 8;
+	for (size_t f = 0; f < random; f++)
+	{
+		if (f > 3)
+			for (size_t i = 0; i < random + 5 - f; i++)
+			{
+				Map[point1 + (4 - f) * 80 + i] = ' ';
+			}
+		else
+			for (size_t i = 0; i < random + 5 + f; i++)
+			{
+				Map[point1 + (4 - f) * 80 + i] = ' ';
+			}
+	}
+	random = rand() % 5 + 3;
+	if (rand() % 2)
+	{
+		for (size_t f = 0; f < random; f++)
+		{
+			for (size_t i = 0; i < random + 5 + f; i++)
+			{
+				Map[point2 + f * 80 - f + i] = ' ';
+				point3 = point2 + f * 80 - f + i + 1;
+			}
+		}
+	}
+	else
+	{
+		for (size_t f = 0; f < random; f++)
+		{
+			for (size_t i = 0; i < random + 8 - f; i++)
+			{
+				Map[point2 - f * 80 + f + i] = ' ';
+				point3 = point2 - f * 80 + f + i + 1;
+			}
+		}
+	}
+	random = rand() % 3 + 2;
+	for (size_t f = 0; f < random; f++)
+	{
+		for (size_t i = 0; i < (random * 2) - f; i++)
+		{
+			Map[point3 - (80 * f) + 2 * f + i] = ' ';
+		}
+	}
+	random = rand() % 3 + 2;
+	if (rand() % 2)
+		for (size_t i = 0; i < random; i++)
+		{
+			Map[point1 - 1 + i * 80] = ' ';
+			point4 = point1 - 1 + i * 80 + 1;
+		}
+	else
+		for (size_t i = 0; i < random; i++)
+		{
+			Map[point1 - 1 - i * 80 + 80] = ' ';
+			point4 = point1 - 1 - i * 80 + 80 + 1;
+		}
+	random = rand() % 3;
+	if (point4 < Map.size() / 2)
+		for (size_t f = 0; f < random; f++)
+		{
+			for (size_t i = 0; i < random; i++)
+			{
+				Map[point4 + 80 * f + i] = ' ';
+				//point5 = point4 + 80 * f + i + 1;
+			}
+		}
+	else
+		for (size_t f = 0; f < random; f++)
+		{
+			for (size_t i = 0; i < random; i++)
+			{
+				Map[point4 - 80 * f + i] = ' ';
+				//point5 = point4 - 80 * f + i + 1;
+			}
+		}
+	//random = rand() % 20 + 8;
+	//for (size_t f = 0; f < random; f++)
+	//{
+	//	for (size_t i = 0; i < random; i++)
+	//		Map[point5 + (rand() % 3 + 1) * 80 + i] = ' ';
+	//}
+	for (size_t i = 0; i < 80 * 24; i++)
+	{
+		if (Map[i] == '`' && i > 80 && i < 23 * 80 && ((Map[i - 80] == ' ') || Map[i + 80] == ' '|| Map[i + 1] == ' ' || Map[i - 1] == ' '))
+			Map[i] = 228;	
+	}
+}
+void weapdata()
+{
+	int i = 0;
+	std::string in;
+	std::ifstream weapondata("weapons.txt");
+	getline(weapondata, Weapons[i].Name); // Gets Pistol
+	weapondata >> Weapons[i].ClipMax;
+	weapondata >> Weapons[i].Reload;
+	weapondata >> Weapons[i].Range;
+	i++;
+	weapondata.ignore();
+	getline(weapondata, Weapons[i].Name); // Gets Crossbow
+	weapondata >> Weapons[i].ClipMax;
+	weapondata >> Weapons[i].Reload;
+	weapondata >> Weapons[i].Range;
+	i++;
+	weapondata.ignore();
+	getline(weapondata, Weapons[i].Name); // Gets Spear
+	weapondata >> Weapons[i].ClipMax;
+	weapondata >> Weapons[i].Reload;
+	weapondata >> Weapons[i].Range;
+	i++;
+	weapondata.ignore();
+	getline(weapondata, Weapons[i].Name); // Gets Rifle
+	weapondata >> Weapons[i].ClipMax;
+	weapondata >> Weapons[i].Reload;
+	weapondata >> Weapons[i].Range;
+	i++;
+	weapondata.close();
+}
+void reload()
+{
+	Weapons[currentWeapon].Clip += Weapons[currentWeapon].ClipMax;	// Adds ammo left in clip to total
+}
+void ost()
+{
+	if (StageType == EMainMenu)
+		PlaySound(TEXT("sound/menu.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
+	else if (StageType == EStage)
+		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // change 'cave' to whatever
+	else if (StageType == EBoss)
+		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
+	b_play = true;
 }
