@@ -37,7 +37,7 @@ int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_INTRO;
 EWEAPONSTATES g_eWeaponState = Hold;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
-int Lives = 3; // Number of lives the player has left (Base Value is 3)
+int Lives = 99; // Number of lives the player has left (Base Value is 3)
 int currentWeapon = 0; // Current Weapon
 WeaponParameters Weapons[4]; // Number of Weapons
 // Console object
@@ -407,7 +407,13 @@ void bossbattle_moveCharacter()
 		(g_dElapsedTime > 6 && g_dElapsedTime <= 9) || 
 		(g_dElapsedTime > 10 && g_dElapsedTime <= 14) ||
 		(g_dElapsedTime > 15 && g_dElapsedTime <= 18) ||
-		(g_dElapsedTime > 19 && g_dElapsedTime <= 21))
+		(g_dElapsedTime > 19 && g_dElapsedTime <= 21) ||
+		(g_dElapsedTime > 23.5 && g_dElapsedTime <= 25.5) ||
+		(g_dElapsedTime > 29 && g_dElapsedTime <= 31) ||
+		(g_dElapsedTime > 36 && g_dElapsedTime <= 38) ||
+		(g_dElapsedTime > 47 && g_dElapsedTime <= 49) ||
+		(g_dElapsedTime > 63.5 && g_dElapsedTime <= 65) ||
+		(g_dElapsedTime > 66 && g_dElapsedTime <= 73))
 		bossSpeech = true;
 	else
 		bossSpeech = false;
@@ -582,8 +588,6 @@ void bossbattle_moveCharacter()
 	}
 	else if (g_dElapsedTime > 53 && g_dElapsedTime <= 54)
 	{
-		g_gaster1.m_bFire = true;
-		g_gaster4.m_bFire = true;
 		g_gaster1.m_cLocation.X = 37 - 10 * (g_dElapsedTime - 53);
 	}
 	else if (g_dElapsedTime > 54 && g_dElapsedTime <= 55)
@@ -599,15 +603,53 @@ void bossbattle_moveCharacter()
 	}
 	else if (g_dElapsedTime > 56 && g_dElapsedTime <= 57)
 	{
-		g_gaster2.m_bActive = true;
 		g_gaster2.m_cLocation.Y = 20;
 		g_gaster3.m_bFire = true;
 		g_gaster3.m_cLocation.Y = 10 + 5 * (g_dElapsedTime - 56);
 		g_gaster3.m_cLocation.X = 66;
 	}
-	else if (g_dElapsedTime > 57 && g_dElapsedTime <= 58)
+	else if (g_dElapsedTime > 57 && g_dElapsedTime <= 57.5)
 	{
-		
+		g_gaster4.m_cLocation.X = 34;
+		g_gaster1.m_cLocation.X = 26;
+		g_gaster2.m_cLocation.Y = 21;
+		g_gaster3.m_cLocation.Y = 14;
+	}
+	else if (g_dElapsedTime > 57.5 && g_dElapsedTime <= 58.5)
+	{
+		g_gaster4.m_cLocation.X = 34 + 5 * (g_dElapsedTime - 57.5);
+		g_gaster1.m_cLocation.X = 26 + 5 * (g_dElapsedTime - 57.5);
+	}
+	else if (g_dElapsedTime > 58.5 && g_dElapsedTime <= 59.5)
+	{
+		g_gaster4.m_cLocation.X = 39 + 5 * (g_dElapsedTime - 58.5);
+		g_gaster1.m_cLocation.X = 31 + 5 * (g_dElapsedTime - 58.5);
+		g_gaster2.m_cLocation.Y = 21 + 3 * (g_dElapsedTime - 58.5);
+		g_gaster3.m_cLocation.Y = 14 + 3 * (g_dElapsedTime - 58.5);
+	}
+	else if (g_dElapsedTime > 59.5 && g_dElapsedTime <= 60.5)
+	{
+		g_gaster4.m_cLocation.X = 44;
+		g_gaster1.m_cLocation.X = 36;
+		g_gaster2.m_cLocation.Y = 24 - 3 * (g_dElapsedTime - 59.5);
+		g_gaster3.m_cLocation.Y = 17 - 3 * (g_dElapsedTime - 59.5);
+	}
+	else if (g_dElapsedTime > 60.5 && g_dElapsedTime <= 61.5)
+	{
+		g_gaster2.m_cLocation.Y = 21 + 4 * (g_dElapsedTime - 60.5);
+		g_gaster3.m_cLocation.Y = 14 + 4 * (g_dElapsedTime - 60.5);
+	}
+	else if (g_dElapsedTime > 61.5 && g_dElapsedTime <= 62.5)
+	{
+		g_gaster2.m_cLocation.Y = 25 - 5 * (g_dElapsedTime - 61.5);
+		g_gaster3.m_cLocation.Y = 18 - 5 * (g_dElapsedTime - 61.5);
+	}
+	else if (g_dElapsedTime > 62.5 && g_dElapsedTime <= 63.5)
+	{
+		g_gaster2.m_cLocation.X = 15 - 15 * (g_dElapsedTime - 62.5);
+		g_gaster3.m_cLocation.X = 66 + 15 * (g_dElapsedTime - 62.5);
+		g_gaster1.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 62.5);
+		g_gaster4.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 62.5);
 	}
 	else
 	{
@@ -1663,7 +1705,7 @@ void processUserInput()
 			else
 				init();
 			g_eGameState = S_GAME;
-			if (Lives != 9)
+			if (Lives != 99)
 				Lives++;
 		}
 	}
@@ -2255,7 +2297,7 @@ void renderBossSpeech()
 			g_Console.writeToBuffer(COORD{ i % 5 + 62, 7 }, text[i % 5], 0x0F);
 		}
 	}
-	if (g_dElapsedTime > 6 && g_dElapsedTime <= 9)
+	else if (g_dElapsedTime > 6 && g_dElapsedTime <= 9)
 	{
 		char text[] = "You've made it this far.";
 		for (short i = 0; i < 24; i++)
@@ -2263,7 +2305,7 @@ void renderBossSpeech()
 			g_Console.writeToBuffer(COORD{ i % 12 + 60, i / 12 + 6 }, text[i % 24], 0x0F);
 		}
 	}
-	if (g_dElapsedTime > 10 && g_dElapsedTime <= 14)
+	else if (g_dElapsedTime > 10 && g_dElapsedTime <= 14)
 	{
 		char text[] = "I am the one who destroyed your town.";
 		for (short i = 0; i < 37; i++)
@@ -2271,7 +2313,7 @@ void renderBossSpeech()
 			g_Console.writeToBuffer(COORD{ i % 13 + 60, i / 13 + 6 }, text[i % 37], 0x0F);
 		}
 	}
-	if (g_dElapsedTime > 15 && g_dElapsedTime <= 18)
+	else if (g_dElapsedTime > 15 && g_dElapsedTime <= 18)
 	{
 		char text[] = "I assume you'rehere to destroyme too.";
 		for (short i = 0; i < 37; i++)
@@ -2279,12 +2321,76 @@ void renderBossSpeech()
 			g_Console.writeToBuffer(COORD{ i % 15 + 59, i / 15 + 6 }, text[i % 37], 0x0F);
 		}
 	}
-	if (g_dElapsedTime > 19 && g_dElapsedTime <= 21)
+	else if (g_dElapsedTime > 19 && g_dElapsedTime <= 21)
 	{
 		char text[] = "Not if I canhelp it!";
 		for (short i = 0; i < 20; i++)
 		{
-			g_Console.writeToBuffer(COORD{ i % 12 + 60, i / 12 + 6 }, text[i % 20], 0x0F);
+			g_Console.writeToBuffer(COORD{ i % 12 + 60, i / 12 + 6 }, text[i % 20], 0x0C);
+		}
+	}
+	else if ((g_dElapsedTime > 23.5 && g_dElapsedTime <= 25.5))
+	{
+		char text[] = "Whoa... You    have fast feet!";
+		for (short i = 0; i < 30; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 15 + 60, i / 15 + 6 }, text[i % 30], 0x0F);
+		}
+	}
+	else if ((g_dElapsedTime > 29 && g_dElapsedTime <= 31))
+	{
+		char text[] = "Let's see if youcan dodge this!";
+		for (short i = 0; i < 31; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 16 + 59, i / 16 + 6 }, text[i % 31], 0x0F);
+		}
+	}
+	else if ((g_dElapsedTime > 36 && g_dElapsedTime <= 38))
+	{
+		char text[] = "Don't make me use my SPECIAL ATTACK!";
+		for (short i = 0; i < 36; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 18 + 58, i / 18 + 6 }, text[i % 36], 0x0F);
+		}
+	}
+	else if ((g_dElapsedTime > 47 && g_dElapsedTime <= 49))
+	{
+		char text[] = "Live this and Iwill use my    SPECIAL ATTACK!";
+		for (short i = 0; i < 45; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 15 + 59, i / 15 + 6 }, text[i % 45], 0x0F);
+		}
+	}
+	else if ((g_dElapsedTime > 63.5 && g_dElapsedTime <= 65))
+	{
+		char text[] = "Huff... Puff...";
+		for (short i = 0; i < 15; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 15 + 59, i / 15 + 7 }, text[i % 15], 0x0F);
+		}
+	}
+	else if ((g_dElapsedTime > 66 && g_dElapsedTime <= 69.5))
+	{
+		char text[] = "My SPECIAL ATTACK  is so strong that  I may die using it.";
+		for (short i = 0; i < 57; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 19 + 57, i / 19 + 6 }, text[i % 57], 0x0F);
+		}
+	}
+	else if ((g_dElapsedTime > 69.5 && g_dElapsedTime <= 71))
+	{
+		char text[] = "It doesn't matter.";
+		for (short i = 0; i < 18; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 18 + 58, i / 18 + 7 }, text[i % 18], 0x0F);
+		}
+	}
+	else if ((g_dElapsedTime > 71 && g_dElapsedTime <= 73))
+	{
+		char text[] = "I WILL STOP YOU!";
+		for (short i = 0; i < 16; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 16 + 59, i / 16 + 7 }, text[i % 16], 0x0C);
 		}
 	}
 }
