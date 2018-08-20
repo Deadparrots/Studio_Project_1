@@ -748,7 +748,7 @@ void bossbattle_moveCharacter()
 	}
 	if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
 	{
-		if (SansFightMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1] == ' ')
+		if (SansFightMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 1] == ' ')
 		{
 			g_sChar.m_cLocation.X--;
 			bSomethingHappened = true;
@@ -756,7 +756,7 @@ void bossbattle_moveCharacter()
 	}
 	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
 	{
-		if (SansFightMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82] == ' ')
+		if (SansFightMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 80] == ' ')
 		{
 			g_sChar.m_cLocation.Y++;
 			bSomethingHappened = true;
@@ -764,7 +764,7 @@ void bossbattle_moveCharacter()
 	}
 	if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
 	{
-		if (SansFightMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1] == ' ')
+		if (SansFightMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 1] == ' ')
 		{
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
@@ -842,7 +842,7 @@ void boss_moveCharacter()
 
 	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
 	{
-		if (SansMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82] == ' ')
+		if (SansMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
 		{
 			g_sChar.m_cLocation.Y--;
 			bSomethingHappened = true;
@@ -850,7 +850,7 @@ void boss_moveCharacter()
 	}
 	if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
 	{
-		if (SansMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1] == ' ')
+		if (SansMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 1] == ' ')
 		{
 			g_sChar.m_cLocation.X--;
 			bSomethingHappened = true;
@@ -858,7 +858,7 @@ void boss_moveCharacter()
 	}
 	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
 	{
-		if (SansMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82] == ' ')
+		if (SansMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 80] == ' ')
 		{
 			g_sChar.m_cLocation.Y++;
 			bSomethingHappened = true;
@@ -866,7 +866,7 @@ void boss_moveCharacter()
 	}
 	if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
 	{
-		if (SansMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1] == ' ')
+		if (SansMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 1] == ' ')
 		{
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
