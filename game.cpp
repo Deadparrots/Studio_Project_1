@@ -925,12 +925,16 @@ void boss_moveCharacter()
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
+	std::fstream myfile("map/bossmap.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
-	
+
 	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
 	{
-		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
 		{
 			g_sChar.m_cLocation.Y--;
 			bSomethingHappened = true;
@@ -938,7 +942,10 @@ void boss_moveCharacter()
 	}
 	if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
 	{
-		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 1] == ' ')
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
 		{
 			g_sChar.m_cLocation.X--;
 			bSomethingHappened = true;
@@ -946,7 +953,10 @@ void boss_moveCharacter()
 	}
 	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
 	{
-		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 80] == ' ')
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
 		{
 			g_sChar.m_cLocation.Y++;
 			bSomethingHappened = true;
@@ -954,12 +964,16 @@ void boss_moveCharacter()
 	}
 	if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
 	{
-		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 1] == ' ')
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
 		{
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
 		}
 	}
+	myfile.close();
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
@@ -1189,7 +1203,7 @@ void moveCharacter()
 		g_enemy6.m_cLocation.Y = 0;
 		reload();
 	}
-	size_t rate = 100 / (stages + 1) + 24;
+	size_t rate = 100 / (stages + 1) + 100;
 	switch (rand() % rate)
 	{
 	case 0:
@@ -1363,7 +1377,7 @@ void moveCharacter()
 			break;
 		}
 	}
-	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_enemy3.m_bActive == true && !(rand() % 4))
+	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_enemy3.m_bActive == true && !(rand() % 20))
 	{
 		if (g_sChar.m_cLocation.Y > g_enemy3.m_cLocation.Y)
 		{
@@ -1376,7 +1390,7 @@ void moveCharacter()
 				g_enemy3.m_cLocation.Y--;
 		}
 	}
-	else if (g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == true && !(rand() % 4))
+	else if (g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == true && !(rand() % 20))
 	{
 		if (g_sChar.m_cLocation.X > g_enemy3.m_cLocation.X)
 		{
@@ -1389,7 +1403,7 @@ void moveCharacter()
 				g_enemy3.m_cLocation.X--;
 		}
 	}
-	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_enemy4.m_bActive == true && !(rand() % 4))
+	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_enemy4.m_bActive == true && !(rand() % 20))
 	{
 		if (g_sChar.m_cLocation.Y > g_enemy4.m_cLocation.Y)
 		{
@@ -1402,7 +1416,7 @@ void moveCharacter()
 				g_enemy4.m_cLocation.Y--;
 		}
 	}
-	else if (g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == true && !(rand() % 4))
+	else if (g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == true && !(rand() % 20))
 	{
 		if (g_sChar.m_cLocation.X > g_enemy4.m_cLocation.X)
 		{
@@ -2408,7 +2422,7 @@ void sound()
 }
 void generate()
 {
-	size_t random, point1, point2, point3, point4, point5;
+	size_t random, point1, point2, point3, point4;
 	srand(time(NULL));
 	for (size_t i = 0; i < 24; i++)
 	{
@@ -2505,7 +2519,6 @@ void generate()
 			for (size_t i = 0; i < random; i++)
 			{
 				Map[point4 + 80 * f + i] = ' ';
-				//point5 = point4 + 80 * f + i + 1;
 			}
 		}
 	else
@@ -2514,19 +2527,12 @@ void generate()
 			for (size_t i = 0; i < random; i++)
 			{
 				Map[point4 - 80 * f + i] = ' ';
-				//point5 = point4 - 80 * f + i + 1;
 			}
 		}
-	//random = rand() % 20 + 8;
-	//for (size_t f = 0; f < random; f++)
-	//{
-	//	for (size_t i = 0; i < random; i++)
-	//		Map[point5 + (rand() % 3 + 1) * 80 + i] = ' ';
-	//}
 	for (size_t i = 0; i < 80 * 24; i++)
 	{
 		if (Map[i] == '`' && i > 80 && i < 23 * 80 && ((Map[i - 80] == ' ') || Map[i + 80] == ' '|| Map[i + 1] == ' ' || Map[i - 1] == ' '))
-			Map[i] = 228;	
+			Map[i] = 219;	
 	}
 }
 void weapdata()
