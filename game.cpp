@@ -22,7 +22,17 @@ SBossGaster	g_gaster2;
 SBossGaster	g_gaster3;
 SBossGaster	g_gaster4;
 SGameChar	g_door;
+std::vector<char>	Title;
+std::vector<char>	GameOver;
 std::vector<char>	Map;
+std::vector<char>	Instructions;
+std::vector<char>	SansMap;
+std::vector<char>	SansFightMap;
+std::vector<char>	Scene1;
+std::vector<char>	Scene2;
+std::vector<char>	Scene3;
+std::vector<char>	Scene4;
+std::vector<char>	Scene5;
 size_t		deathsound = 0;
 size_t		shootsound = 0;
 size_t		reloadsound = 0;
@@ -264,6 +274,7 @@ void update(double dt)
 	switch (g_eGameState)
 	{
 	case S_INTRO: intro();
+		break;
 	case S_TITLE: splashScreenWait(); // game logic for the splash screen
 		break;
 	case S_GAME: gameplay(); // gameplay logic when we are in the game
@@ -291,7 +302,7 @@ void render()
 		break;
 	case S_GAMEOVER: gameOver();
 		break;
-	case S_INTRUCTIONS: instructions();
+	case S_INSTRUCTIONS: instructions();
 		break;
 	}
 	renderFramerate();  // renders debug information, frame rate, elapsed time, etc
@@ -299,6 +310,11 @@ void render()
 }
 void intro()
 {
+	if (b_play == false)
+	{
+		ost();
+		b_play = true;
+	}
 	if ((g_dElapsedTime > 35) || g_abKeyPressed[K_W] || g_abKeyPressed[K_A] || g_abKeyPressed[K_S] || g_abKeyPressed[K_D] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_RIGHT])
 	{
 		g_eGameState = S_TITLE;
@@ -308,6 +324,8 @@ void intro()
 }
 void splashScreenWait() 
 {
+	if (!b_play)
+		ost();
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
@@ -333,7 +351,7 @@ void splashScreenWait()
 	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMInstructions && g_eGameState == S_TITLE)
 	{
-		g_eGameState = S_INTRUCTIONS;
+		g_eGameState = S_INSTRUCTIONS;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 	}
@@ -342,8 +360,6 @@ void splashScreenWait()
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		g_bQuitGame = true;
 	}
-	if(!b_play)
-		ost();
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_TITLE)
 	{
 		StageType = EStage;
@@ -707,110 +723,8 @@ void bossbattle_moveCharacter()
 	// End Boss stuff
 
 
-
-	std::fstream myfile("map/bossscreen.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
-	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
-	{
-		shootfailsound = 1;
-	}
-	if (Weapons[currentWeapon].Clip > 0)
-	{
-		if (g_abKeyPressed[K_UP] && g_eWeaponState == Hold)
-		{
-			g_eWeaponState = FireUp;
-			if (g_abKeyPressed[K_W])
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y - 1;
-			else
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			shootsound++;
-			Weapons[currentWeapon].Clip--;
-		}
-		if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
-		{
-			g_eWeaponState = FireDown;
-			if (g_abKeyPressed[K_S])
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y + 1;
-			else
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			shootsound++;
-			Weapons[currentWeapon].Clip--;
-		}
-		if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
-		{
-			g_eWeaponState = FireLeft;
-			if (g_abKeyPressed[K_A])
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X - 1;
-			else
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-			shootsound++;
-			Weapons[currentWeapon].Clip--;
-		}
-		if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
-		{
-			g_eWeaponState = FireRight;
-			if (g_abKeyPressed[K_D])
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X + 1;
-			else
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-			shootsound++;
-			Weapons[currentWeapon].Clip--;
-		}
-	}
-	char * buffer2 = new char[0];
-	if (g_eWeaponState == FireUp)
-	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
-		{
-			g_weapon.m_cLocation.Y--;
-			g_shootdist++;
-		}
-		else
-			g_shootdist = g_shootmaxdist;
-	}
-	if (g_eWeaponState == FireDown)
-	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 82);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
-		{
-			g_weapon.m_cLocation.Y++;
-			g_shootdist++;
-		}
-		else
-			g_shootdist = g_shootmaxdist;
-	}
-	if (g_eWeaponState == FireLeft)
-	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 - 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
-		{
-			g_weapon.m_cLocation.X--;
-			g_shootdist++;
-		}
-		else
-			g_shootdist = g_shootmaxdist;
-	}
-	if (g_eWeaponState == FireRight)
-	{
-		myfile.seekg(g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 82 + 1);
-		myfile.read(buffer2, 1);
-		if (buffer2[0] == ' ')
-		{
-			g_weapon.m_cLocation.X++;
-			g_shootdist++;
-		}
-		else
-			g_shootdist = g_shootmaxdist;
-	}
 	if (g_abKeyPressed[K_E])
 	{
 		if (currentWeapon < 3)
@@ -824,20 +738,9 @@ void bossbattle_moveCharacter()
 		g_dBounceTime = g_dElapsedTime + 0.2;
 	}
 
-	if (g_shootdist >= g_shootmaxdist)
-	{
-		g_eWeaponState = Hold;
-		g_weapon.m_cLocation.X = 10;
-		g_weapon.m_cLocation.Y = 2;
-		g_shootdist = 0;
-	}
-
 	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (SansFightMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
 		{
 			g_sChar.m_cLocation.Y--;
 			bSomethingHappened = true;
@@ -845,10 +748,7 @@ void bossbattle_moveCharacter()
 	}
 	if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (SansFightMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1] == ' ')
 		{
 			g_sChar.m_cLocation.X--;
 			bSomethingHappened = true;
@@ -856,10 +756,7 @@ void bossbattle_moveCharacter()
 	}
 	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (SansFightMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82] == ' ')
 		{
 			g_sChar.m_cLocation.Y++;
 			bSomethingHappened = true;
@@ -867,10 +764,7 @@ void bossbattle_moveCharacter()
 	}
 	if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (SansFightMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1] == ' ')
 		{
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
@@ -932,7 +826,6 @@ void bossbattle_moveCharacter()
 		g_sChar.m_bActive = false;
 		bSomethingHappened = true;
 	}
-	myfile.close();
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
@@ -944,16 +837,12 @@ void boss_moveCharacter()
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	std::fstream myfile("map/bossmap.txt");
 	// Updating the location of the character based on the key press
 	// providing a beep sound whenver we shift the character
 
 	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (SansMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82] == ' ')
 		{
 			g_sChar.m_cLocation.Y--;
 			bSomethingHappened = true;
@@ -961,10 +850,7 @@ void boss_moveCharacter()
 	}
 	if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (SansMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1] == ' ')
 		{
 			g_sChar.m_cLocation.X--;
 			bSomethingHappened = true;
@@ -972,10 +858,7 @@ void boss_moveCharacter()
 	}
 	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (SansMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82] == ' ')
 		{
 			g_sChar.m_cLocation.Y++;
 			bSomethingHappened = true;
@@ -983,16 +866,12 @@ void boss_moveCharacter()
 	}
 	if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
 	{
-		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1);
-		char * buffer = new char[0];
-		myfile.read(buffer, 1);
-		if (buffer[0] == ' ')
+		if (SansMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1] == ' ')
 		{
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
 		}
 	}
-	myfile.close();
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
@@ -1001,11 +880,6 @@ void boss_moveCharacter()
 }
 void moveCharacter()
 {
-	bool bSomethingHappened = false;
-	if (g_dBounceTime > g_dElapsedTime)
-		return;
-	// Updating the location of the character based on the key press
-	// providing a beep sound whenver we shift the character
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
 	{
 		shootfailsound = 1;
@@ -1103,6 +977,11 @@ void moveCharacter()
 			g_shootdist = g_shootmaxdist;
 	}
 
+	bool bSomethingHappened = false;
+	if (g_dBounceTime > g_dElapsedTime)
+		return;
+	// Updating the location of the character based on the key press
+	// providing a beep sound whenver we shift the character
 
 	if (g_shootdist >= g_shootmaxdist)
 	{
@@ -1628,85 +1507,52 @@ void clearScreen()
 void renderIntro()
 {
 	if (g_dElapsedTime <= 7)
-		for (int i = 0; i < 12; ++i)
+	{
+		std::vector<char>::iterator it = Scene1.begin();
+		for (short i = 0; i < 80 * 24; ++i)
 		{
-			std::fstream myfile("map/scene1.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
+	}
 	if (g_dElapsedTime > 7 && g_dElapsedTime <= 14)
-		for (int i = 0; i < 12; ++i)
+	{
+		std::vector<char>::iterator it = Scene2.begin();
+		for (short i = 0; i < 80 * 24; ++i)
 		{
-			std::fstream myfile("map/scene2.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
+	}
 	if (g_dElapsedTime > 14 && g_dElapsedTime <= 21)
-		for (int i = 0; i < 12; ++i)
+	{
+		std::vector<char>::iterator it = Scene3.begin();
+		for (short i = 0; i < 80 * 24; ++i)
 		{
-			std::fstream myfile("map/scene3.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
+	}
 	if (g_dElapsedTime > 21 && g_dElapsedTime <= 28)
-		for (int i = 0; i < 12; ++i)
+	{
+		std::vector<char>::iterator it = Scene4.begin();
+		for (short i = 0; i < 80 * 24; ++i)
 		{
-			std::fstream myfile("map/scene4.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
-
+	}
 	if (g_dElapsedTime > 28 && g_dElapsedTime <= 35)
-		for (int i = 0; i < 12; ++i)
+	{
+		std::vector<char>::iterator it = Scene5.begin();
+		for (short i = 0; i < 80 * 24; ++i)
 		{
-			std::fstream myfile("map/scene5.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
+	}
 }
 void renderSplashScreen()  // renders the splash screen
 {
-	for (int i = 0; i < 12; ++i)
+	std::vector<char>::iterator it = Title.begin();
+	for (short i = 0; i < 80 * 24; ++i)
 	{
-		std::fstream myfile("map/title.txt");
-		std::string sLine;
-		for (short i = 0; i < 24 * 80; i++)
-		{
-			if (i % 80 == 0)
-				std::getline(myfile, sLine);
-			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-		}
-		myfile.close();
+		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 	}
 
 	COORD m = g_Console.getConsoleSize();
@@ -1777,46 +1623,30 @@ void renderGame()
 }
 void renderMap()
 {
-	// Set up sample colours, and output shadings
-	//const WORD colors[] = {
-	//    0x1A, 0x2B, 0x3C, 0x4D, 0x5E, 0x6F,
-	//    0xA1, 0xB2, 0xC3, 0xD4, 0xE5, 0xF6
-	//};
-
-	//COORD c;
-	std::vector<char>::iterator it = Map.begin();
 	if (StageType == EStage)
-		for (short i = 0; i < 80*24; ++i)
+	{
+		std::vector<char>::iterator it = Map.begin();
+		for (short i = 0; i < 80 * 24; ++i)
 		{
-			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i] , 0x0F);
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
-	
+	}
 	else if (StageType == EBoss)
-		for (int i = 0; i < 12; ++i)
+	{
+		std::vector<char>::iterator it = SansMap.begin();
+		for (short i = 0; i < 80 * 24; ++i)
 		{
-			std::fstream myfile("map/bossmap.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
+	}
 	else if (StageType == EBossBattle)
-		for (int i = 0; i < 12; ++i)
+	{
+		std::vector<char>::iterator it = SansFightMap.begin();
+		for (short i = 0; i < 80 * 24; ++i)
 		{
-			std::fstream myfile("map/bossscreen.txt");
-			std::string sLine;
-			for (short i = 0; i < 24 * 80; i++)
-			{
-				if (i % 80 == 0)
-					std::getline(myfile, sLine);
-				g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-			}
-			myfile.close();
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
+	}
 }
 void renderUI()
 {
@@ -2352,17 +2182,10 @@ void renderToScreen()
 }
 void gameOver()
 {
-	for (int i = 0; i < 24; ++i)
+	std::vector<char>::iterator it = GameOver.begin();
+	for (short i = 0; i < 80 * 24; ++i)
 	{
-		std::fstream myfile("map/gameover.txt");
-		std::string sLine;
-		for (short i = 0; i < 24 * 80; i++)
-		{
-			if (i % 80 == 0)
-				std::getline(myfile, sLine);
-			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-		}
-		myfile.close();
+		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 	}
 	COORD m = g_Console.getConsoleSize();
 	switch (MMSelect)
@@ -2406,17 +2229,10 @@ void gameOver()
 }
 void instructions()
 {
-	for (int i = 0; i < 24; ++i)
+	std::vector<char>::iterator it = Instructions.begin();
+	for (short i = 0; i < 80 * 24; ++i)
 	{
-		std::fstream myfile("map/instructions.txt");
-		std::string sLine;
-		for (short i = 0; i < 24 * 80; i++)
-		{
-			if (i % 80 == 0)
-				std::getline(myfile, sLine);
-			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, sLine[i % 80], 0x0F);
-		}
-		myfile.close();
+		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 	}
 	if (g_abKeyPressed[K_ESCAPE])
 		g_eGameState = S_TITLE;
@@ -2596,10 +2412,114 @@ void reload()
 void ost()
 {
 	if (StageType == EMainMenu)
-		PlaySound(TEXT("sound/menu.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
+		PlaySound(TEXT("sound/menu.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in menu
 	else if (StageType == EStage)
 		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // change 'cave' to whatever
 	else if (StageType == EBoss)
 		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
 	b_play = true;
+}
+void convertToString()
+{
+	std::fstream myfile1("map/bossmap.txt");
+	std::string sLine;
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile1.seekg(i);
+		char * buffer = new char[1];
+		myfile1.read(buffer, 1);
+		if (buffer[0] != '\n')
+			SansMap.push_back(buffer[0]);
+	}
+	myfile1.close();
+	std::fstream myfile2("map/bossscreen.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile2.seekg(i);
+		char * buffer = new char[1];
+		myfile2.read(buffer, 1);
+		if (buffer[0] != '\n')
+			SansFightMap.push_back(buffer[0]);
+	}
+	myfile2.close();
+	std::fstream myfile3("map/instructions.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile3.seekg(i);
+		char * buffer = new char[1];
+		myfile3.read(buffer, 1);
+		if (buffer[0] != '\n')
+			Instructions.push_back(buffer[0]);
+	}
+	myfile3.close();
+	std::fstream myfile4("map/title.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile4.seekg(i);
+		char * buffer = new char[1];
+		myfile4.read(buffer, 1);
+		if (buffer[0] != '\n')
+			Title.push_back(buffer[0]);
+	}
+	myfile4.close();
+	std::fstream myfile5("map/gameover.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile5.seekg(i);
+		char * buffer = new char[1];
+		myfile5.read(buffer, 1);
+		if (buffer[0] != '\n')
+			GameOver.push_back(buffer[0]);
+	}
+	myfile5.close();
+	std::fstream myfile6("map/scene1.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile6.seekg(i);
+		char * buffer = new char[1];
+		myfile6.read(buffer, 1);
+		if (buffer[0] != '\n')
+			Scene1.push_back(buffer[0]);
+	}
+	myfile6.close();
+	std::fstream myfile7("map/scene2.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile7.seekg(i);
+		char * buffer = new char[1];
+		myfile7.read(buffer, 1);
+		if (buffer[0] != '\n')
+			Scene2.push_back(buffer[0]);
+	}
+	myfile7.close();
+	std::fstream myfile8("map/scene3.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile8.seekg(i);
+		char * buffer = new char[1];
+		myfile8.read(buffer, 1);
+		if (buffer[0] != '\n')
+			Scene3.push_back(buffer[0]);
+	}
+	myfile8.close();
+	std::fstream myfile9("map/scene4.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile9.seekg(i);
+		char * buffer = new char[1];
+		myfile9.read(buffer, 1);
+		if (buffer[0] != '\n')
+			Scene4.push_back(buffer[0]);
+	}
+	myfile9.close();
+	std::fstream myfile10("map/scene5.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile10.seekg(i);
+		char * buffer = new char[1];
+		myfile10.read(buffer, 1);
+		if (buffer[0] != '\n')
+			Scene5.push_back(buffer[0]);
+	}
+	myfile10.close();
 }
