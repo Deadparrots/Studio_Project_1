@@ -10,6 +10,7 @@
 #include <ctime>
 #include <string>
 #include <Windows.h>
+#include <vector>
 
 extern CStopWatch g_swTimer;
 extern bool g_bQuitGame;
