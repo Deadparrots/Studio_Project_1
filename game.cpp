@@ -714,7 +714,6 @@ void bossbattle_moveCharacter()
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
 	{
 		shootfailsound = 1;
-		//bSomethingHappened = true;
 	}
 	if (Weapons[currentWeapon].Clip > 0)
 	{
@@ -728,7 +727,6 @@ void bossbattle_moveCharacter()
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			//bSomethingHappened = true;
 		}
 		if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
 		{
@@ -740,7 +738,6 @@ void bossbattle_moveCharacter()
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			//bSomethingHappened = true;
 		}
 		if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
 		{
@@ -752,7 +749,6 @@ void bossbattle_moveCharacter()
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			//bSomethingHappened = true;
 		}
 		if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
 		{
@@ -764,7 +760,6 @@ void bossbattle_moveCharacter()
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			//bSomethingHappened = true;
 		}
 	}
 	char * buffer2 = new char[0];
@@ -775,7 +770,6 @@ void bossbattle_moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.Y--;
-			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -788,7 +782,6 @@ void bossbattle_moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.Y++;
-			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -801,7 +794,6 @@ void bossbattle_moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.X--;
-			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -814,7 +806,6 @@ void bossbattle_moveCharacter()
 		if (buffer2[0] == ' ')
 		{
 			g_weapon.m_cLocation.X++;
-			//bSomethingHappened = true;
 			g_shootdist++;
 		}
 		else
@@ -940,6 +931,66 @@ void bossbattle_moveCharacter()
 	{
 		g_sChar.m_bActive = false;
 		bSomethingHappened = true;
+	}
+	myfile.close();
+	if (bSomethingHappened)
+	{
+		// set the bounce time to some time in the future to prevent accidental triggers
+		g_dBounceTime = g_dElapsedTime + 0.07; // 125ms should be enough
+	}
+}
+void boss_moveCharacter()
+{
+	bool bSomethingHappened = false;
+	if (g_dBounceTime > g_dElapsedTime)
+		return;
+	std::fstream myfile("map/bossmap.txt");
+	// Updating the location of the character based on the key press
+	// providing a beep sound whenver we shift the character
+
+	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
+	{
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 82);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+		{
+			g_sChar.m_cLocation.Y--;
+			bSomethingHappened = true;
+		}
+	}
+	if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
+	{
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 - 1);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+		{
+			g_sChar.m_cLocation.X--;
+			bSomethingHappened = true;
+		}
+	}
+	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
+	{
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 82);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+		{
+			g_sChar.m_cLocation.Y++;
+			bSomethingHappened = true;
+		}
+	}
+	if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
+	{
+		myfile.seekg(g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 82 + 1);
+		char * buffer = new char[0];
+		myfile.read(buffer, 1);
+		if (buffer[0] == ' ')
+		{
+			g_sChar.m_cLocation.X++;
+			bSomethingHappened = true;
+		}
 	}
 	myfile.close();
 	if (bSomethingHappened)
