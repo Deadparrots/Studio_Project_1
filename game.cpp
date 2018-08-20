@@ -27,7 +27,7 @@ size_t		shootsound = 0;
 size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
 int			MMSelect = MMStart;
-double		stages = 9.000; // set to 0 normally... 9 for boss testing
+double		stages = 1.000; // set to 1 normally... 9 for boss testing
 int			int_stages = stages;
 size_t		StageType = EMainMenu;
 bool		b_play = false;
@@ -37,7 +37,7 @@ int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_INTRO;
 EWEAPONSTATES g_eWeaponState = Hold;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
-int Lives = 99; // Number of lives the player has left (Base Value is 3)
+int Lives = 3; // Number of lives the player has left (Base Value is 3)
 int currentWeapon = 0; // Current Weapon
 WeaponParameters Weapons[4]; // Number of Weapons
 // Console object
@@ -413,7 +413,8 @@ void bossbattle_moveCharacter()
 		(g_dElapsedTime > 36 && g_dElapsedTime <= 38) ||
 		(g_dElapsedTime > 47 && g_dElapsedTime <= 49) ||
 		(g_dElapsedTime > 63.5 && g_dElapsedTime <= 65) ||
-		(g_dElapsedTime > 66 && g_dElapsedTime <= 73))
+		(g_dElapsedTime > 66 && g_dElapsedTime <= 73) ||
+		(g_dElapsedTime > 75 && g_dElapsedTime <= 87))
 		bossSpeech = true;
 	else
 		bossSpeech = false;
@@ -650,6 +651,72 @@ void bossbattle_moveCharacter()
 		g_gaster3.m_cLocation.X = 66 + 15 * (g_dElapsedTime - 62.5);
 		g_gaster1.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 62.5);
 		g_gaster4.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 62.5);
+	}
+	else if (g_dElapsedTime > 72 && g_dElapsedTime <= 73) // ATTACK 6 (72)
+	{
+		g_gaster1.m_bActive = true;
+		g_gaster2.m_bActive = true;
+		g_gaster3.m_bActive = true;
+		g_gaster4.m_bActive = true;
+		g_gaster2.m_cLocation.X = 15 * (g_dElapsedTime - 72);
+		g_gaster3.m_cLocation.X = 81 - 15 * (g_dElapsedTime - 72);
+		g_gaster1.m_cLocation.Y = 10 * (g_dElapsedTime - 72);
+		g_gaster4.m_cLocation.Y = 10 * (g_dElapsedTime - 72);
+		g_gaster2.m_cLocation.Y = g_sChar.m_cLocation.Y + 4;
+		g_gaster3.m_cLocation.Y = g_sChar.m_cLocation.Y - 4;
+		g_gaster1.m_cLocation.X = g_sChar.m_cLocation.X + 4;
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X - 4;
+	}
+	else if (g_dElapsedTime > 73 && g_dElapsedTime <= 73.5)
+	{
+		g_gaster1.m_bFire = true;
+		g_gaster2.m_bFire = true;
+		g_gaster3.m_bFire = true;
+		g_gaster4.m_bFire = true;
+		g_gaster2.m_cLocation.Y = g_sChar.m_cLocation.Y + 4;
+		g_gaster3.m_cLocation.Y = g_sChar.m_cLocation.Y - 4;
+		g_gaster1.m_cLocation.X = g_sChar.m_cLocation.X + 4;
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X - 4;
+	}
+
+	else if (g_dElapsedTime > 73.5 && g_dElapsedTime <= 80)
+	{
+		int randomone, randomtwo, randomthree, randomfour;
+		if (rand() % 2)
+			randomone = 3;
+		else
+			randomone = 4;
+		if (rand() % 2)
+			randomtwo = 3;
+		else
+			randomtwo = 4;
+		if (rand() % 2)
+			randomthree = 3;
+		else
+			randomthree = 4;
+		if (rand() % 2)
+			randomfour = 3;
+		else
+			randomfour = 4;
+		g_gaster2.m_cLocation.Y = g_sChar.m_cLocation.Y + randomone;
+		g_gaster3.m_cLocation.Y = g_sChar.m_cLocation.Y - randomtwo;
+		g_gaster1.m_cLocation.X = g_sChar.m_cLocation.X + randomthree;
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X - randomfour;
+	}
+	else if (g_dElapsedTime > 80 && g_dElapsedTime <= 85)
+	{
+		g_gaster1.m_bFire = false;
+		g_gaster2.m_bFire = false;
+		g_gaster3.m_bFire = false;
+		g_gaster4.m_bFire = false;
+		g_gaster2.m_cLocation.Y = g_sChar.m_cLocation.Y;
+		g_gaster3.m_cLocation.Y = g_sChar.m_cLocation.Y;
+		g_gaster1.m_cLocation.X = g_sChar.m_cLocation.X;
+		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X;
+	}
+	else if (g_dElapsedTime > 87)
+	{
+		g_door.m_bActive = true;
 	}
 	else
 	{
@@ -2391,6 +2458,30 @@ void renderBossSpeech()
 		for (short i = 0; i < 16; i++)
 		{
 			g_Console.writeToBuffer(COORD{ i % 16 + 59, i / 16 + 7 }, text[i % 16], 0x0C);
+		}
+	}
+	else if ((g_dElapsedTime > 75 && g_dElapsedTime <= 80))
+	{
+		char text[] = "HAHAHAHAHAHAHAHA";
+		for (short i = 0; i < 16; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 16 + 59, i / 16 + 7 }, text[i % 16], 0x0C);
+		}
+	}
+	else if ((g_dElapsedTime > 80 && g_dElapsedTime <= 85))
+	{
+		char text[] = "I've got you now!";
+		for (short i = 0; i < 17; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 17 + 59, i / 17 + 7 }, text[i % 17], 0x0C);
+		}
+	}
+	else if ((g_dElapsedTime > 85 && g_dElapsedTime <= 87))
+	{
+		char text[] = "Ack!";
+		for (short i = 0; i < 4; i++)
+		{
+			g_Console.writeToBuffer(COORD{ i % 4 + 63, i / 4 + 7 }, text[i % 4], 0x0C);
 		}
 	}
 }
