@@ -50,6 +50,7 @@ int			int_stages = stages;
 size_t		StageType = EMainMenu;
 bool		b_play = false;
 bool		bossSpeech = false;
+bool        continuestats = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_INTRO;
@@ -87,7 +88,6 @@ void boss_init()
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
 	g_Console.setConsoleFont(0, 16, L"Consolas");
-	reload();
 	g_sChar.m_cLocation.X = 40;
 	g_sChar.m_cLocation.Y = 11;
 	g_sChar.m_bActive = true;
@@ -115,7 +115,6 @@ void boss_battle_init()
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
 	g_Console.setConsoleFont(0, 16, L"Consolas");
-	reload();
 	g_door.m_cLocation.X = 40;
 	g_door.m_cLocation.Y = 14;
 	g_door.m_bActive = false;
@@ -225,7 +224,6 @@ void init(void)
 	g_gaster4.m_bFire = false;
 	// sets the width, height and the font name to use in the console
 	g_Console.setConsoleFont(0, 16, L"Consolas");
-	reload();
 }
 void shutdown(void)
 {
@@ -242,6 +240,7 @@ void getInput(void)
 	g_abKeyPressed[K_RIGHT] = isKeyPressed(VK_RIGHT);
 	g_abKeyPressed[K_SPACE] = isKeyPressed(VK_SPACE);
 	g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
+	g_abKeyPressed[K_ENTER] = isKeyPressed(13);
 	g_abKeyPressed[K_W] = isKeyPressed(87);
 	g_abKeyPressed[K_A] = isKeyPressed(65);
 	g_abKeyPressed[K_S] = isKeyPressed(83);
@@ -280,6 +279,10 @@ void render()
 		break;
 	case S_INSTRUCTIONS: instructions();
 		break;
+	case S_SAVE: save();
+		break;
+	case S_CONTINUE: continueSave();
+		break;
 	}
 	renderFramerate();  // renders debug information, frame rate, elapsed time, etc
 	renderToScreen();   // dump the contents of the buffer to the screen, one frame worth of game
@@ -305,12 +308,12 @@ void splashScreenWait()
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	if ((MMSelect == MMStart || MMSelect == MMInstructions) && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	if ((MMSelect == MMStart || MMSelect == MMInstructions || MMSelect == MMExit) && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
 	{
 		MMSelect++;
 		bSomethingHappened = true;
 	}
-	else if ((MMSelect == MMExit || MMSelect == MMInstructions) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if ((MMSelect == MMExit || MMSelect == MMInstructions || MMSelect == MMContinue) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
 	{
 		MMSelect--;
 		bSomethingHappened = true;
@@ -342,6 +345,13 @@ void splashScreenWait()
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 		g_eGameState = S_GAME;
+	}
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMContinue && g_eGameState == S_TITLE)
+	{
+		StageType = EStage;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		b_play = false;
+		g_eGameState = S_CONTINUE;
 	}
 	if (bSomethingHappened)
 	{
@@ -1750,6 +1760,8 @@ void processUserInput()
 				Lives++;
 		}
 	}
+	if (g_abKeyPressed[K_ENTER] && StageType == EStage) // save the game
+		g_eGameState = S_SAVE;
 }
 void clearScreen()
 {
@@ -1820,6 +1832,8 @@ void renderSplashScreen()  // renders the splash screen
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
+		m.X = g_Console.getConsoleSize().X - 12;
+		g_Console.writeToBuffer(m, "Continue", 0x03);
 		break;
 
 	case MMInstructions:
@@ -1832,6 +1846,8 @@ void renderSplashScreen()  // renders the splash screen
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
+		m.X = g_Console.getConsoleSize().X - 12;
+		g_Console.writeToBuffer(m, "Continue", 0x03);
 		break;
 
 	case MMExit:
@@ -1844,6 +1860,22 @@ void renderSplashScreen()  // renders the splash screen
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x0E);
+		m.X = g_Console.getConsoleSize().X - 12;
+		g_Console.writeToBuffer(m, "Continue", 0x03);
+		break;
+
+	case MMContinue:
+		m.Y = 20;
+		m.X = m.X / 2 - 2;
+		g_Console.writeToBuffer(m, "Start", 0x03);
+		m.Y += 1;
+		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		g_Console.writeToBuffer(m, "Instructions", 0x03);
+		m.Y += 1;
+		m.X = g_Console.getConsoleSize().X / 2 - 2;
+		g_Console.writeToBuffer(m, "Exit", 0x03);
+		m.X = g_Console.getConsoleSize().X - 12;
+		g_Console.writeToBuffer(m, "Continue", 0x0E);
 		break;
 	}
 }
@@ -2844,4 +2876,35 @@ void convertToString()
 			Minigame1Map.push_back(buffer[0]);
 	}
 	myfile11.close();
+}
+void save()
+{
+	std::ofstream stats("map/stats.txt");
+	for (int currentWeapon = 0; currentWeapon < 4; currentWeapon++)
+	{
+		stats << Weapons[currentWeapon].Name << std::endl;
+		stats << Weapons[currentWeapon].Clip << std::endl;
+	}
+	stats << Lives << std::endl;
+	stats << stages << std::endl;
+	stats.close();
+	g_eGameState = S_GAME;
+}
+void continueSave()
+{
+	init();
+	if (!continuestats)
+	{
+		std::fstream stats("map/stats.txt"); // get back the stats from ui (for every weapons + lives left + stage level currently at + location of stuffs)
+		for (int currentWeapon = 0; currentWeapon < 4; currentWeapon++)
+		{
+			stats >> Weapons[currentWeapon].Name;
+			stats >> Weapons[currentWeapon].Clip;
+		}
+		stats >> Lives;
+		stats >> stages;
+		continuestats = true;
+	}
+	MMSelect = MMStart;
+	g_eGameState = S_GAME;
 }

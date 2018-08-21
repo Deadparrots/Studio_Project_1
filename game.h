@@ -30,7 +30,8 @@ enum EKEYS
 	K_D,
 	K_C,
 	K_E,
-	K_COUNT,
+	K_ENTER,
+	K_COUNT
 };
 
 // Enumeration for the different screen states
@@ -41,7 +42,9 @@ enum EGAMESTATES
 	S_GAME,
 	S_GAMEOVER,
 	S_INSTRUCTIONS,
-	S_COUNT
+	S_COUNT,
+	S_SAVE,
+	S_CONTINUE
 };
 enum EWEAPONSTATES
 {
@@ -65,8 +68,8 @@ enum EMAINMENU
 {
 	MMStart,
 	MMInstructions,
-	MMExit
-
+	MMExit,
+	MMContinue
 };
 
 // struct for the game character
@@ -150,4 +153,6 @@ void ost();
 void gameOver();
 void instructions();
 void convertToString();
+void save();
+void continueSave();
 #endif // _GAME_H
