@@ -293,8 +293,9 @@ void intro()
 		ost();
 		b_play = true;
 	}
-	if ((g_dElapsedTime > 35) || g_abKeyPressed[K_W] || g_abKeyPressed[K_A] || g_abKeyPressed[K_S] || g_abKeyPressed[K_D] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_RIGHT])
+	if ((g_dElapsedTime > 35) || g_abKeyPressed[K_W] || g_abKeyPressed[K_A] || g_abKeyPressed[K_S] || g_abKeyPressed[K_D] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_SPACE])
 	{
+		g_dBounceTime = g_dElapsedTime + 0.125;
 		g_eGameState = S_TITLE;
 		StageType = EMainMenu;
 		init();
@@ -307,17 +308,37 @@ void splashScreenWait()
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	if ((MMSelect == MMStart || MMSelect == MMInstructions || MMSelect == MMExit) && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	if ((MMSelect == MMStart || MMSelect == MMContinue) && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
 	{
-		MMSelect++;
+		MMSelect = MMInstructions;
 		bSomethingHappened = true;
 	}
-	else if ((MMSelect == MMExit || MMSelect == MMInstructions || MMSelect == MMContinue) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMStart && (g_abKeyPressed[K_A] || g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_TITLE)
 	{
-		MMSelect--;
+		MMSelect = MMContinue;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMStart && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMContinue && (g_abKeyPressed[K_A] || g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMStart;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMInstructions && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMExit;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMInstructions && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMStart;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMExit && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMInstructions;
+		bSomethingHappened = true;
+	}
+	else if ((MMSelect == MMStart || MMSelect == MMContinue) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMExit;
 		bSomethingHappened = true;
@@ -1825,58 +1846,58 @@ void renderSplashScreen()  // renders the splash screen
 	{
 	case MMStart:
 		m.Y = 20;
-		m.X = m.X / 2 - 2;
+		m.X = 34;
 		g_Console.writeToBuffer(m, "Start", 0x0E);
+		m.X = 40;
+		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 6;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
-		m.X = g_Console.getConsoleSize().X - 12;
-		g_Console.writeToBuffer(m, "Continue", 0x03);
 		break;
 
 	case MMInstructions:
 		m.Y = 20;
-		m.X = m.X / 2 - 2;
+		m.X = 34;
 		g_Console.writeToBuffer(m, "Start", 0x03);
+		m.X = 40;
+		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 6;
 		g_Console.writeToBuffer(m, "Instructions", 0x0E);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
-		m.X = g_Console.getConsoleSize().X - 12;
-		g_Console.writeToBuffer(m, "Continue", 0x03);
 		break;
 
 	case MMExit:
 		m.Y = 20;
-		m.X = m.X / 2 - 2;
+		m.X = 34;
 		g_Console.writeToBuffer(m, "Start", 0x03);
+		m.X = 40;
+		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 6;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x0E);
-		m.X = g_Console.getConsoleSize().X - 12;
-		g_Console.writeToBuffer(m, "Continue", 0x03);
 		break;
 
 	case MMContinue:
 		m.Y = 20;
-		m.X = m.X / 2 - 2;
+		m.X = 34;
 		g_Console.writeToBuffer(m, "Start", 0x03);
+		m.X = 40;
+		g_Console.writeToBuffer(m, "Continue", 0x0E);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 6;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
-		m.X = g_Console.getConsoleSize().X - 12;
-		g_Console.writeToBuffer(m, "Continue", 0x0E);
 		break;
 	}
 }
