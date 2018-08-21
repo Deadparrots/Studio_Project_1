@@ -2563,7 +2563,7 @@ void gameOver()
 	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_GAMEOVER) // CONTINUE_GAME
 	{
-		StageType = EStage;
+		StageType = EMainMenu;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 		g_eGameState = S_GAME;
@@ -2607,6 +2607,7 @@ void sound()
 }
 void generate()
 {
+	Map.clear();
 	size_t random, point1, point2, point3, point4;
 	srand(time(NULL));
 	for (size_t i = 0; i < 24; i++)
@@ -2908,4 +2909,5 @@ void continueSave()
 		stages = 0.000 + int_stages;
 	MMSelect = MMStart;
 	g_eGameState = S_GAME;
+	StageType = EStage;
 }
