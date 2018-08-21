@@ -45,7 +45,7 @@ size_t		shootsound = 0;
 size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
 int			MMSelect = MMStart;
-int			int_stages = 1; // set to 1 normally... 4 for minigame testing... 9 for boss testing
+int			int_stages = 1;
 double		stages = 0.000 + int_stages;
 size_t		StageType = EMainMenu;
 bool		b_play = false;
@@ -1689,6 +1689,8 @@ void moveCharacter()
 }
 void processUserInput()
 {
+	if (g_abKeyPressed[K_ENTER] && StageType == EBossBattle && g_dElapsedTime < 20)
+		g_dElapsedTime = 20;
 	if (Lives < 1 || g_abKeyPressed[K_ESCAPE])
 	{
 		PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME);
@@ -1702,8 +1704,6 @@ void processUserInput()
 		g_enemy4.m_bActive = false;
 		g_enemy5.m_bActive = false;
 		g_enemy6.m_bActive = false;
-		if(StageType == EBossBattle)
-			g_dElapsedTime = 20;
 	}
 	if (g_sChar.m_bActive == false) // Took damage
 	{
@@ -2572,10 +2572,19 @@ void gameOver()
 		g_Console.writeToBuffer(m, "Exit", 0x0E);
 		break;
 	}
+	bool bSomethingHappened = false;
+	if (g_dBounceTime > g_dElapsedTime)
+		return;
 	if (MMSelect == MMStart && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_GAMEOVER) // MENU FOR GAME_OVER
+	{
 		MMSelect = MMExit;
+		bSomethingHappened = true;
+	}
 	else if (MMSelect == MMExit && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_GAMEOVER)
+	{
 		MMSelect = MMStart;
+		bSomethingHappened = true;
+	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit && g_eGameState == S_GAMEOVER) // QUIT_GAME
 	{
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
@@ -2590,6 +2599,10 @@ void gameOver()
 		init();
 		Lives = 3;
 		stages = 0;
+	}
+	if (bSomethingHappened)
+	{
+		g_dBounceTime = g_dElapsedTime + 0.125;
 	}
 }
 void instructions()
