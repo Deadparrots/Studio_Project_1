@@ -45,12 +45,11 @@ size_t		shootsound = 0;
 size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
 int			MMSelect = MMStart;
-double		stages = 1.000; // set to 1 normally... 4 for minigame testing... 9 for boss testing
-int			int_stages = stages;
+int			int_stages = 1; // set to 1 normally... 4 for minigame testing... 9 for boss testing
+double		stages = 0.000 + int_stages;
 size_t		StageType = EMainMenu;
 bool		b_play = false;
 bool		bossSpeech = false;
-bool        continuestats = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_INTRO;
@@ -344,6 +343,8 @@ void splashScreenWait()
 		StageType = EStage;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
+		reload();
+		int_stages = 1;
 		g_eGameState = S_GAME;
 	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMContinue && g_eGameState == S_TITLE)
@@ -1737,8 +1738,8 @@ void processUserInput()
 		}
 		else
 		{
+			int_stages++;
 			stages++;
-			int_stages = stages;
 			if (int_stages == 10)
 				StageType = EBoss;
 			else if (int_stages % 5 == 0)
@@ -2886,25 +2887,25 @@ void save()
 		stats << Weapons[currentWeapon].Clip << std::endl;
 	}
 	stats << Lives << std::endl;
-	stats << stages << std::endl;
+	stats << int_stages << std::endl;
 	stats.close();
 	g_eGameState = S_GAME;
 }
 void continueSave()
 {
 	init();
-	if (!continuestats)
+	std::fstream stats("map/stats.txt"); // get back the stats from ui (for every weapons + lives left + stage level currently at + location of stuffs)
+	for (int currentWeapon = 0; currentWeapon < 4; currentWeapon++)
 	{
-		std::fstream stats("map/stats.txt"); // get back the stats from ui (for every weapons + lives left + stage level currently at + location of stuffs)
-		for (int currentWeapon = 0; currentWeapon < 4; currentWeapon++)
-		{
-			stats >> Weapons[currentWeapon].Name;
-			stats >> Weapons[currentWeapon].Clip;
-		}
-		stats >> Lives;
-		stats >> stages;
-		continuestats = true;
+		stats >> Weapons[currentWeapon].Name;
+		stats >> Weapons[currentWeapon].Clip;
 	}
+	stats >> Lives;
+	stats >> int_stages;
+	if (int_stages % 5 == 0)
+		stages = 0.000 + int_stages - 1;
+	else
+		stages = 0.000 + int_stages;
 	MMSelect = MMStart;
 	g_eGameState = S_GAME;
 }
