@@ -516,7 +516,7 @@ void minigame1_moveCharacter()
 					g_minigame1_beat1.m_bLeft = false;
 				}
 			}
-			else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
+			else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.15)
 			{
 				g_minigame1_beat2.m_bActive = true;
 				if (rand() % 2)
@@ -530,7 +530,7 @@ void minigame1_moveCharacter()
 					g_minigame1_beat2.m_bLeft = false;
 				}
 			}
-			else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.4)
+			else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.35)
 			{
 				g_minigame1_beat3.m_bActive = true;
 				if (rand() % 2)
@@ -544,7 +544,7 @@ void minigame1_moveCharacter()
 					g_minigame1_beat3.m_bLeft = false;
 				}
 			}
-			else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.6)
+			else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.55)
 			{
 				g_minigame1_beat1.m_bActive = true;
 				if (rand() % 2)
