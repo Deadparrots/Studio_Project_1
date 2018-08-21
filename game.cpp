@@ -363,7 +363,7 @@ void splashScreenWait()
 		StageType = EStage;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
-		reload();
+		Weapons[0].Clip = Weapons[0].ClipMax;
 		int_stages = 1;
 		g_eGameState = S_GAME;
 	}
