@@ -57,7 +57,8 @@ enum ESTAGETYPE
 	EMainMenu,
 	EStage,
 	EBoss,
-	EBossBattle
+	EBossBattle,
+	EMinigame1
 };
 
 enum EMAINMENU
@@ -74,6 +75,14 @@ struct SGameChar
 	COORD m_cLocation;
 	bool  m_bActive;
 };
+
+struct SMinigame1
+{
+	COORD m_cLocation;
+	bool  m_bActive;
+	bool  m_bLeft;
+};
+
 struct SBossGaster
 {
 	COORD m_cLocation;
@@ -102,6 +111,7 @@ void shutdown(void);      // do clean up, free memory
 void intro();
 void splashScreenWait();    // waits for time to pass in splash screen
 void gameplay();            // gameplay logic
+void minigame1_moveCharacter();
 void moveCharacter();       // moves the character, collision detection, physics, etc
 void boss_moveCharacter();
 void bossbattle_moveCharacter();
@@ -123,6 +133,10 @@ void renderEnemy3();
 void renderEnemy4();
 void renderEnemy5();
 void renderEnemy6();
+void renderbeat1();
+void renderbeat2();
+void renderbeat3();
+void renderbeat4();
 void renderDoor();
 void renderWeapon();
 void renderBossSpeech();
