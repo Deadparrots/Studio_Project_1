@@ -43,7 +43,6 @@ enum EGAMESTATES
 	S_GAMEOVER,
 	S_INSTRUCTIONS,
 	S_COUNT,
-	S_SAVE,
 	S_CONTINUE
 };
 enum EWEAPONSTATES
@@ -60,7 +59,8 @@ enum ESTAGETYPE
 	EMainMenu,
 	EStage,
 	EBoss,
-	EBossBattle
+	EBossBattle,
+	EMinigame1
 };
 
 enum EMAINMENU
@@ -77,6 +77,14 @@ struct SGameChar
 	COORD m_cLocation;
 	bool  m_bActive;
 };
+
+struct SMinigame1
+{
+	COORD m_cLocation;
+	bool  m_bActive;
+	bool  m_bLeft;
+};
+
 struct SBossGaster
 {
 	COORD m_cLocation;
@@ -98,6 +106,7 @@ struct WeaponParameters
 void init(void);      // initialize your variables, allocate memory, etc
 void boss_init();
 void boss_battle_init();
+void check_init();
 void getInput(void);      // get input from player
 void update(double dt); // update the game and the state of the game
 void render(void);      // renders the current state of the game to the console
@@ -105,6 +114,7 @@ void shutdown(void);      // do clean up, free memory
 void intro();
 void splashScreenWait();    // waits for time to pass in splash screen
 void gameplay();            // gameplay logic
+void minigame1_moveCharacter();
 void moveCharacter();       // moves the character, collision detection, physics, etc
 void boss_moveCharacter();
 void bossbattle_moveCharacter();
@@ -126,6 +136,11 @@ void renderEnemy3();
 void renderEnemy4();
 void renderEnemy5();
 void renderEnemy6();
+void renderbeat1();
+void renderbeat2();
+void renderbeat3();
+void renderbeat4();
+void renderCheck();
 void renderDoor();
 void renderWeapon();
 void renderBossSpeech();

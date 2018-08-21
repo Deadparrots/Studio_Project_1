@@ -21,32 +21,38 @@ SBossGaster	g_gaster1;
 SBossGaster	g_gaster2;
 SBossGaster	g_gaster3;
 SBossGaster	g_gaster4;
+SMinigame1	g_minigame1_beat1;
+SMinigame1	g_minigame1_beat2;
+SMinigame1	g_minigame1_beat3;
+SMinigame1	g_minigame1_beat4;
 SGameChar	g_door;
+SGameChar   g_check;
 std::vector<char>	Title;
 std::vector<char>	GameOver;
 std::vector<char>	Map;
-std::vector<char>	Savee;
 std::vector<char>	Instructions;
 std::vector<char>	SansMap;
 std::vector<char>	SansFightMap;
+std::vector<char>	Minigame1Map;
 std::vector<char>	Scene1;
 std::vector<char>	Scene2;
 std::vector<char>	Scene3;
 std::vector<char>	Scene4;
 std::vector<char>	Scene5;
+size_t		minigame1time = 0;
+size_t		minigame1random = 9;
 size_t		deathsound = 0;
 size_t		shootsound = 0;
 size_t		reloadsound = 0;
 size_t		shootfailsound = 0;
 int			MMSelect = MMStart;
-double		stages = 1.000; // set to 1 normally... 9 for boss testing
-int			int_stages = stages;
+int			int_stages = 1;
+double		stages = 0.000 + int_stages;
 size_t		StageType = EMainMenu;
 bool		b_play = false;
 bool		bossSpeech = false;
-bool        continuestats = false;
-int         g_shootdist = 0;
-int         g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
+int g_shootdist = 0;
+int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_INTRO;
 EWEAPONSTATES g_eWeaponState = Hold;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
@@ -55,14 +61,25 @@ int currentWeapon = 0; // Current Weapon
 WeaponParameters Weapons[4]; // Number of Weapons
 // Console object
 Console g_Console(80, 24, "Monster Dungeon");
-
-//--------------------------------------------------------------
-// Purpose  : Initialisation function
-//            Initialize variables, allocate memory, load data from file, etc. 
-//            This is called once before entering into your main loop
-// Input    : void
-// Output   : void
-//--------------------------------------------------------------
+void minigame1_init()
+{
+	weapdata();
+	g_dElapsedTime = 0.0;
+	g_dBounceTime = 0.0;
+	g_sChar.m_cLocation.Y = 17;
+	g_minigame1_beat1.m_cLocation.Y = 17;
+	g_minigame1_beat2.m_cLocation.Y = 17;
+	g_minigame1_beat3.m_cLocation.Y = 17;
+	g_minigame1_beat4.m_cLocation.Y = 17;
+	g_sChar.m_cLocation.X = 40;
+	g_minigame1_beat1.m_bActive = false;
+	g_minigame1_beat2.m_bActive = false;
+	g_minigame1_beat3.m_bActive = false;
+	g_minigame1_beat4.m_bActive = false;
+	g_door.m_cLocation.X = 40;
+	g_door.m_cLocation.Y = 17;
+	g_door.m_bActive = false;
+}
 void boss_init()
 {
 	b_play = false;
@@ -70,7 +87,6 @@ void boss_init()
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
 	g_Console.setConsoleFont(0, 16, L"Consolas");
-	reload();
 	g_sChar.m_cLocation.X = 40;
 	g_sChar.m_cLocation.Y = 11;
 	g_sChar.m_bActive = true;
@@ -98,10 +114,13 @@ void boss_battle_init()
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
 	g_Console.setConsoleFont(0, 16, L"Consolas");
-	reload();
 	g_door.m_cLocation.X = 40;
 	g_door.m_cLocation.Y = 14;
 	g_door.m_bActive = false;
+}
+void check_init()
+{
+
 }
 void init(void)
 {
@@ -208,16 +227,7 @@ void init(void)
 	g_gaster4.m_bFire = false;
 	// sets the width, height and the font name to use in the console
 	g_Console.setConsoleFont(0, 16, L"Consolas");
-	reload();
 }
-
-//--------------------------------------------------------------
-// Purpose  : Reset before exiting the program
-//            Do your clean up of memory here
-//            This is called once just before the game exits
-// Input    : Void
-// Output   : void
-//--------------------------------------------------------------
 void shutdown(void)
 {
 	// Reset to white text on black background
@@ -225,18 +235,6 @@ void shutdown(void)
 
 	g_Console.clearBuffer();
 }
-
-//--------------------------------------------------------------
-// Purpose  : Getting all the key press states
-//            This function checks if any key had been pressed since the last time we checked
-//            If a key is pressed, the value for that particular key will be true
-//
-//            Add more keys to the enum in game.h if you need to detect more keys
-//            To get other VK key defines, right click on the VK define (e.g. VK_UP) and choose "Go To Definition" 
-//            For Alphanumeric keys, the values are their ascii values (uppercase).
-// Input    : Void
-// Output   : void
-//--------------------------------------------------------------
 void getInput(void)
 {
 	g_abKeyPressed[K_UP] = isKeyPressed(VK_UP);
@@ -253,21 +251,6 @@ void getInput(void)
 	g_abKeyPressed[K_C] = isKeyPressed(67);
 	g_abKeyPressed[K_E] = isKeyPressed(69); // For Weapon Switching
 }
-
-//--------------------------------------------------------------
-// Purpose  : Update function
-//            This is the update function
-//            double dt - This is the amount of time in seconds since the previous call was made
-//
-//            Game logic should be done here.
-//            Such as collision checks, determining the position of your game characters, status updates, etc
-//            If there are any calls to write to the console here, then you are doing it wrong.
-//
-//            If your game has multiple states, you should determine the current state, and call the relevant function here.
-//
-// Input    : dt = deltatime
-// Output   : void
-//--------------------------------------------------------------
 void update(double dt)
 {
 	// get the delta time
@@ -284,14 +267,6 @@ void update(double dt)
 		break;
 	}
 }
-//--------------------------------------------------------------
-// Purpose  : Render function is to update the console screen
-//            At this point, you should know exactly what to draw onto the screen.
-//            Just draw it!
-//            To get an idea of the values for colours, look at console.h and the URL listed there
-// Input    : void
-// Output   : void
-//--------------------------------------------------------------
 void render()
 {
 	clearScreen();      // clears the current screen and draw from scratch 
@@ -306,8 +281,6 @@ void render()
 	case S_GAMEOVER: gameOver();
 		break;
 	case S_INSTRUCTIONS: instructions();
-		break;
-	case S_SAVE: save();
 		break;
 	case S_CONTINUE: continueSave();
 		break;
@@ -331,20 +304,42 @@ void intro()
 }
 void splashScreenWait() 
 {
+	if (!b_play)
+		ost();
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	if ((MMSelect == MMStart || MMSelect == MMInstructions || MMSelect == MMExit) && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	if ((MMSelect == MMStart || MMSelect == MMContinue) && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
 	{
-		MMSelect++;
+		MMSelect = MMInstructions;
 		bSomethingHappened = true;
 	}
-	else if ((MMSelect == MMExit || MMSelect == MMInstructions || MMSelect == MMContinue) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMStart && (g_abKeyPressed[K_A] || g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_TITLE)
 	{
-		MMSelect--;
+		MMSelect = MMContinue;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMStart && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMContinue && (g_abKeyPressed[K_A] || g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMStart;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMInstructions && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMExit;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMInstructions && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMStart;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMExit && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMInstructions;
+		bSomethingHappened = true;
+	}
+	else if ((MMSelect == MMStart || MMSelect == MMContinue) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMExit;
 		bSomethingHappened = true;
@@ -365,13 +360,13 @@ void splashScreenWait()
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		g_bQuitGame = true;
 	}
-	if (!b_play)
-		ost();
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_TITLE)
 	{
 		StageType = EStage;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
+		Weapons[0].Clip = Weapons[0].ClipMax;
+		int_stages = 1;
 		g_eGameState = S_GAME;
 	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMContinue && g_eGameState == S_TITLE)
@@ -396,9 +391,286 @@ void gameplay()            // gameplay logic
 		boss_moveCharacter();
 	else if (StageType == EBossBattle)
 		bossbattle_moveCharacter();
+	else if (StageType == EMinigame1)
+		minigame1_moveCharacter();
 	sound(); // sound can be played here too.
 	if (!b_play)
 		ost();
+}
+void minigame1_moveCharacter()
+{
+	// Minigame stuff go here
+	if (g_dElapsedTime < 3 && g_dElapsedTime >= 2.9)
+	{
+		minigame1time = 3;
+		minigame1random = 0;
+	}
+	else if (g_dElapsedTime < 4 && g_dElapsedTime >= 3.9)
+	{
+		minigame1time = 4;
+		minigame1random = 1;
+	}
+	else if (g_dElapsedTime < 5 && g_dElapsedTime >= 4.9)
+	{
+		minigame1time = 5;
+		minigame1random = rand() % 4;
+	}
+	else if (g_dElapsedTime < 6 && g_dElapsedTime >= 5.9)
+	{
+		minigame1time = 6;
+		minigame1random = 2;
+	}
+	else if (g_dElapsedTime < 7 && g_dElapsedTime >= 6.9)
+	{
+		minigame1time = 7;
+		minigame1random = 2;
+	}
+	else if (g_dElapsedTime < 8 && g_dElapsedTime >= 7.9)
+	{
+		minigame1time = 8;
+		minigame1random = 2;
+	}
+	else if (g_dElapsedTime < 9 && g_dElapsedTime >= 8.9)
+	{
+		minigame1time = 9;
+		minigame1random = 2;
+	}
+	else if (g_dElapsedTime < 10 && g_dElapsedTime >= 9.9)
+	{
+		minigame1time = 10;
+		minigame1random = 2;
+	}
+	else if (g_dElapsedTime >= 12)
+	{
+		g_door.m_bActive = true;
+	}
+	switch (minigame1random)
+	{
+	case 0:
+	{
+		if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
+		{
+			g_minigame1_beat1.m_bActive = true;
+			g_minigame1_beat1.m_cLocation.X = 2;
+			g_minigame1_beat1.m_bLeft = true;
+		}
+		else if (g_dElapsedTime < minigame1time + 0.2 && g_dElapsedTime >= minigame1time + 0.1)
+		{
+			g_minigame1_beat2.m_bActive = true;
+			g_minigame1_beat2.m_cLocation.X = 2;
+			g_minigame1_beat2.m_bLeft = true;
+		}
+		else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
+		{
+			g_minigame1_beat3.m_bActive = true;
+			g_minigame1_beat3.m_cLocation.X = 2;
+			g_minigame1_beat3.m_bLeft = true;
+		}
+		else if (g_dElapsedTime < minigame1time + 0.4 && g_dElapsedTime >= minigame1time + 0.3)
+		{
+			g_minigame1_beat4.m_bActive = true;
+			g_minigame1_beat4.m_cLocation.X = 2;
+			g_minigame1_beat4.m_bLeft = true;
+		}
+		break;
+	}
+	case 1:
+		{
+			if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
+			{
+				g_minigame1_beat1.m_bActive = true;
+				g_minigame1_beat1.m_cLocation.X = 77;
+				g_minigame1_beat1.m_bLeft = false;
+			}
+			else if (g_dElapsedTime < minigame1time + 0.2 && g_dElapsedTime >= minigame1time + 0.1)
+			{
+				g_minigame1_beat2.m_bActive = true;
+				g_minigame1_beat2.m_cLocation.X = 77;
+				g_minigame1_beat2.m_bLeft = false;
+			}
+			else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
+			{
+				g_minigame1_beat3.m_bActive = true;
+				g_minigame1_beat3.m_cLocation.X = 77;
+				g_minigame1_beat3.m_bLeft = false;
+			}
+			else if (g_dElapsedTime < minigame1time + 0.4 && g_dElapsedTime >= minigame1time + 0.3)
+			{
+				g_minigame1_beat4.m_bActive = true;
+				g_minigame1_beat4.m_cLocation.X = 77;
+				g_minigame1_beat4.m_bLeft = false;
+			}
+			break;
+		}
+	case 2:
+		{
+			if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
+			{
+				g_minigame1_beat1.m_bActive = true;
+				if (rand() % 2)
+				{
+					g_minigame1_beat1.m_cLocation.X = 2;
+					g_minigame1_beat1.m_bLeft = true;
+				}
+				else
+				{
+					g_minigame1_beat1.m_cLocation.X = 77;
+					g_minigame1_beat1.m_bLeft = false;
+				}
+			}
+			else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
+			{
+				g_minigame1_beat2.m_bActive = true;
+				if (rand() % 2)
+				{
+					g_minigame1_beat2.m_cLocation.X = 2;
+					g_minigame1_beat2.m_bLeft = true;
+				}
+				else
+				{
+					g_minigame1_beat2.m_cLocation.X = 77;
+					g_minigame1_beat2.m_bLeft = false;
+				}
+			}
+			else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.4)
+			{
+				g_minigame1_beat3.m_bActive = true;
+				if (rand() % 2)
+				{
+					g_minigame1_beat3.m_cLocation.X = 2;
+					g_minigame1_beat3.m_bLeft = true;
+				}
+				else
+				{
+					g_minigame1_beat3.m_cLocation.X = 77;
+					g_minigame1_beat3.m_bLeft = false;
+				}
+			}
+			else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.6)
+			{
+				g_minigame1_beat1.m_bActive = true;
+				if (rand() % 2)
+				{
+					g_minigame1_beat4.m_cLocation.X = 2;
+					g_minigame1_beat4.m_bLeft = true;
+				}
+				else
+				{
+					g_minigame1_beat4.m_cLocation.X = 77;
+					g_minigame1_beat4.m_bLeft = false;
+				}
+			}
+			break;
+		}
+	}
+	// Minigame stuff end
+	if (g_abKeyPressed[K_LEFT])
+	{
+		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X - 3;
+		g_weapon.m_cLocation.Y = 17;
+	}
+	else if (g_abKeyPressed[K_RIGHT])
+	{
+		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X + 3;
+		g_weapon.m_cLocation.Y = 17;
+	}
+	else
+	{
+		g_weapon.m_cLocation.X = 0;
+		g_weapon.m_cLocation.Y = 0;
+	}
+	if (g_weapon.m_cLocation.X == g_minigame1_beat1.m_cLocation.X && g_minigame1_beat1.m_bActive == true)
+	{
+		deathsound = 5;
+		g_minigame1_beat1.m_bActive = false;
+		g_minigame1_beat1.m_cLocation.X = 2;
+	}
+	if (g_weapon.m_cLocation.X == g_minigame1_beat2.m_cLocation.X && g_minigame1_beat2.m_bActive == true)
+	{
+		deathsound = 5;
+		g_minigame1_beat2.m_bActive = false;
+		g_minigame1_beat2.m_cLocation.X = 77;
+	}
+	if (g_weapon.m_cLocation.X == g_minigame1_beat3.m_cLocation.X && g_minigame1_beat3.m_bActive == true)
+	{
+		deathsound = 5;
+		g_minigame1_beat3.m_bActive = false;
+		g_minigame1_beat3.m_cLocation.X = 2;
+	}
+	if (g_weapon.m_cLocation.X == g_minigame1_beat4.m_cLocation.X && g_minigame1_beat4.m_bActive == true)
+	{
+		deathsound = 5;
+		g_minigame1_beat4.m_bActive = false;
+		g_minigame1_beat4.m_cLocation.X = 77;
+	}
+	if (g_minigame1_beat1.m_cLocation.X == g_sChar.m_cLocation.X && g_minigame1_beat1.m_bActive == true)
+	{
+		g_minigame1_beat1.m_bActive = false;
+		g_minigame1_beat1.m_cLocation.X = 2;
+		g_sChar.m_bActive = false;
+		deathsound = 5;
+	}
+	if (g_minigame1_beat2.m_cLocation.X == g_sChar.m_cLocation.X && g_minigame1_beat2.m_bActive == true)
+	{
+		g_minigame1_beat2.m_bActive = false;
+		g_minigame1_beat2.m_cLocation.X = 77;
+		g_sChar.m_bActive = false;
+		deathsound = 5;
+	}
+	if (g_minigame1_beat3.m_cLocation.X == g_sChar.m_cLocation.X && g_minigame1_beat3.m_bActive == true)
+	{
+		g_minigame1_beat3.m_bActive = false;
+		g_minigame1_beat3.m_cLocation.X = 2;
+		g_sChar.m_bActive = false;
+		deathsound = 5;
+	}
+	if (g_minigame1_beat4.m_cLocation.X == g_sChar.m_cLocation.X && g_minigame1_beat4.m_bActive == true)
+	{
+		g_minigame1_beat4.m_bActive = false;
+		g_minigame1_beat4.m_cLocation.X = 77;
+		g_sChar.m_bActive = false;
+		deathsound = 5;
+	}
+	bool bSomethingHappened = false;
+	if (g_dBounceTime > g_dElapsedTime)
+		return;
+	if (g_minigame1_beat1.m_bActive)
+	{
+		if (g_minigame1_beat1.m_bLeft)
+			g_minigame1_beat1.m_cLocation.X++;
+		else
+			g_minigame1_beat1.m_cLocation.X--;
+		bSomethingHappened = true;
+	}
+	if (g_minigame1_beat2.m_bActive)
+	{
+		if (g_minigame1_beat2.m_bLeft)
+			g_minigame1_beat2.m_cLocation.X++;
+		else
+			g_minigame1_beat2.m_cLocation.X--;
+		bSomethingHappened = true;
+	}
+	if (g_minigame1_beat3.m_bActive)
+	{
+		if (g_minigame1_beat3.m_bLeft)
+			g_minigame1_beat3.m_cLocation.X++;
+		else
+			g_minigame1_beat3.m_cLocation.X--;
+		bSomethingHappened = true;
+	}
+	if (g_minigame1_beat4.m_bActive)
+	{
+		if (g_minigame1_beat4.m_bLeft)
+			g_minigame1_beat4.m_cLocation.X++;
+		else
+			g_minigame1_beat4.m_cLocation.X--;
+		bSomethingHappened = true;
+	}
+	if (bSomethingHappened)
+	{
+		// set the bounce time to some time in the future to prevent accidental triggers
+		g_dBounceTime = g_dElapsedTime + 0.015; // 125ms should be enough
+	}
 }
 void bossbattle_moveCharacter()
 {
@@ -897,7 +1169,6 @@ void moveCharacter()
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
 	{
 		shootfailsound = 1;
-		//bSomethingHappened = true;
 	}
 	if (Weapons[currentWeapon].Clip > 0)
 	{
@@ -911,7 +1182,6 @@ void moveCharacter()
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			//bSomethingHappened = true;
 		}
 		if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
 		{
@@ -923,7 +1193,6 @@ void moveCharacter()
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			//bSomethingHappened = true;
 		}
 		if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
 		{
@@ -935,7 +1204,6 @@ void moveCharacter()
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			//bSomethingHappened = true;
 		}
 		if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
 		{
@@ -947,7 +1215,6 @@ void moveCharacter()
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound++;
 			Weapons[currentWeapon].Clip--;
-			//bSomethingHappened = true;
 		}
 	}
 	if (g_eWeaponState == FireUp)
@@ -991,12 +1258,6 @@ void moveCharacter()
 			g_shootdist = g_shootmaxdist;
 	}
 
-	bool bSomethingHappened = false;
-	if (g_dBounceTime > g_dElapsedTime)
-		return;
-	// Updating the location of the character based on the key press
-	// providing a beep sound whenver we shift the character
-
 	if (g_shootdist >= g_shootmaxdist)
 	{
 		g_eWeaponState = Hold;
@@ -1004,6 +1265,12 @@ void moveCharacter()
 		g_weapon.m_cLocation.Y = 2;
 		g_shootdist = 0;
 	}
+
+	bool bSomethingHappened = false;
+	if (g_dBounceTime > g_dElapsedTime)
+		return;
+	// Updating the location of the character based on the key press
+	// providing a beep sound whenver we shift the character
 
 	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
 	{
@@ -1424,6 +1691,8 @@ void moveCharacter()
 }
 void processUserInput()
 {
+	if (g_abKeyPressed[K_ENTER] && StageType == EBossBattle && g_dElapsedTime < 20)
+		g_dElapsedTime = 20;
 	if (Lives < 1 || g_abKeyPressed[K_ESCAPE])
 	{
 		PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME);
@@ -1437,8 +1706,6 @@ void processUserInput()
 		g_enemy4.m_bActive = false;
 		g_enemy5.m_bActive = false;
 		g_enemy6.m_bActive = false;
-		if(StageType == EBossBattle)
-			g_dElapsedTime = 20;
 	}
 	if (g_sChar.m_bActive == false) // Took damage
 	{
@@ -1493,10 +1760,12 @@ void processUserInput()
 		}
 		else
 		{
+			int_stages++;
 			stages++;
-			int_stages = stages;
 			if (int_stages == 10)
 				StageType = EBoss;
+			else if (int_stages % 5 == 0)
+				StageType = EMinigame1;
 			else
 			{
 				if (StageType == EBossBattle)
@@ -1505,15 +1774,16 @@ void processUserInput()
 			}
 			if (StageType == EBoss)
 				boss_init();
+			else if (StageType == EMinigame1)
+				minigame1_init();
 			else
 				init();
 			g_eGameState = S_GAME;
 			if (Lives != 99)
 				Lives++;
+			save();
 		}
 	}
-	if (g_abKeyPressed[K_ENTER] && StageType == EStage) // save the game
-		g_eGameState = S_SAVE;
 }
 void clearScreen()
 {
@@ -1576,65 +1846,66 @@ void renderSplashScreen()  // renders the splash screen
 	{
 	case MMStart:
 		m.Y = 20;
-		m.X = m.X / 2 - 2;
+		m.X = 34;
 		g_Console.writeToBuffer(m, "Start", 0x0E);
+		m.X = 40;
+		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 6;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
-		m.X = g_Console.getConsoleSize().X - 12;
-		g_Console.writeToBuffer(m, "Continue", 0x03);
 		break;
 
 	case MMInstructions:
 		m.Y = 20;
-		m.X = m.X / 2 - 2;
+		m.X = 34;
 		g_Console.writeToBuffer(m, "Start", 0x03);
+		m.X = 40;
+		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 6;
 		g_Console.writeToBuffer(m, "Instructions", 0x0E);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
-		m.X = g_Console.getConsoleSize().X - 12;
-		g_Console.writeToBuffer(m, "Continue", 0x03);
 		break;
 
 	case MMExit:
 		m.Y = 20;
-		m.X = m.X / 2 - 2;
+		m.X = 34;
 		g_Console.writeToBuffer(m, "Start", 0x03);
+		m.X = 40;
+		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 6;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x0E);
-		m.X = g_Console.getConsoleSize().X - 12;
-		g_Console.writeToBuffer(m, "Continue", 0x03);
 		break;
 
 	case MMContinue:
 		m.Y = 20;
-		m.X = m.X / 2 - 2;
+		m.X = 34;
 		g_Console.writeToBuffer(m, "Start", 0x03);
+		m.X = 40;
+		g_Console.writeToBuffer(m, "Continue", 0x0E);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 6;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
 		m.X = g_Console.getConsoleSize().X / 2 - 2;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
-		m.X = g_Console.getConsoleSize().X - 12;
-		g_Console.writeToBuffer(m, "Continue", 0x0E);
 		break;
 	}
 }
 void renderGame()
 {
 	renderMap();        // renders the map to the buffer first
-	renderDoor();
+	renderDoor();       // door after killing E
+	renderCheck();      // checkpoint after reaching certain points of game
 	renderCharacter();  // renders the character into the buffer
 	if (StageType == EStage)
 	{
@@ -1648,11 +1919,19 @@ void renderGame()
 	}
 	if (StageType == EBossBattle)
 	{
+		renderBossSpeech();
 		renderGaster1();
 		renderGaster2();
 		renderGaster3();
 		renderGaster4();
-		renderBossSpeech();
+		renderWeapon();
+	}
+	if (StageType == EMinigame1)
+	{
+		renderbeat1();
+		renderbeat2();
+		renderbeat3();
+		renderbeat4();
 		renderWeapon();
 	}
 	renderUI();
@@ -1678,6 +1957,14 @@ void renderMap()
 	else if (StageType == EBossBattle)
 	{
 		std::vector<char>::iterator it = SansFightMap.begin();
+		for (short i = 0; i < 80 * 24; ++i)
+		{
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
+		}
+	}
+	else if (StageType == EMinigame1)
+	{
+		std::vector<char>::iterator it = Minigame1Map.begin();
 		for (short i = 0; i < 80 * 24; ++i)
 		{
 			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
@@ -2033,6 +2320,57 @@ void renderEnemy6()
 	}
 	g_Console.writeToBuffer(g_enemy6.m_cLocation, character, charColor);
 }
+void renderbeat1()
+{
+	WORD charColor = 0x0E;
+	char character = '<';
+	if (g_minigame1_beat1.m_bLeft)
+		character = '>';
+	if (g_minigame1_beat1.m_bActive)
+	{
+		g_Console.writeToBuffer(g_minigame1_beat1.m_cLocation, character, charColor);
+	}
+}
+void renderbeat2()
+{
+	WORD charColor = 0x0E;
+	char character = '<';
+	if (g_minigame1_beat2.m_bLeft)
+		character = '>';
+	if (g_minigame1_beat2.m_bActive)
+	{
+		g_Console.writeToBuffer(g_minigame1_beat2.m_cLocation, character, charColor);
+	}
+}
+void renderbeat3()
+{
+	WORD charColor = 0x0E;
+	char character = '<';
+	if (g_minigame1_beat3.m_bLeft)
+		character = '>';
+	if (g_minigame1_beat3.m_bActive)
+	{
+		g_Console.writeToBuffer(g_minigame1_beat3.m_cLocation, character, charColor);
+	}
+}
+void renderbeat4()
+{
+	WORD charColor = 0x0E;
+	char character = '<';
+	if (g_minigame1_beat4.m_bLeft)
+		character = '>';
+	if (g_minigame1_beat4.m_bActive)
+	{
+		g_Console.writeToBuffer(g_minigame1_beat4.m_cLocation, character, charColor);
+	}
+}
+void renderCheck()
+{
+	WORD charColor = 0x00;
+	if (g_check.m_bActive == true)
+		charColor = 0x0B;
+	g_Console.writeToBuffer(g_check.m_cLocation, (char)'C', charColor);
+}
 void renderDoor()
 {
 	// Draw the location of the door
@@ -2243,10 +2581,19 @@ void gameOver()
 		g_Console.writeToBuffer(m, "Exit", 0x0E);
 		break;
 	}
-	if (MMSelect == MMStart && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_GAMEOVER) // MENU FOR GAME_OVER
+	bool bSomethingHappened = false;
+	if (g_dBounceTime > g_dElapsedTime)
+		return;
+	if (MMSelect == MMStart && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_GAMEOVER) // MENU FOR GAME_OVER
+	{
 		MMSelect = MMExit;
-	else if (MMSelect == MMExit && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_GAMEOVER)
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMExit && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_GAMEOVER)
+	{
 		MMSelect = MMStart;
+		bSomethingHappened = true;
+	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit && g_eGameState == S_GAMEOVER) // QUIT_GAME
 	{
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
@@ -2254,13 +2601,17 @@ void gameOver()
 	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_GAMEOVER) // CONTINUE_GAME
 	{
-		StageType = EStage;
+		StageType = EMainMenu;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 		g_eGameState = S_GAME;
 		init();
 		Lives = 3;
 		stages = 0;
+	}
+	if (bSomethingHappened)
+	{
+		g_dBounceTime = g_dElapsedTime + 0.125;
 	}
 }
 void instructions()
@@ -2298,6 +2649,7 @@ void sound()
 }
 void generate()
 {
+	Map.clear();
 	size_t random, point1, point2, point3, point4;
 	srand(time(NULL));
 	for (size_t i = 0; i < 24; i++)
@@ -2558,46 +2910,49 @@ void convertToString()
 			Scene5.push_back(buffer[0]);
 	}
 	myfile10.close();
-	std::fstream myfile12("map/save.txt");
-	Map.clear();
+	std::fstream myfile11("map/minigame1map.txt");
 	for (short i = 0; i < 25 * 80; i++)
 	{
-		myfile12.seekg(i);
+		myfile11.seekg(i);
 		char * buffer = new char[1];
-		myfile12.read(buffer, 1);
+		myfile11.read(buffer, 1);
 		if (buffer[0] != '\n')
-			Map.push_back(buffer[0]);
+			Minigame1Map.push_back(buffer[0]);
 	}
-	myfile12.close();
+	myfile11.close();
 }
 void save()
 {
-	ofstream stats("map/stats.txt");
+	std::ofstream stats("map/stats.txt");
 	for (int currentWeapon = 0; currentWeapon < 4; currentWeapon++)
 	{
-		stats << Weapons[currentWeapon].Name << endl;
-		stats << Weapons[currentWeapon].Clip << endl;
+		stats << Weapons[currentWeapon].Name << std::endl;
+		stats << Weapons[currentWeapon].Clip << std::endl;
 	}
-	stats << Lives << endl;
-	stats << stages << endl;
+	stats << Lives << std::endl;
+	stats << int_stages << std::endl;
 	stats.close();
 	g_eGameState = S_GAME;
 }
 void continueSave()
 {
 	init();
-	if (!continuestats)
+	std::fstream stats("map/stats.txt"); // get back the stats from ui (for every weapons + lives left + stage level currently at + location of stuffs)
+	for (int currentWeapon = 0; currentWeapon < 4; currentWeapon++)
 	{
-		std::fstream stats("map/stats.txt"); // get back the stats from ui (for every weapons + lives left + stage level currently at + location of stuffs)
-		for (int currentWeapon = 0; currentWeapon < 4; currentWeapon++)
-		{
-			stats >> Weapons[currentWeapon].Name;
-			stats >> Weapons[currentWeapon].Clip;
-		}
-		stats >> Lives;
-		stats >> stages;
-		continuestats = true;
+		stats >> Weapons[currentWeapon].Name;
+		stats >> Weapons[currentWeapon].Clip;
 	}
+	stats >> Lives;
+	stats >> int_stages;
+	if (int_stages % 5 == 0)
+	{
+		stages = 0.000 + int_stages - 1;
+		int_stages--;
+	}
+	else
+		stages = 0.000 + int_stages;
 	MMSelect = MMStart;
 	g_eGameState = S_GAME;
+	StageType = EStage;
 }
