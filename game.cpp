@@ -62,7 +62,6 @@ WeaponParameters Weapons[4]; // Number of Weapons
 Console g_Console(80, 24, "Monster Dungeon");
 void minigame1_init()
 {
-	generate();
 	weapdata();
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
@@ -277,8 +276,6 @@ void render()
 	case S_GAMEOVER: gameOver();
 		break;
 	case S_INSTRUCTIONS: instructions();
-		break;
-	case S_SAVE: save();
 		break;
 	case S_CONTINUE: continueSave();
 		break;
@@ -1776,13 +1773,11 @@ void processUserInput()
 				minigame1_init();
 			else
 				init();
-			g_eGameState = S_GAME;
+			save();
 			if (Lives != 99)
 				Lives++;
 		}
 	}
-	if (g_abKeyPressed[K_ENTER] && StageType == EStage) // save the game
-		g_eGameState = S_SAVE;
 }
 void clearScreen()
 {
@@ -2937,7 +2932,10 @@ void continueSave()
 	stats >> Lives;
 	stats >> int_stages;
 	if (int_stages % 5 == 0)
+	{
 		stages = 0.000 + int_stages - 1;
+		int_stages--;
+	}
 	else
 		stages = 0.000 + int_stages;
 	MMSelect = MMStart;
