@@ -30,7 +30,7 @@ enum EKEYS
 	K_C,
 	K_E,
 	K_ENTER,
-	K_COUNT
+	K_COUNT,
 };
 
 // Enumeration for the different screen states
@@ -40,9 +40,10 @@ enum EGAMESTATES
 	S_TITLE,
 	S_GAME,
 	S_GAMEOVER,
-	S_COUNT,
 	S_INTRUCTIONS,
-	S_SAVE
+	S_COUNT,
+	S_SAVE,
+	S_CONTINUE,
 };
 enum EWEAPONSTATES
 {
@@ -53,7 +54,7 @@ enum EWEAPONSTATES
 	FireRight
 };
 
-enum ESONGTYPE
+enum ESTAGETYPE
 {
 	EMainMenu,
 	EStage,
@@ -65,7 +66,8 @@ enum EMAINMENU
 {
 	MMStart,
 	MMInstructions,
-	MMExit
+	MMExit,
+	MMContinue
 
 };
 
@@ -91,6 +93,7 @@ struct WeaponParameters
 	int Reload; // Reload Speed
 	int ProjectileSpeed; // Projectile Speed
 	int Range; // Range
+	int clipSave;
 };
 
 void init(void);      // initialize your variables, allocate memory, etc
@@ -137,4 +140,5 @@ void ost();
 void gameOver();
 void instructions();
 void save();
+void continueSave();
 #endif // _GAME_H
