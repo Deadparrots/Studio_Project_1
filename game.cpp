@@ -765,7 +765,7 @@ void minigame2_moveCharacter()
 		g_door.m_bActive = true;
 		g_door.m_cLocation = g_sChar.m_cLocation;
 	}
-	if (g_weapon.m_cLocation.X == g_minigame2_paddle1.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle1.m_cLocation.Y - 3 && g_weapon.m_cLocation.Y <= g_minigame2_paddle1.m_cLocation.Y + 3))
+	if (g_weapon.m_cLocation.X == g_minigame2_paddle1.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle1.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle1.m_cLocation.Y + 2))
 		g_eWeaponState = FireRight;
 	if (g_weapon.m_cLocation.X == g_minigame2_paddle2.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle2.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle2.m_cLocation.Y + 2))
 		g_eWeaponState = FireLeft;
