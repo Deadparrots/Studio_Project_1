@@ -746,9 +746,6 @@ void minigame2_moveCharacter()
 		g_eWeaponState = FireRight;
 	if (g_weapon.m_cLocation.X == g_minigame2_paddle2.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle2.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle2.m_cLocation.Y + 2))
 		g_eWeaponState = FireLeft;
-	// Updating the location of the character based on the key press
-	// providing a beep sound whenver we shift the character
-
 	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
 	{
 		if (Minigame2Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
@@ -766,11 +763,10 @@ void minigame2_moveCharacter()
 		}
 	}
 	g_minigame2_paddle1.m_cLocation.Y = g_sChar.m_cLocation.Y;
-	if (g_dElapsedTime < 30 && g_eWeaponState == FireRight && g_minigame2_paddle2.m_cLocation.Y <= g_weapon.m_cLocation.Y + 1  && g_minigame2_paddle2.m_cLocation.Y >= g_weapon.m_cLocation.Y - 1 && g_weapon.m_cLocation.X >= 40)
+	if (g_dElapsedTime < int_stages + 5 && g_eWeaponState == FireRight && g_minigame2_paddle2.m_cLocation.Y <= g_weapon.m_cLocation.Y + 1  && g_minigame2_paddle2.m_cLocation.Y >= g_weapon.m_cLocation.Y - 1 && g_weapon.m_cLocation.X >= 40)
 		g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
 	if (bSomethingHappened)
 	{
-		// set the bounce time to some time in the future to prevent accidental triggers
 		g_dBounceTime = g_dElapsedTime + 0.03 + 0.1/stages; // 125ms should be enough
 	}
 }
@@ -1864,7 +1860,7 @@ void processUserInput()
 		{
 			int_stages++;
 			stages++;
-			if (int_stages == 20)
+			if (int_stages == 50)
 				StageType = EBoss;
 			else if (int_stages % 10 == 0)
 				StageType = EMinigame1;
@@ -2739,11 +2735,6 @@ void gameOver()
 	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit && g_eGameState == S_GAMEOVER) // QUIT_GAME
 	{
-		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
-		g_bQuitGame = true;
-	}
-	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_GAMEOVER) // CONTINUE_GAME
-	{
 		StageType = EMainMenu;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
@@ -2751,6 +2742,15 @@ void gameOver()
 		init();
 		Lives = 3;
 		stages = 0;
+		for (size_t i = 0; i < 4; i++)
+			Weapons[i].Clip = 0;
+	}
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_GAMEOVER) // CONTINUE_GAME
+	{
+		StageType = EStage;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		b_play = false;
+		g_eGameState = S_CONTINUE;
 	}
 	if (bSomethingHappened)
 	{
