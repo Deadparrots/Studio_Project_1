@@ -30,16 +30,6 @@ enum EKEYS
 	K_D,
 	K_C,
 	K_E,
-	K_M,
-	K_1,
-	K_2,
-	K_3,
-	K_4,
-	K_5,
-	K_6,
-	K_7,
-	K_8,
-	K_9,
 	K_ENTER,
 	K_COUNT
 };
@@ -71,7 +61,7 @@ enum ESTAGETYPE
 	EBoss,
 	EBossBattle,
 	EMinigame1,
-	ETicTacToe
+	EMinigame2
 };
 
 enum EMAINMENU
@@ -115,6 +105,8 @@ struct WeaponParameters
 };
 
 void init(void);      // initialize your variables, allocate memory, etc
+void minigame1_init();
+void minigame2_init();
 void boss_init();
 void boss_battle_init();
 void getInput(void);      // get input from player
@@ -125,6 +117,7 @@ void intro();
 void splashScreenWait();    // waits for time to pass in splash screen
 void gameplay();            // gameplay logic
 void minigame1_moveCharacter();
+void minigame2_moveCharacter();
 void moveCharacter();       // moves the character, collision detection, physics, etc
 void boss_moveCharacter();
 void bossbattle_moveCharacter();
@@ -150,6 +143,8 @@ void renderbeat1();
 void renderbeat2();
 void renderbeat3();
 void renderbeat4();
+void renderpaddle1();
+void renderpaddle2();
 void renderDoor();
 void renderWeapon();
 void renderBossSpeech();
@@ -165,7 +160,4 @@ void instructions();
 void convertToString();
 void save();
 void continueSave();
-void tictactoePlay();
-void renderTicTacToe();
-void tictactoeWin();
 #endif // _GAME_H
