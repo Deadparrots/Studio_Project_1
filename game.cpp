@@ -45,7 +45,7 @@ size_t		minigame1time = 0;
 size_t		minigame1random = 9;
 size_t		deathsound = 0;
 bool		minigame1sound = false;
-size_t		shootsound = 0;
+bool		shootsound = false;
 size_t		reloadsound = 0;
 bool		shootfailsound = false;
 int			MMSelect = MMStart;
@@ -748,9 +748,15 @@ void minigame2_moveCharacter()
 		g_door.m_cLocation = g_sChar.m_cLocation;
 	}
 	if (g_weapon.m_cLocation.X == g_minigame2_paddle1.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle1.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle1.m_cLocation.Y + 2))
+	{
 		g_eWeaponState = FireRight;
+		shootsound = true;
+	}
 	if (g_weapon.m_cLocation.X == g_minigame2_paddle2.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle2.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle2.m_cLocation.Y + 2))
+	{
 		g_eWeaponState = FireLeft;
+		shootsound = true;
+	}
 	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
 	{
 		if (Minigame2Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
@@ -826,6 +832,7 @@ void bossbattle_moveCharacter()
 		g_gaster1.m_bFire = true;
 		g_gaster2.m_cLocation.X = 5 - 10 * (g_dElapsedTime - 22.5);
 		g_gaster2.m_bFire = true;
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 25 && g_dElapsedTime <= 26) // ATTACK 2 (25)
 	{
@@ -842,6 +849,7 @@ void bossbattle_moveCharacter()
 		g_gaster4.m_cLocation.X = 61 - 9 * (g_dElapsedTime - 26);
 		g_gaster1.m_bFire = true;
 		g_gaster4.m_bFire = true;
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 28 && g_dElapsedTime <= 29)
 	{
@@ -849,6 +857,7 @@ void bossbattle_moveCharacter()
 		g_gaster1.m_bFire = true;
 		g_gaster4.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 28);
 		g_gaster4.m_bFire = true;
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 30 && g_dElapsedTime <= 31) // ATTACK 3 (30)
 	{
@@ -860,6 +869,7 @@ void bossbattle_moveCharacter()
 	{
 		g_gaster2.m_cLocation.Y = 9 + 5 * (g_dElapsedTime - 31);
 		g_gaster2.m_bFire = true;
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 32 && g_dElapsedTime <= 33)
 	{
@@ -870,17 +880,20 @@ void bossbattle_moveCharacter()
 	{
 		g_gaster2.m_cLocation.Y = 19;
 		g_gaster2.m_bFire = true;
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 34 && g_dElapsedTime <= 35)
 	{
 		g_gaster2.m_cLocation.Y = 19 - 9 * (g_dElapsedTime - 34);
 		g_gaster2.m_bFire = true;
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 35 && g_dElapsedTime <= 36)
 	{
 		g_gaster2.m_cLocation.Y = 10;
 		g_gaster2.m_cLocation.X = 14 - 14 * (g_dElapsedTime - 35);
 		g_gaster2.m_bFire = true;
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 37 && g_dElapsedTime <= 38) // ATTACK 4 (37)
 	{
@@ -899,6 +912,7 @@ void bossbattle_moveCharacter()
 		g_gaster3.m_cLocation.X = 66;
 		g_gaster3.m_bActive = true;
 		g_gaster3.m_cLocation.Y = 21 * (g_dElapsedTime - 38);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 39 && g_dElapsedTime <= 40)
 	{
@@ -909,24 +923,28 @@ void bossbattle_moveCharacter()
 		g_gaster1.m_cLocation.X = 20 * (g_dElapsedTime - 39);
 		g_gaster3.m_cLocation.Y = 21 - 2 * (g_dElapsedTime - 39);
 		g_gaster2.m_cLocation.Y = 14 + 2 * (g_dElapsedTime - 39);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 40 && g_dElapsedTime <= 43)
 	{
 		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X;
 		g_gaster1.m_bFire = true;
 		g_gaster1.m_cLocation.X = 20 + 10 * (g_dElapsedTime - 40);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 43 && g_dElapsedTime <= 45)
 	{
 		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X;
 		g_gaster1.m_bFire = true;
 		g_gaster1.m_cLocation.X = 50 - 30 * (g_dElapsedTime - 43);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 45 && g_dElapsedTime <= 46)
 	{
 		g_gaster4.m_cLocation.Y = 10;
 		g_gaster2.m_cLocation.Y = 16 - 3 * (g_dElapsedTime - 45);
 		g_gaster3.m_cLocation.Y = 19 + 3 * (g_dElapsedTime - 45);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 46 && g_dElapsedTime <= 47)
 	{
@@ -934,6 +952,7 @@ void bossbattle_moveCharacter()
 		g_gaster4.m_bFire = true;
 		g_gaster2.m_cLocation.X = 15 - 15 * (g_dElapsedTime - 46);
 		g_gaster3.m_cLocation.X = 66 + 15 * (g_dElapsedTime - 46);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 48 && g_dElapsedTime <= 49) // ATTACK 5 (48)
 	{
@@ -950,6 +969,7 @@ void bossbattle_moveCharacter()
 		g_gaster4.m_cLocation.X = 61 - 9 * (g_dElapsedTime - 49);
 		g_gaster1.m_bFire = true;
 		g_gaster4.m_bFire = true;
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 51 && g_dElapsedTime <= 52)
 	{
@@ -961,19 +981,23 @@ void bossbattle_moveCharacter()
 		g_gaster2.m_bFire = true;
 		g_gaster2.m_cLocation.X = 15;
 		g_gaster2.m_cLocation.Y = 24 - 7 * (g_dElapsedTime - 51);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 52 && g_dElapsedTime <= 53)
 	{
 		g_gaster1.m_bFire = true;
 		g_gaster4.m_bFire = true;
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 53 && g_dElapsedTime <= 54)
 	{
 		g_gaster1.m_cLocation.X = 37 - 10 * (g_dElapsedTime - 53);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 54 && g_dElapsedTime <= 55)
 	{
 		g_gaster4.m_cLocation.X = 43 - 10 * (g_dElapsedTime - 54);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 55 && g_dElapsedTime <= 56)
 	{
@@ -981,6 +1005,7 @@ void bossbattle_moveCharacter()
 		g_gaster3.m_bActive = true;
 		g_gaster3.m_cLocation.Y = 10;
 		g_gaster3.m_cLocation.X = 81 - 15 * (g_dElapsedTime - 55);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 56 && g_dElapsedTime <= 57)
 	{
@@ -988,6 +1013,7 @@ void bossbattle_moveCharacter()
 		g_gaster3.m_bFire = true;
 		g_gaster3.m_cLocation.Y = 10 + 5 * (g_dElapsedTime - 56);
 		g_gaster3.m_cLocation.X = 66;
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 57 && g_dElapsedTime <= 57.5)
 	{
@@ -995,11 +1021,13 @@ void bossbattle_moveCharacter()
 		g_gaster1.m_cLocation.X = 26;
 		g_gaster2.m_cLocation.Y = 21;
 		g_gaster3.m_cLocation.Y = 14;
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 57.5 && g_dElapsedTime <= 58.5)
 	{
 		g_gaster4.m_cLocation.X = 34 + 5 * (g_dElapsedTime - 57.5);
 		g_gaster1.m_cLocation.X = 26 + 5 * (g_dElapsedTime - 57.5);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 58.5 && g_dElapsedTime <= 59.5)
 	{
@@ -1007,6 +1035,7 @@ void bossbattle_moveCharacter()
 		g_gaster1.m_cLocation.X = 31 + 5 * (g_dElapsedTime - 58.5);
 		g_gaster2.m_cLocation.Y = 21 + 3 * (g_dElapsedTime - 58.5);
 		g_gaster3.m_cLocation.Y = 14 + 3 * (g_dElapsedTime - 58.5);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 59.5 && g_dElapsedTime <= 60.5)
 	{
@@ -1014,16 +1043,19 @@ void bossbattle_moveCharacter()
 		g_gaster1.m_cLocation.X = 36;
 		g_gaster2.m_cLocation.Y = 24 - 3 * (g_dElapsedTime - 59.5);
 		g_gaster3.m_cLocation.Y = 17 - 3 * (g_dElapsedTime - 59.5);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 60.5 && g_dElapsedTime <= 61.5)
 	{
 		g_gaster2.m_cLocation.Y = 21 + 4 * (g_dElapsedTime - 60.5);
 		g_gaster3.m_cLocation.Y = 14 + 4 * (g_dElapsedTime - 60.5);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 61.5 && g_dElapsedTime <= 62.5)
 	{
 		g_gaster2.m_cLocation.Y = 25 - 5 * (g_dElapsedTime - 61.5);
 		g_gaster3.m_cLocation.Y = 18 - 5 * (g_dElapsedTime - 61.5);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 62.5 && g_dElapsedTime <= 63.5)
 	{
@@ -1031,6 +1063,7 @@ void bossbattle_moveCharacter()
 		g_gaster3.m_cLocation.X = 66 + 15 * (g_dElapsedTime - 62.5);
 		g_gaster1.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 62.5);
 		g_gaster4.m_cLocation.Y = 10 - 10 * (g_dElapsedTime - 62.5);
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 72 && g_dElapsedTime <= 73) // ATTACK 6 (72)
 	{
@@ -1057,8 +1090,8 @@ void bossbattle_moveCharacter()
 		g_gaster3.m_cLocation.Y = g_sChar.m_cLocation.Y - 4;
 		g_gaster1.m_cLocation.X = g_sChar.m_cLocation.X + 4;
 		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X - 4;
+		shootsound = true;
 	}
-
 	else if (g_dElapsedTime > 73.5 && g_dElapsedTime <= 80)
 	{
 		int randomone, randomtwo, randomthree, randomfour;
@@ -1082,6 +1115,7 @@ void bossbattle_moveCharacter()
 		g_gaster3.m_cLocation.Y = g_sChar.m_cLocation.Y - randomtwo;
 		g_gaster1.m_cLocation.X = g_sChar.m_cLocation.X + randomthree;
 		g_gaster4.m_cLocation.X = g_sChar.m_cLocation.X - randomfour;
+		shootsound = true;
 	}
 	else if (g_dElapsedTime > 80 && g_dElapsedTime <= 85)
 	{
@@ -1283,7 +1317,7 @@ void moveCharacter()
 			else
 				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			shootsound++;
+			shootsound = true;
 			Weapons[currentWeapon].Clip--;
 		}
 		if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
@@ -1294,7 +1328,7 @@ void moveCharacter()
 			else
 				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-			shootsound++;
+			shootsound = true;
 			Weapons[currentWeapon].Clip--;
 		}
 		if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
@@ -1305,7 +1339,7 @@ void moveCharacter()
 			else
 				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-			shootsound++;
+			shootsound = true;
 			Weapons[currentWeapon].Clip--;
 		}
 		if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
@@ -1316,7 +1350,7 @@ void moveCharacter()
 			else
 				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-			shootsound++;
+			shootsound = true;
 			Weapons[currentWeapon].Clip--;
 		}
 	}
@@ -2779,10 +2813,10 @@ void sound()
 		Beep(deathsound * 150, 15);
 		deathsound--;
 	}
-	if (shootsound > 0)
+	if (shootsound)
 	{
-		Beep(shootsound * 1000, 15);
-		shootsound--;
+		Beep(1500, 10);
+		shootsound = false;
 	}
 	if (reloadsound > 0)
 	{
