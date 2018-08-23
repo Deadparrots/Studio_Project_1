@@ -759,8 +759,9 @@ void minigame2_moveCharacter()
 		g_eWeaponState = FireRight;
 		g_weapon.m_cLocation.X = 2;
 	}
-	if (g_weapon.m_cLocation.X == 77)
+	if (g_weapon.m_cLocation.X >= 78)
 	{
+		g_weapon.m_cLocation.X = 78;
 		g_door.m_bActive = true;
 		g_door.m_cLocation = g_sChar.m_cLocation;
 	}
@@ -788,12 +789,12 @@ void minigame2_moveCharacter()
 		}
 	}
 	g_minigame2_paddle1.m_cLocation.Y = g_sChar.m_cLocation.Y;
-	if (g_dElapsedTime < 30)
+	if (g_dElapsedTime < 30 && g_eWeaponState == FireRight && g_minigame2_paddle2.m_cLocation.Y <= g_weapon.m_cLocation.Y + 1  && g_minigame2_paddle2.m_cLocation.Y >= g_weapon.m_cLocation.Y - 1 && g_weapon.m_cLocation.X >= 40)
 		g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
-		g_dBounceTime = g_dElapsedTime + 0.05; // 125ms should be enough
+		g_dBounceTime = g_dElapsedTime + 0.03 + 0.1/stages; // 125ms should be enough
 	}
 }
 void bossbattle_moveCharacter()
@@ -1889,9 +1890,9 @@ void processUserInput()
 			if (int_stages == 20)
 				StageType = EBoss;
 			else if (int_stages % 10 == 0)
-				StageType = EMinigame2;
-			else if (int_stages % 5 == 0)
 				StageType = EMinigame1;
+			else if (int_stages % 5 == 0)
+				StageType = EMinigame2;
 			else
 			{
 				if (StageType == EBossBattle)
@@ -2032,7 +2033,6 @@ void renderGame()
 {
 	renderMap();        // renders the map to the buffer first
 	renderDoor();
-	renderCharacter();  // renders the character into the buffer
 	if (StageType == EStage)
 	{
 		renderEnemy1();
@@ -2066,6 +2066,7 @@ void renderGame()
 		renderpaddle2();
 		renderWeapon();
 	}
+	renderCharacter();  // renders the character into the buffer
 	renderUI();
 }
 void renderMap()
