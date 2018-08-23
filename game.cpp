@@ -1814,32 +1814,32 @@ void processUserInput()
 		Lives--;
 		deathsound = 5;
 	}
-	if (g_enemy1.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy1.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy1.m_bActive == true)
+	if (g_enemy1.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy1.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy1.m_bActive == true && StageType == EStage)
 	{
 		g_enemy1.m_bActive = false;
 		deathsound = 5;
 	}
-	if (g_enemy2.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy2.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy2.m_bActive == true)
+	if (g_enemy2.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy2.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy2.m_bActive == true && StageType == EStage)
 	{
 		g_enemy2.m_bActive = false;
 		deathsound = 5;
 	}
-	if (g_enemy3.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy3.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy3.m_bActive == true)
+	if (g_enemy3.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy3.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy3.m_bActive == true && StageType == EStage)
 	{
 		g_enemy3.m_bActive = false;
 		deathsound = 5;
 	}
-	if (g_enemy4.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy4.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy4.m_bActive == true)
+	if (g_enemy4.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy4.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy4.m_bActive == true && StageType == EStage)
 	{
 		g_enemy4.m_bActive = false;
 		deathsound = 5;
 	}
-	if (g_enemy5.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy5.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy5.m_bActive == true)
+	if (g_enemy5.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy5.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy5.m_bActive == true && StageType == EStage)
 	{
 		g_enemy5.m_bActive = false;
 		deathsound = 5;
 	}
-	if (g_enemy6.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy6.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy6.m_bActive == true)
+	if (g_enemy6.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy6.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy6.m_bActive == true && StageType == EStage)
 	{
 		g_enemy6.m_bActive = false;
 		deathsound = 5;
@@ -3108,14 +3108,27 @@ void continueSave()
 	}
 	stats >> Lives;
 	stats >> int_stages;
-	if (int_stages % 5 == 0)
-	{
-		stages = 0.000 + int_stages - 1;
-		int_stages--;
-	}
+	stages = 0.000 + int_stages;
+	if (int_stages == 50)
+		StageType = EBoss;
+	else if (int_stages % 10 == 0)
+		StageType = EMinigame1;
+	else if (int_stages % 5 == 0)
+		StageType = EMinigame2;
 	else
-		stages = 0.000 + int_stages;
+	{
+		if (StageType == EBossBattle || StageType == EMinigame1 || StageType == EMinigame2)
+			b_play = false;
+		StageType = EStage;
+	}
+	if (StageType == EBoss)
+		boss_init();
+	else if (StageType == EMinigame1)
+		minigame1_init();
+	else if (StageType == EMinigame2)
+		minigame2_init();
+	else
+		init();
 	MMSelect = MMStart;
 	g_eGameState = S_GAME;
-	StageType = EStage;
 }
