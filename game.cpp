@@ -543,7 +543,7 @@ void minigame1_moveCharacter()
 			}
 			else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.55)
 			{
-				g_minigame1_beat1.m_bActive = true;
+				g_minigame1_beat4.m_bActive = true;
 				if (rand() % 2)
 				{
 					g_minigame1_beat4.m_cLocation.X = 2;
