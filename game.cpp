@@ -66,6 +66,7 @@ WeaponParameters Weapons[4]; // Number of Weapons
 Console g_Console(80, 24, "Monster Dungeon");
 void minigame1_init()
 {
+	b_play = false;
 	weapdata();
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
@@ -87,6 +88,7 @@ void minigame1_init()
 }
 void minigame2_init()
 {
+	b_play = false;
 	weapdata();
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
@@ -1868,7 +1870,7 @@ void processUserInput()
 				StageType = EMinigame2;
 			else
 			{
-				if (StageType == EBossBattle)
+				if (StageType == EBossBattle || StageType == EMinigame1 || StageType == EMinigame2)
 					b_play = false;
 				StageType = EStage;
 			}
@@ -2943,11 +2945,13 @@ void reload()
 void ost()
 {
 	if (StageType == EMainMenu)
-		PlaySound(TEXT("sound/menu.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in menu
+		PlaySound(TEXT("sound/menu.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	else if (StageType == EStage)
-		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // change 'cave' to whatever
+		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	else if (StageType == EBoss)
-		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP); // play sound while in stage
+		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+	else if (StageType == EMinigame1 || StageType == EMinigame2)
+		PlaySound(TEXT("sound/minigame.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	b_play = true;
 }
 void convertToString()
