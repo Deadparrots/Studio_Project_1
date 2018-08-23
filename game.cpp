@@ -65,18 +65,18 @@ void minigame1_init()
 	weapdata();
 	g_dElapsedTime = 0.0;
 	g_dBounceTime = 0.0;
-	g_sChar.m_cLocation.Y = 17;
-	g_minigame1_beat1.m_cLocation.Y = 17;
-	g_minigame1_beat2.m_cLocation.Y = 17;
-	g_minigame1_beat3.m_cLocation.Y = 17;
-	g_minigame1_beat4.m_cLocation.Y = 17;
+	g_sChar.m_cLocation.Y = 13;
+	g_minigame1_beat1.m_cLocation.Y = 13;
+	g_minigame1_beat2.m_cLocation.Y = 13;
+	g_minigame1_beat3.m_cLocation.Y = 13;
+	g_minigame1_beat4.m_cLocation.Y = 13;
 	g_sChar.m_cLocation.X = 40;
 	g_minigame1_beat1.m_bActive = false;
 	g_minigame1_beat2.m_bActive = false;
 	g_minigame1_beat3.m_bActive = false;
 	g_minigame1_beat4.m_bActive = false;
 	g_door.m_cLocation.X = 40;
-	g_door.m_cLocation.Y = 17;
+	g_door.m_cLocation.Y = 13;
 	g_door.m_bActive = false;
 }
 void boss_init()
@@ -438,6 +438,10 @@ void minigame1_moveCharacter()
 	else if (g_dElapsedTime >= 12)
 	{
 		g_door.m_bActive = true;
+		g_minigame1_beat1.m_bActive = false;
+		g_minigame1_beat2.m_bActive = false;
+		g_minigame1_beat3.m_bActive = false;
+		g_minigame1_beat4.m_bActive = false;
 	}
 	switch (minigame1random)
 	{
@@ -513,7 +517,7 @@ void minigame1_moveCharacter()
 					g_minigame1_beat1.m_bLeft = false;
 				}
 			}
-			else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.15)
+			else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
 			{
 				g_minigame1_beat2.m_bActive = true;
 				if (rand() % 2)
@@ -527,7 +531,7 @@ void minigame1_moveCharacter()
 					g_minigame1_beat2.m_bLeft = false;
 				}
 			}
-			else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.35)
+			else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.4)
 			{
 				g_minigame1_beat3.m_bActive = true;
 				if (rand() % 2)
@@ -541,7 +545,7 @@ void minigame1_moveCharacter()
 					g_minigame1_beat3.m_bLeft = false;
 				}
 			}
-			else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.55)
+			else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.6)
 			{
 				g_minigame1_beat4.m_bActive = true;
 				if (rand() % 2)
@@ -562,12 +566,12 @@ void minigame1_moveCharacter()
 	if (g_abKeyPressed[K_LEFT])
 	{
 		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X - 3;
-		g_weapon.m_cLocation.Y = 17;
+		g_weapon.m_cLocation.Y = 13;
 	}
 	else if (g_abKeyPressed[K_RIGHT])
 	{
 		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X + 3;
-		g_weapon.m_cLocation.Y = 17;
+		g_weapon.m_cLocation.Y = 13;
 	}
 	else
 	{
