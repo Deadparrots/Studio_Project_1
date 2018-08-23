@@ -510,7 +510,7 @@ void minigame1_moveCharacter()
 		}
 	case 2:
 		{
-			if (g_dElapsedTime < minigame1time + 0.25 && g_dElapsedTime >= minigame1time)
+			if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
 			{
 				g_minigame1_beat1.m_bActive = true;
 				if (rand() % 2)
@@ -524,7 +524,7 @@ void minigame1_moveCharacter()
 					g_minigame1_beat1.m_bLeft = false;
 				}
 			}
-			else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.25)
+			else if (g_dElapsedTime < minigame1time + 0.35 && g_dElapsedTime >= minigame1time + 0.25)
 			{
 				g_minigame1_beat2.m_bActive = true;
 				if (rand() % 2)
@@ -538,7 +538,7 @@ void minigame1_moveCharacter()
 					g_minigame1_beat2.m_bLeft = false;
 				}
 			}
-			else if (g_dElapsedTime < minigame1time + 0.75 && g_dElapsedTime >= minigame1time + 0.5)
+			else if (g_dElapsedTime < minigame1time + 0.6 && g_dElapsedTime >= minigame1time + 0.5)
 			{
 				g_minigame1_beat3.m_bActive = true;
 				if (rand() % 2)
@@ -552,7 +552,7 @@ void minigame1_moveCharacter()
 					g_minigame1_beat3.m_bLeft = false;
 				}
 			}
-			else if (g_dElapsedTime < minigame1time + 1 && g_dElapsedTime >= minigame1time + 0.75)
+			else if (g_dElapsedTime < minigame1time + 0.85 && g_dElapsedTime >= minigame1time + 0.75)
 			{
 				g_minigame1_beat4.m_bActive = true;
 				if (rand() % 2)
@@ -2439,7 +2439,7 @@ void renderEnemy6()
 }
 void renderbeat1()
 {
-	WORD charColor = 0x0E;
+	WORD charColor = 0x0F;
 	char character = '<';
 	if (g_minigame1_beat1.m_bLeft)
 		character = '>';
@@ -2450,7 +2450,7 @@ void renderbeat1()
 }
 void renderbeat2()
 {
-	WORD charColor = 0x0E;
+	WORD charColor = 0x0F;
 	char character = '<';
 	if (g_minigame1_beat2.m_bLeft)
 		character = '>';
@@ -2461,7 +2461,7 @@ void renderbeat2()
 }
 void renderbeat3()
 {
-	WORD charColor = 0x0E;
+	WORD charColor = 0x0F;
 	char character = '<';
 	if (g_minigame1_beat3.m_bLeft)
 		character = '>';
@@ -2472,7 +2472,7 @@ void renderbeat3()
 }
 void renderbeat4()
 {
-	WORD charColor = 0x0E;
+	WORD charColor = 0x0F;
 	char character = '<';
 	if (g_minigame1_beat4.m_bLeft)
 		character = '>';
@@ -2794,7 +2794,7 @@ void sound()
 	}
 	if (minigame1sound)
 	{
-		Beep(1000, 20);
+		Beep(1000, 15);
 		minigame1sound = false;
 	}
 }
