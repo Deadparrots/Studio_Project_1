@@ -30,6 +30,16 @@ enum EKEYS
 	K_D,
 	K_C,
 	K_E,
+	K_M,
+	K_1,
+	K_2,
+	K_3,
+	K_4,
+	K_5,
+	K_6,
+	K_7,
+	K_8,
+	K_9,
 	K_ENTER,
 	K_COUNT
 };
@@ -43,7 +53,8 @@ enum EGAMESTATES
 	S_GAMEOVER,
 	S_INSTRUCTIONS,
 	S_COUNT,
-	S_CONTINUE
+	S_CONTINUE,
+	S_MINIGAME
 };
 enum EWEAPONSTATES
 {
@@ -60,7 +71,8 @@ enum ESTAGETYPE
 	EStage,
 	EBoss,
 	EBossBattle,
-	EMinigame1
+	EMinigame1,
+	ETicTacToe
 };
 
 enum EMAINMENU
@@ -68,7 +80,16 @@ enum EMAINMENU
 	MMStart,
 	MMInstructions,
 	MMExit,
-	MMContinue
+	MMContinue,
+	MMminigame
+};
+
+enum EMINIGAME
+{
+	MMrhythm,
+	MMpong,
+	MMtictactoe,
+	MMsnake
 };
 
 // struct for the game character
@@ -106,7 +127,6 @@ struct WeaponParameters
 void init(void);      // initialize your variables, allocate memory, etc
 void boss_init();
 void boss_battle_init();
-void check_init();
 void getInput(void);      // get input from player
 void update(double dt); // update the game and the state of the game
 void render(void);      // renders the current state of the game to the console
@@ -140,7 +160,6 @@ void renderbeat1();
 void renderbeat2();
 void renderbeat3();
 void renderbeat4();
-void renderCheck();
 void renderDoor();
 void renderWeapon();
 void renderBossSpeech();
@@ -156,4 +175,9 @@ void instructions();
 void convertToString();
 void save();
 void continueSave();
+void tictactoePlay();
+void renderTicTacToe();
+void tictactoeWin();
+void minigame();
+void minigameselect();
 #endif // _GAME_H
