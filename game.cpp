@@ -82,6 +82,10 @@ void minigame1_init()
 	g_door.m_cLocation.X = 40;
 	g_door.m_cLocation.Y = 13;
 	g_door.m_bActive = false;
+	if (Lives + stages / 10 <= 99)
+		Lives += stages / 10;
+	else
+		Lives = 99;
 }
 void minigame2_init()
 {
@@ -455,19 +459,19 @@ void minigame1_moveCharacter()
 			g_minigame1_beat1.m_cLocation.X = 2;
 			g_minigame1_beat1.m_bLeft = true;
 		}
-		else if (g_dElapsedTime < minigame1time + 0.2 && g_dElapsedTime >= minigame1time + 0.1)
+		else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
 		{
 			g_minigame1_beat2.m_bActive = true;
 			g_minigame1_beat2.m_cLocation.X = 2;
 			g_minigame1_beat2.m_bLeft = true;
 		}
-		else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
+		else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.4)
 		{
 			g_minigame1_beat3.m_bActive = true;
 			g_minigame1_beat3.m_cLocation.X = 2;
 			g_minigame1_beat3.m_bLeft = true;
 		}
-		else if (g_dElapsedTime < minigame1time + 0.4 && g_dElapsedTime >= minigame1time + 0.3)
+		else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.6)
 		{
 			g_minigame1_beat4.m_bActive = true;
 			g_minigame1_beat4.m_cLocation.X = 2;
@@ -483,19 +487,19 @@ void minigame1_moveCharacter()
 				g_minigame1_beat1.m_cLocation.X = 77;
 				g_minigame1_beat1.m_bLeft = false;
 			}
-			else if (g_dElapsedTime < minigame1time + 0.2 && g_dElapsedTime >= minigame1time + 0.1)
+			else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
 			{
 				g_minigame1_beat2.m_bActive = true;
 				g_minigame1_beat2.m_cLocation.X = 77;
 				g_minigame1_beat2.m_bLeft = false;
 			}
-			else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
+			else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.4)
 			{
 				g_minigame1_beat3.m_bActive = true;
 				g_minigame1_beat3.m_cLocation.X = 77;
 				g_minigame1_beat3.m_bLeft = false;
 			}
-			else if (g_dElapsedTime < minigame1time + 0.4 && g_dElapsedTime >= minigame1time + 0.3)
+			else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.6)
 			{
 				g_minigame1_beat4.m_bActive = true;
 				g_minigame1_beat4.m_cLocation.X = 77;
