@@ -432,37 +432,12 @@ void minigame1_moveCharacter()
 		minigame1time = 4;
 		minigame1random = 1;
 	}
-	else if (g_dElapsedTime < 5 && g_dElapsedTime >= 4.9)
+	else if (g_dElapsedTime < int_stages && g_dElapsedTime >= 4.9 && g_dElapsedTime >= minigame1time + 1)
 	{
-		minigame1time = 5;
-		minigame1random = rand() % 4;
-	}
-	else if (g_dElapsedTime < 6 && g_dElapsedTime >= 5.9)
-	{
-		minigame1time = 6;
+		minigame1time++;
 		minigame1random = 2;
 	}
-	else if (g_dElapsedTime < 7 && g_dElapsedTime >= 6.9)
-	{
-		minigame1time = 7;
-		minigame1random = 2;
-	}
-	else if (g_dElapsedTime < 8 && g_dElapsedTime >= 7.9)
-	{
-		minigame1time = 8;
-		minigame1random = 2;
-	}
-	else if (g_dElapsedTime < 9 && g_dElapsedTime >= 8.9)
-	{
-		minigame1time = 9;
-		minigame1random = 2;
-	}
-	else if (g_dElapsedTime < 10 && g_dElapsedTime >= 9.9)
-	{
-		minigame1time = 10;
-		minigame1random = 2;
-	}
-	else if (g_dElapsedTime >= 12)
+	else if (g_dElapsedTime >= int_stages + 3)
 	{
 		g_door.m_bActive = true;
 		g_minigame1_beat1.m_bActive = false;
@@ -695,7 +670,7 @@ void minigame1_moveCharacter()
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
-		g_dBounceTime = g_dElapsedTime + 0.015; // 125ms should be enough
+		g_dBounceTime = g_dElapsedTime + 0.02; // 125ms should be enough
 	}
 }
 void minigame2_moveCharacter()
