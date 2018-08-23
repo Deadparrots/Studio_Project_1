@@ -25,6 +25,8 @@ SMinigame1	g_minigame1_beat1;
 SMinigame1	g_minigame1_beat2;
 SMinigame1	g_minigame1_beat3;
 SMinigame1	g_minigame1_beat4;
+SGameChar	g_minigame2_paddle1;
+SGameChar	g_minigame2_paddle2;
 SGameChar	g_door;
 std::vector<char>	Title;
 std::vector<char>	GameOver;
@@ -33,6 +35,7 @@ std::vector<char>	Instructions;
 std::vector<char>	SansMap;
 std::vector<char>	SansFightMap;
 std::vector<char>	Minigame1Map;
+std::vector<char>	Minigame2Map;
 std::vector<char>	Scene1;
 std::vector<char>	Scene2;
 std::vector<char>	Scene3;
@@ -54,6 +57,7 @@ int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_INTRO;
 EWEAPONSTATES g_eWeaponState = Hold;
+EWEAPONSTATES g_eM2WeaponState = FireUp;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 int Lives = 3; // Number of lives the player has left (Base Value is 3)
 int currentWeapon = 0; // Current Weapon
@@ -76,6 +80,27 @@ void minigame1_init()
 	g_minigame1_beat3.m_bActive = false;
 	g_minigame1_beat4.m_bActive = false;
 	g_door.m_cLocation.X = 40;
+	g_door.m_cLocation.Y = 13;
+	g_door.m_bActive = false;
+}
+void minigame2_init()
+{
+	weapdata();
+	g_dElapsedTime = 0.0;
+	g_dBounceTime = 0.0;
+	g_sChar.m_cLocation.X = 10;
+	g_sChar.m_cLocation.Y = 13;
+	g_eWeaponState = FireLeft;
+	g_weapon.m_cLocation.X = 69;
+	g_weapon.m_cLocation.Y = 13;
+	g_minigame2_paddle1.m_bActive = true;
+	g_minigame2_paddle2.m_bActive = true;
+	g_minigame2_paddle1.m_cLocation.X = g_sChar.m_cLocation.X;
+	g_minigame2_paddle1.m_cLocation.Y = g_sChar.m_cLocation.Y;
+	g_minigame2_paddle2.m_cLocation.X = 70;
+	g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
+	g_weapon.m_bActive = true;
+	g_door.m_cLocation.X = 10;
 	g_door.m_cLocation.Y = 13;
 	g_door.m_bActive = false;
 }
@@ -388,6 +413,8 @@ void gameplay()            // gameplay logic
 		bossbattle_moveCharacter();
 	else if (StageType == EMinigame1)
 		minigame1_moveCharacter();
+	else if (StageType == EMinigame2)
+		minigame2_moveCharacter();
 	sound(); // sound can be played here too.
 	if (!b_play)
 		ost();
@@ -669,6 +696,104 @@ void minigame1_moveCharacter()
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
 		g_dBounceTime = g_dElapsedTime + 0.015; // 125ms should be enough
+	}
+}
+void minigame2_moveCharacter()
+{
+	bool bSomethingHappened = false;
+	if (g_dBounceTime > g_dElapsedTime)
+		return;
+	if (g_eWeaponState == FireLeft)
+	{
+		if (g_eM2WeaponState == FireUp)
+		{
+			if (Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 80] == ' ' || Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 80] == '|')
+			{
+				g_weapon.m_cLocation.X--;
+				g_weapon.m_cLocation.Y--;
+				bSomethingHappened = true;
+			}
+			else
+				g_eM2WeaponState = FireDown;
+		}
+		else if (g_eM2WeaponState == FireDown)
+		{
+			if (Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 80] == ' ' || Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 80] == '|')
+			{
+				g_weapon.m_cLocation.X--;
+				g_weapon.m_cLocation.Y++;
+				bSomethingHappened = true;
+			}
+			else
+				g_eM2WeaponState = FireUp;
+		}
+	}
+	if (g_eWeaponState == FireRight)
+	{
+		if (g_eM2WeaponState == FireUp)
+		{
+			if (Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 80] == ' ' || Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 80] == '|')
+			{
+				g_weapon.m_cLocation.X++;
+				g_weapon.m_cLocation.Y--;
+				bSomethingHappened = true;
+			}
+			else
+				g_eM2WeaponState = FireDown;
+		}
+		else if (g_eM2WeaponState == FireDown)
+		{
+			if (Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 80] == ' ' || Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 80] == '|')
+			{
+				g_weapon.m_cLocation.X++;
+				g_weapon.m_cLocation.Y++;
+				bSomethingHappened = true;
+			}
+			else
+				g_eM2WeaponState = FireUp;
+		}
+	}
+	if (g_weapon.m_cLocation.X == 1)
+	{
+		g_sChar.m_bActive = false;
+		g_eWeaponState = FireRight;
+		g_weapon.m_cLocation.X = 2;
+	}
+	if (g_weapon.m_cLocation.X == 77)
+	{
+		g_door.m_bActive = true;
+		g_door.m_cLocation = g_sChar.m_cLocation;
+	}
+	if (g_weapon.m_cLocation.X == g_minigame2_paddle1.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle1.m_cLocation.Y - 3 && g_weapon.m_cLocation.Y <= g_minigame2_paddle1.m_cLocation.Y + 3))
+		g_eWeaponState = FireRight;
+	if (g_weapon.m_cLocation.X == g_minigame2_paddle2.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle2.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle2.m_cLocation.Y + 2))
+		g_eWeaponState = FireLeft;
+	// Updating the location of the character based on the key press
+	// providing a beep sound whenver we shift the character
+
+	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
+	{
+		if (Minigame2Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
+		{
+			g_sChar.m_cLocation.Y--;
+			bSomethingHappened = true;
+		}
+	}
+	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
+	{
+		if (Minigame2Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 80] == ' ')
+		{
+			g_sChar.m_cLocation.Y++;
+			bSomethingHappened = true;
+		}
+	}
+	g_minigame2_paddle1.m_cLocation.Y = g_sChar.m_cLocation.Y;
+	if (g_dElapsedTime < 30)
+		g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
+	if (bSomethingHappened)
+	{
+		// set the bounce time to some time in the future to prevent accidental triggers
+		g_dBounceTime = g_dElapsedTime + 0.05; // 125ms should be enough
 	}
 }
 void bossbattle_moveCharacter()
@@ -1761,8 +1886,10 @@ void processUserInput()
 		{
 			int_stages++;
 			stages++;
-			if (int_stages == 10)
+			if (int_stages == 20)
 				StageType = EBoss;
+			else if (int_stages % 10 == 0)
+				StageType = EMinigame2;
 			else if (int_stages % 5 == 0)
 				StageType = EMinigame1;
 			else
@@ -1775,6 +1902,8 @@ void processUserInput()
 				boss_init();
 			else if (StageType == EMinigame1)
 				minigame1_init();
+			else if (StageType == EMinigame2)
+				minigame2_init();
 			else
 				init();
 			save();
@@ -1931,6 +2060,12 @@ void renderGame()
 		renderbeat4();
 		renderWeapon();
 	}
+	if (StageType == EMinigame2)
+	{
+		renderpaddle1();
+		renderpaddle2();
+		renderWeapon();
+	}
 	renderUI();
 }
 void renderMap()
@@ -1962,6 +2097,14 @@ void renderMap()
 	else if (StageType == EMinigame1)
 	{
 		std::vector<char>::iterator it = Minigame1Map.begin();
+		for (short i = 0; i < 80 * 24; ++i)
+		{
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
+		}
+	}
+	else if (StageType == EMinigame2)
+	{
+		std::vector<char>::iterator it = Minigame2Map.begin();
 		for (short i = 0; i < 80 * 24; ++i)
 		{
 			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
@@ -2359,6 +2502,38 @@ void renderbeat4()
 	if (g_minigame1_beat4.m_bActive)
 	{
 		g_Console.writeToBuffer(g_minigame1_beat4.m_cLocation, character, charColor);
+	}
+}
+void renderpaddle1()
+{
+	WORD charColor = 0x0A;
+	char character = 186;
+	if (g_minigame2_paddle1.m_bActive)
+	{
+		COORD c;
+		for (size_t i = 0; i < 5; i++)
+		{
+			c.X = g_minigame2_paddle1.m_cLocation.X;
+			c.Y = g_minigame2_paddle1.m_cLocation.Y + i - 2;
+			g_Console.writeToBuffer(c, character, charColor);
+		}
+
+	}
+}
+void renderpaddle2()
+{
+	WORD charColor = 0x0C;
+	char character = 186;
+	if (g_minigame2_paddle2.m_bActive)
+	{
+		COORD c;
+		for (size_t i = 0; i < 5; i++)
+		{
+			c.X = g_minigame2_paddle2.m_cLocation.X;
+			c.Y = g_minigame2_paddle2.m_cLocation.Y + i - 2;
+			g_Console.writeToBuffer(c, character, charColor);
+		}
+
 	}
 }
 void renderDoor()
@@ -2910,6 +3085,16 @@ void convertToString()
 			Minigame1Map.push_back(buffer[0]);
 	}
 	myfile11.close();
+	std::fstream myfile12("map/minigame2map.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile12.seekg(i);
+		char * buffer = new char[1];
+		myfile12.read(buffer, 1);
+		if (buffer[0] != '\n')
+			Minigame2Map.push_back(buffer[0]);
+	}
+	myfile12.close();
 }
 void save()
 {

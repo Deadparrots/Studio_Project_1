@@ -43,7 +43,6 @@ enum EGAMESTATES
 	S_GAMEOVER,
 	S_INSTRUCTIONS,
 	S_COUNT,
-	S_SAVE,
 	S_CONTINUE
 };
 enum EWEAPONSTATES
@@ -61,7 +60,8 @@ enum ESTAGETYPE
 	EStage,
 	EBoss,
 	EBossBattle,
-	EMinigame1
+	EMinigame1,
+	EMinigame2
 };
 
 enum EMAINMENU
@@ -105,6 +105,8 @@ struct WeaponParameters
 };
 
 void init(void);      // initialize your variables, allocate memory, etc
+void minigame1_init();
+void minigame2_init();
 void boss_init();
 void boss_battle_init();
 void getInput(void);      // get input from player
@@ -115,6 +117,7 @@ void intro();
 void splashScreenWait();    // waits for time to pass in splash screen
 void gameplay();            // gameplay logic
 void minigame1_moveCharacter();
+void minigame2_moveCharacter();
 void moveCharacter();       // moves the character, collision detection, physics, etc
 void boss_moveCharacter();
 void bossbattle_moveCharacter();
@@ -140,6 +143,8 @@ void renderbeat1();
 void renderbeat2();
 void renderbeat3();
 void renderbeat4();
+void renderpaddle1();
+void renderpaddle2();
 void renderDoor();
 void renderWeapon();
 void renderBossSpeech();
