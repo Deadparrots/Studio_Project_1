@@ -44,9 +44,10 @@ std::vector<char>	Scene5;
 size_t		minigame1time = 0;
 size_t		minigame1random = 9;
 size_t		deathsound = 0;
+bool		minigame1sound = false;
 size_t		shootsound = 0;
 size_t		reloadsound = 0;
-size_t		shootfailsound = 0;
+bool		shootfailsound = false;
 int			MMSelect = MMStart;
 int			int_stages = 1;
 double		stages = 0.000 + int_stages;
@@ -509,7 +510,7 @@ void minigame1_moveCharacter()
 		}
 	case 2:
 		{
-			if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
+			if (g_dElapsedTime < minigame1time + 0.25 && g_dElapsedTime >= minigame1time)
 			{
 				g_minigame1_beat1.m_bActive = true;
 				if (rand() % 2)
@@ -523,7 +524,7 @@ void minigame1_moveCharacter()
 					g_minigame1_beat1.m_bLeft = false;
 				}
 			}
-			else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
+			else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.25)
 			{
 				g_minigame1_beat2.m_bActive = true;
 				if (rand() % 2)
@@ -537,7 +538,7 @@ void minigame1_moveCharacter()
 					g_minigame1_beat2.m_bLeft = false;
 				}
 			}
-			else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.4)
+			else if (g_dElapsedTime < minigame1time + 0.75 && g_dElapsedTime >= minigame1time + 0.5)
 			{
 				g_minigame1_beat3.m_bActive = true;
 				if (rand() % 2)
@@ -551,7 +552,7 @@ void minigame1_moveCharacter()
 					g_minigame1_beat3.m_bLeft = false;
 				}
 			}
-			else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.6)
+			else if (g_dElapsedTime < minigame1time + 1 && g_dElapsedTime >= minigame1time + 0.75)
 			{
 				g_minigame1_beat4.m_bActive = true;
 				if (rand() % 2)
@@ -586,25 +587,25 @@ void minigame1_moveCharacter()
 	}
 	if (g_weapon.m_cLocation.X == g_minigame1_beat1.m_cLocation.X && g_minigame1_beat1.m_bActive == true)
 	{
-		deathsound = 5;
+		minigame1sound = true;
 		g_minigame1_beat1.m_bActive = false;
 		g_minigame1_beat1.m_cLocation.X = 2;
 	}
 	if (g_weapon.m_cLocation.X == g_minigame1_beat2.m_cLocation.X && g_minigame1_beat2.m_bActive == true)
 	{
-		deathsound = 5;
+		minigame1sound = true;
 		g_minigame1_beat2.m_bActive = false;
 		g_minigame1_beat2.m_cLocation.X = 77;
 	}
 	if (g_weapon.m_cLocation.X == g_minigame1_beat3.m_cLocation.X && g_minigame1_beat3.m_bActive == true)
 	{
-		deathsound = 5;
+		minigame1sound = true;
 		g_minigame1_beat3.m_bActive = false;
 		g_minigame1_beat3.m_cLocation.X = 2;
 	}
 	if (g_weapon.m_cLocation.X == g_minigame1_beat4.m_cLocation.X && g_minigame1_beat4.m_bActive == true)
 	{
-		deathsound = 5;
+		minigame1sound = true;
 		g_minigame1_beat4.m_bActive = false;
 		g_minigame1_beat4.m_cLocation.X = 77;
 	}
@@ -1268,7 +1269,7 @@ void moveCharacter()
 {
 	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
 	{
-		shootfailsound = 1;
+		shootfailsound = true;
 	}
 	if (Weapons[currentWeapon].Clip > 0)
 	{
@@ -2786,10 +2787,15 @@ void sound()
 		Beep((3 - reloadsound) * 450, 15);
 		reloadsound--;
 	}
-	if (shootfailsound > 0)
+	if (shootfailsound)
 	{
 		Beep(400, 15);
-		shootfailsound--;
+		shootfailsound = false;
+	}
+	if (minigame1sound)
+	{
+		Beep(1000, 20);
+		minigame1sound = false;
 	}
 }
 void generate()
