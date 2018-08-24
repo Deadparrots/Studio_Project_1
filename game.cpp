@@ -99,10 +99,13 @@ void minigame1_init()
 	g_door.m_cLocation.X = 40;
 	g_door.m_cLocation.Y = 13;
 	g_door.m_bActive = false;
-	if (Lives + int_stages/10 <= 99)
-		Lives += int_stages/10;
-	else
-		Lives = 99;
+	if (!g_bMinigame)
+	{
+		if (Lives + int_stages / 10 <= 99)
+			Lives += int_stages / 10;
+		else
+			Lives = 99;
+	}
 }
 void minigame2_init()
 {
