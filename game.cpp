@@ -2949,6 +2949,12 @@ void weapdata()
 	int i = 0;
 	std::string in;
 	std::ifstream weapondata("weapons.txt");
+	getline(weapondata, Weapons[i].Name); // Gets Spear
+	weapondata >> Weapons[i].ClipMax;
+	weapondata >> Weapons[i].Reload;
+	weapondata >> Weapons[i].Range;
+	i++;
+	weapondata.ignore();
 	getline(weapondata, Weapons[i].Name); // Gets Pistol
 	weapondata >> Weapons[i].ClipMax;
 	weapondata >> Weapons[i].Reload;
@@ -2956,12 +2962,6 @@ void weapdata()
 	i++;
 	weapondata.ignore();
 	getline(weapondata, Weapons[i].Name); // Gets Crossbow
-	weapondata >> Weapons[i].ClipMax;
-	weapondata >> Weapons[i].Reload;
-	weapondata >> Weapons[i].Range;
-	i++;
-	weapondata.ignore();
-	getline(weapondata, Weapons[i].Name); // Gets Spear
 	weapondata >> Weapons[i].ClipMax;
 	weapondata >> Weapons[i].Reload;
 	weapondata >> Weapons[i].Range;
