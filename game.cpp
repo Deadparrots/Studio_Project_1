@@ -2503,7 +2503,7 @@ void renderEnemy6()
 }
 void renderbeat1()
 {
-	WORD charColor = 0x0F;
+	WORD charColor = 0x0E;
 	char character = '<';
 	if (g_minigame1_beat1.m_bLeft)
 		character = '>';
@@ -2514,7 +2514,7 @@ void renderbeat1()
 }
 void renderbeat2()
 {
-	WORD charColor = 0x0F;
+	WORD charColor = 0x0E;
 	char character = '<';
 	if (g_minigame1_beat2.m_bLeft)
 		character = '>';
@@ -2525,7 +2525,7 @@ void renderbeat2()
 }
 void renderbeat3()
 {
-	WORD charColor = 0x0F;
+	WORD charColor = 0x0E;
 	char character = '<';
 	if (g_minigame1_beat3.m_bLeft)
 		character = '>';
@@ -2536,7 +2536,7 @@ void renderbeat3()
 }
 void renderbeat4()
 {
-	WORD charColor = 0x0F;
+	WORD charColor = 0x0E;
 	char character = '<';
 	if (g_minigame1_beat4.m_bLeft)
 		character = '>';
