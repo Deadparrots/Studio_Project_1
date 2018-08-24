@@ -17,8 +17,8 @@
 л                                   |      |                                   л
 л                                                                              л
 л                          Player 1 has the 'O' symbol                         л
-л    Player                Player 2 has the 'X' symbol                         л
+л                          Player 2 has the 'X' symbol                         л
 л                                                                              л
-л                                                                              л
+л    Player                                                                    л
 л                                                                              л
 лллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллллл
