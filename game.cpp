@@ -3361,7 +3361,7 @@ void minigame()
 	case MMrhythm:
 		m.Y = 6;
 		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Minigame 1", 0x0E);
+		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x0E);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "2. Pong", 0x03);
 		m.Y += 2;
@@ -3372,7 +3372,7 @@ void minigame()
 	case MMpong:
 		m.Y = 6;
 		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Minigame 1", 0x03);
+		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "2. Pong", 0x0E);
 		m.Y += 2;
@@ -3383,7 +3383,7 @@ void minigame()
 	case MMtictactoe:
 		m.Y = 6;
 		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Minigame 1", 0x03);
+		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "2. Pong", 0x03);
 		m.Y += 2;
@@ -3394,7 +3394,7 @@ void minigame()
 	case MMsnake:
 		m.Y = 6;
 		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Minigame 1", 0x03);
+		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "2. Pong", 0x03);
 		m.Y += 2;
