@@ -395,6 +395,7 @@ void splashScreenWait()
 		Weapons[0].Clip = Weapons[0].ClipMax;
 		int_stages = 1;
 		g_eGameState = S_GAME;
+		save();
 	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMContinue && g_eGameState == S_TITLE)
 	{
