@@ -30,7 +30,6 @@ enum EKEYS
 	K_D,
 	K_C,
 	K_E,
-	K_M,
 	K_1,
 	K_2,
 	K_3,
@@ -40,7 +39,6 @@ enum EKEYS
 	K_7,
 	K_8,
 	K_9,
-	K_ENTER,
 	K_COUNT
 };
 
@@ -84,13 +82,14 @@ enum EMAINMENU
 	MMContinue,
 	MMminigame
 };
-
 enum EMINIGAME
 {
 	MMrhythm,
 	MMpong,
 	MMtictactoe,
-	MMsnake
+	MMsnake,
+	MM1P,
+	MM2P
 };
 
 // struct for the game character
@@ -186,4 +185,5 @@ void renderTicTacToe();
 void tictactoeWin();
 void minigame();
 void minigameselect();
+void playercount();
 #endif // _GAME_H

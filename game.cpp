@@ -51,15 +51,17 @@ bool		shootsound = false;
 size_t		reloadsound = 0;
 bool		shootfailsound = false;
 int			MMSelect = MMStart;
-int         MMgame = MMrhythm;
 int			int_stages = 1;
+int			MMgame = MMrhythm;
 double		stages = 0.000 + int_stages;
 size_t		StageType = EMainMenu;
 bool		b_play = false;
 bool		bossSpeech = false;
-bool        g_bMinigame = false;
+bool		ticgame = false;
+bool		g_bMinigame = false;
+bool        win = false;
 int g_shootdist = 0;
-int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
+int g_shootmaxdist = 2; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_INTRO;
 EWEAPONSTATES g_eWeaponState = Hold;
 EWEAPONSTATES g_eM2WeaponState = FireUp;
@@ -98,10 +100,13 @@ void minigame1_init()
 	g_door.m_cLocation.X = 40;
 	g_door.m_cLocation.Y = 13;
 	g_door.m_bActive = false;
-	if (Lives + int_stages / 10 <= 99)
-		Lives += int_stages / 10;
-	else
-		Lives = 99;
+	if (!g_bMinigame)
+	{
+		if (Lives + int_stages / 10 <= 99)
+			Lives += int_stages / 10;
+		else
+			Lives = 99;
+	}
 }
 void minigame2_init()
 {
@@ -284,14 +289,12 @@ void getInput(void)
 	g_abKeyPressed[K_RIGHT] = isKeyPressed(VK_RIGHT);
 	g_abKeyPressed[K_SPACE] = isKeyPressed(VK_SPACE);
 	g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
-	g_abKeyPressed[K_ENTER] = isKeyPressed(13);
 	g_abKeyPressed[K_W] = isKeyPressed(87);
 	g_abKeyPressed[K_A] = isKeyPressed(65);
 	g_abKeyPressed[K_S] = isKeyPressed(83);
 	g_abKeyPressed[K_D] = isKeyPressed(68);
 	g_abKeyPressed[K_C] = isKeyPressed(67);
 	g_abKeyPressed[K_E] = isKeyPressed(69); // For Weapon Switching
-	g_abKeyPressed[K_M] = isKeyPressed(77); // tic tac toe if work
 	g_abKeyPressed[K_1] = isKeyPressed(49);
 	g_abKeyPressed[K_2] = isKeyPressed(50);
 	g_abKeyPressed[K_3] = isKeyPressed(51);
@@ -350,15 +353,18 @@ void intro()
 		ost();
 		b_play = true;
 	}
-	if ((g_dElapsedTime > 35) || g_abKeyPressed[K_W] || g_abKeyPressed[K_A] || g_abKeyPressed[K_S] || g_abKeyPressed[K_D] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_RIGHT])
+	if ((g_dElapsedTime > 35) || g_abKeyPressed[K_W] || g_abKeyPressed[K_A] || g_abKeyPressed[K_S] || g_abKeyPressed[K_D] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_SPACE])
 	{
 		g_eGameState = S_TITLE;
 		StageType = EMainMenu;
 		init();
+		g_dBounceTime = g_dElapsedTime + 0.15;
 	}
 }
 void splashScreenWait()
 {
+	Lives = 3;
+	g_bMinigame = false;
 	if (!b_play)
 		ost();
 	bool bSomethingHappened = false;
@@ -389,14 +395,24 @@ void splashScreenWait()
 		MMSelect = MMStart;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMExit && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if ((MMSelect == MMExit || MMSelect == MMminigame) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMInstructions;
 		bSomethingHappened = true;
 	}
-	else if ((MMSelect == MMStart || MMSelect == MMContinue) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMStart && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMminigame;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMContinue && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMExit;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMExit && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMContinue;
 		bSomethingHappened = true;
 	}
 	else if (MMSelect == MMminigame && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
@@ -404,19 +420,14 @@ void splashScreenWait()
 		MMSelect = MMStart;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMExit && (g_abKeyPressed[K_D] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMExit && (g_abKeyPressed[K_A] || g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMminigame;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMminigame && (g_abKeyPressed[K_A] || g_abKeyPressed[K_RIGHT]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMminigame && (g_abKeyPressed[K_A] || g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMExit;
-		bSomethingHappened = true;
-	}
-	else if (MMSelect == MMminigame && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
-	{
-		MMSelect = MMInstructions;
 		bSomethingHappened = true;
 	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMInstructions && g_eGameState == S_TITLE)
@@ -425,12 +436,12 @@ void splashScreenWait()
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 	}
-	if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit && g_eGameState == S_TITLE)
+	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit && g_eGameState == S_TITLE)
 	{
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		g_bQuitGame = true;
 	}
-	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_TITLE)
+	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_TITLE)
 	{
 		StageType = EStage;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
@@ -438,15 +449,16 @@ void splashScreenWait()
 		Weapons[0].Clip = Weapons[0].ClipMax;
 		int_stages = 1;
 		g_eGameState = S_GAME;
+		save();
 	}
-	if (g_abKeyPressed[K_SPACE] && MMSelect == MMContinue && g_eGameState == S_TITLE)
+	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMContinue && g_eGameState == S_TITLE)
 	{
 		StageType = EStage;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 		g_eGameState = S_CONTINUE;
 	}
-	if (g_abKeyPressed[K_SPACE] && MMSelect == MMminigame && g_eGameState == S_TITLE)
+	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMminigame && g_eGameState == S_TITLE)
 	{
 		g_eGameState = S_MINIGAME;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
@@ -498,14 +510,15 @@ void minigame1_moveCharacter()
 	else if (g_dElapsedTime >= int_stages + 3)
 	{
 		if (g_bMinigame)
-		{
 			g_eGameState = S_MINIGAME;
+		else
+		{
+			g_door.m_bActive = true;
+			g_minigame1_beat1.m_bActive = false;
+			g_minigame1_beat2.m_bActive = false;
+			g_minigame1_beat3.m_bActive = false;
+			g_minigame1_beat4.m_bActive = false;
 		}
-		g_door.m_bActive = true;
-		g_minigame1_beat1.m_bActive = false;
-		g_minigame1_beat2.m_bActive = false;
-		g_minigame1_beat3.m_bActive = false;
-		g_minigame1_beat4.m_bActive = false;
 	}
 	switch (minigame1random)
 	{
@@ -538,93 +551,93 @@ void minigame1_moveCharacter()
 		break;
 	}
 	case 1:
-	{
-		if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
 		{
-			g_minigame1_beat1.m_bActive = true;
-			g_minigame1_beat1.m_cLocation.X = 77;
-			g_minigame1_beat1.m_bLeft = false;
-		}
-		else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
-		{
-			g_minigame1_beat2.m_bActive = true;
-			g_minigame1_beat2.m_cLocation.X = 77;
-			g_minigame1_beat2.m_bLeft = false;
-		}
-		else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.4)
-		{
-			g_minigame1_beat3.m_bActive = true;
-			g_minigame1_beat3.m_cLocation.X = 77;
-			g_minigame1_beat3.m_bLeft = false;
-		}
-		else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.6)
-		{
-			g_minigame1_beat4.m_bActive = true;
-			g_minigame1_beat4.m_cLocation.X = 77;
-			g_minigame1_beat4.m_bLeft = false;
-		}
-		break;
-	}
-	case 2:
-	{
-		if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
-		{
-			g_minigame1_beat1.m_bActive = true;
-			if (rand() % 2)
+			if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
 			{
-				g_minigame1_beat1.m_cLocation.X = 2;
-				g_minigame1_beat1.m_bLeft = true;
-			}
-			else
-			{
+				g_minigame1_beat1.m_bActive = true;
 				g_minigame1_beat1.m_cLocation.X = 77;
 				g_minigame1_beat1.m_bLeft = false;
 			}
-		}
-		else if (g_dElapsedTime < minigame1time + 0.35 && g_dElapsedTime >= minigame1time + 0.25)
-		{
-			g_minigame1_beat2.m_bActive = true;
-			if (rand() % 2)
+			else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
 			{
-				g_minigame1_beat2.m_cLocation.X = 2;
-				g_minigame1_beat2.m_bLeft = true;
-			}
-			else
-			{
+				g_minigame1_beat2.m_bActive = true;
 				g_minigame1_beat2.m_cLocation.X = 77;
 				g_minigame1_beat2.m_bLeft = false;
 			}
-		}
-		else if (g_dElapsedTime < minigame1time + 0.6 && g_dElapsedTime >= minigame1time + 0.5)
-		{
-			g_minigame1_beat3.m_bActive = true;
-			if (rand() % 2)
+			else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.4)
 			{
-				g_minigame1_beat3.m_cLocation.X = 2;
-				g_minigame1_beat3.m_bLeft = true;
-			}
-			else
-			{
+				g_minigame1_beat3.m_bActive = true;
 				g_minigame1_beat3.m_cLocation.X = 77;
 				g_minigame1_beat3.m_bLeft = false;
 			}
-		}
-		else if (g_dElapsedTime < minigame1time + 0.85 && g_dElapsedTime >= minigame1time + 0.75)
-		{
-			g_minigame1_beat4.m_bActive = true;
-			if (rand() % 2)
+			else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.6)
 			{
-				g_minigame1_beat4.m_cLocation.X = 2;
-				g_minigame1_beat4.m_bLeft = true;
-			}
-			else
-			{
+				g_minigame1_beat4.m_bActive = true;
 				g_minigame1_beat4.m_cLocation.X = 77;
 				g_minigame1_beat4.m_bLeft = false;
 			}
+			break;
 		}
-		break;
-	}
+	case 2:
+		{
+			if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
+			{
+				g_minigame1_beat1.m_bActive = true;
+				if (rand() % 2)
+				{
+					g_minigame1_beat1.m_cLocation.X = 2;
+					g_minigame1_beat1.m_bLeft = true;
+				}
+				else
+				{
+					g_minigame1_beat1.m_cLocation.X = 77;
+					g_minigame1_beat1.m_bLeft = false;
+				}
+			}
+			else if (g_dElapsedTime < minigame1time + 0.35 && g_dElapsedTime >= minigame1time + 0.25)
+			{
+				g_minigame1_beat2.m_bActive = true;
+				if (rand() % 2)
+				{
+					g_minigame1_beat2.m_cLocation.X = 2;
+					g_minigame1_beat2.m_bLeft = true;
+				}
+				else
+				{
+					g_minigame1_beat2.m_cLocation.X = 77;
+					g_minigame1_beat2.m_bLeft = false;
+				}
+			}
+			else if (g_dElapsedTime < minigame1time + 0.6 && g_dElapsedTime >= minigame1time + 0.5)
+			{
+				g_minigame1_beat3.m_bActive = true;
+				if (rand() % 2)
+				{
+					g_minigame1_beat3.m_cLocation.X = 2;
+					g_minigame1_beat3.m_bLeft = true;
+				}
+				else
+				{
+					g_minigame1_beat3.m_cLocation.X = 77;
+					g_minigame1_beat3.m_bLeft = false;
+				}
+			}
+			else if (g_dElapsedTime < minigame1time + 0.85 && g_dElapsedTime >= minigame1time + 0.75)
+			{
+				g_minigame1_beat4.m_bActive = true;
+				if (rand() % 2)
+				{
+					g_minigame1_beat4.m_cLocation.X = 2;
+					g_minigame1_beat4.m_bLeft = true;
+				}
+				else
+				{
+					g_minigame1_beat4.m_cLocation.X = 77;
+					g_minigame1_beat4.m_bLeft = false;
+				}
+			}
+			break;
+		}
 	}
 	// Minigame stuff end
 	if (g_abKeyPressed[K_LEFT])
@@ -799,12 +812,13 @@ void minigame2_moveCharacter()
 	if (g_weapon.m_cLocation.X >= 78)
 	{
 		if (g_bMinigame)
-		{
 			g_eGameState = S_MINIGAME;
+		else
+		{
+			g_weapon.m_cLocation.X = 78;
+			g_door.m_bActive = true;
+			g_door.m_cLocation = g_sChar.m_cLocation;
 		}
-		g_weapon.m_cLocation.X = 78;
-		g_door.m_bActive = true;
-		g_door.m_cLocation = g_sChar.m_cLocation;
 	}
 	if (g_weapon.m_cLocation.X == g_minigame2_paddle1.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle1.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle1.m_cLocation.Y + 2))
 	{
@@ -833,11 +847,11 @@ void minigame2_moveCharacter()
 		}
 	}
 	g_minigame2_paddle1.m_cLocation.Y = g_sChar.m_cLocation.Y;
-	if (g_dElapsedTime < int_stages + 5 && g_eWeaponState == FireRight && g_minigame2_paddle2.m_cLocation.Y <= g_weapon.m_cLocation.Y + 1 && g_minigame2_paddle2.m_cLocation.Y >= g_weapon.m_cLocation.Y - 1 && g_weapon.m_cLocation.X >= 40)
+	if (g_dElapsedTime < int_stages + 5 && g_eWeaponState == FireRight && g_minigame2_paddle2.m_cLocation.Y <= g_weapon.m_cLocation.Y + 1  && g_minigame2_paddle2.m_cLocation.Y >= g_weapon.m_cLocation.Y - 1 && g_weapon.m_cLocation.X >= 38)
 		g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
 	if (bSomethingHappened)
 	{
-		g_dBounceTime = g_dElapsedTime + 0.03 + 0.1 / stages; // 125ms should be enough
+		g_dBounceTime = g_dElapsedTime + 0.03 + 0.1/stages; // 125ms should be enough
 	}
 }
 void bossbattle_moveCharacter()
@@ -1205,21 +1219,6 @@ void bossbattle_moveCharacter()
 	// End Boss stuff
 
 
-	// Updating the location of the character based on the key press
-	// providing a beep sound whenver we shift the character
-	if (g_abKeyPressed[K_E])
-	{
-		if (currentWeapon < 3)
-		{
-			currentWeapon++;
-		}
-		else
-		{
-			currentWeapon = 0;
-		}
-		g_dBounceTime = g_dElapsedTime + 0.2;
-	}
-
 	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
 	{
 		if (SansFightMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
@@ -1251,62 +1250,6 @@ void bossbattle_moveCharacter()
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
 		}
-	}
-	if (
-		(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == false)
-		)
-	{
-		reload();
-		reloadsound += 2;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y)
-	{
-		g_enemy1.m_bActive = false;
-		g_enemy1.m_cLocation.X = 0;
-		g_enemy1.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y)
-	{
-		g_enemy2.m_bActive = false;
-		g_enemy2.m_cLocation.X = 0;
-		g_enemy2.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y)
-	{
-		g_enemy3.m_bActive = false;
-		g_enemy3.m_cLocation.X = 0;
-		g_enemy3.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y)
-	{
-		g_enemy4.m_bActive = false;
-		g_enemy4.m_cLocation.X = 0;
-		g_enemy4.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y)
-	{
-		g_enemy5.m_bActive = false;
-		g_enemy5.m_cLocation.X = 0;
-		g_enemy5.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y)
-	{
-		g_enemy6.m_bActive = false;
-		g_enemy6.m_cLocation.X = 0;
-		g_enemy6.m_cLocation.Y = 0;
-	}
-	if (((g_sChar.m_cLocation.X == g_gaster1.m_cLocation.X - 1 || g_sChar.m_cLocation.X == g_gaster1.m_cLocation.X || g_sChar.m_cLocation.X == g_gaster1.m_cLocation.X + 1) && g_gaster1.m_bFire) ||
-		((g_sChar.m_cLocation.Y == g_gaster2.m_cLocation.Y - 1 || g_sChar.m_cLocation.Y == g_gaster2.m_cLocation.Y || g_sChar.m_cLocation.Y == g_gaster2.m_cLocation.Y + 1) && g_gaster2.m_bFire) ||
-		((g_sChar.m_cLocation.Y == g_gaster3.m_cLocation.Y - 1 || g_sChar.m_cLocation.Y == g_gaster3.m_cLocation.Y || g_sChar.m_cLocation.Y == g_gaster3.m_cLocation.Y + 1) && g_gaster3.m_bFire) ||
-		((g_sChar.m_cLocation.X == g_gaster4.m_cLocation.X - 1 || g_sChar.m_cLocation.X == g_gaster4.m_cLocation.X || g_sChar.m_cLocation.X == g_gaster4.m_cLocation.X + 1) && g_gaster4.m_bFire))
-	{
-		g_sChar.m_bActive = false;
-		bSomethingHappened = true;
 	}
 	if (bSomethingHappened)
 	{
@@ -1362,7 +1305,7 @@ void boss_moveCharacter()
 }
 void moveCharacter()
 {
-	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
+	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0) && currentWeapon)
 	{
 		shootfailsound = true;
 	}
@@ -1371,46 +1314,38 @@ void moveCharacter()
 		if (g_abKeyPressed[K_UP] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireUp;
-			if (g_abKeyPressed[K_W])
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y - 1;
-			else
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound = true;
-			Weapons[currentWeapon].Clip--;
+			if (currentWeapon)
+				Weapons[currentWeapon].Clip--;
 		}
 		if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireDown;
-			if (g_abKeyPressed[K_S])
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y + 1;
-			else
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound = true;
-			Weapons[currentWeapon].Clip--;
+			if (currentWeapon)
+				Weapons[currentWeapon].Clip--;
 		}
 		if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireLeft;
-			if (g_abKeyPressed[K_A])
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X - 1;
-			else
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound = true;
-			Weapons[currentWeapon].Clip--;
+			if (currentWeapon)
+				Weapons[currentWeapon].Clip--;
 		}
 		if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireRight;
-			if (g_abKeyPressed[K_D])
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X + 1;
-			else
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound = true;
-			Weapons[currentWeapon].Clip--;
+			if (currentWeapon)
+				Weapons[currentWeapon].Clip--;
 		}
 	}
 	if (g_eWeaponState == FireUp)
@@ -1505,10 +1440,12 @@ void moveCharacter()
 		if (currentWeapon < 3)
 		{
 			currentWeapon++;
+			g_shootmaxdist = Weapons[currentWeapon].Range;
 		}
 		else
 		{
 			currentWeapon = 0;
+			g_shootmaxdist = Weapons[currentWeapon].Range;
 		}
 		g_dBounceTime = g_dElapsedTime + 0.2;
 	}
@@ -1677,7 +1614,7 @@ void moveCharacter()
 		if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 80] == ' ')
 			g_enemy6.m_cLocation.Y--;
 		break;
-	}
+	}	
 	if (g_weapon.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == true)
 	{
 		switch (rand() % 100 / (int_stages + 1) + 5)
@@ -1887,12 +1824,20 @@ void moveCharacter()
 }
 void processUserInput()
 {
-	if (g_abKeyPressed[K_ENTER] && StageType == EBossBattle && g_dElapsedTime < 20)
+	if (g_abKeyPressed[K_SPACE] && StageType == EBossBattle && g_dElapsedTime < 20)
 		g_dElapsedTime = 20;
 	if (Lives < 1 || g_abKeyPressed[K_ESCAPE])
 	{
-		PlaySound(TEXT("sound/die.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-		g_eGameState = S_GAMEOVER;
+		if (g_bMinigame)
+		{
+			g_eGameState = S_MINIGAME;
+			g_dBounceTime = g_dElapsedTime + 0.125;
+		}
+		else
+		{
+			PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
+			g_eGameState = S_GAMEOVER;
+		}
 	}
 	if (g_abKeyPressed[K_C])
 	{
@@ -2127,7 +2072,7 @@ void renderSplashScreen()  // renders the splash screen
 void renderGame()
 {
 	renderMap();        // renders the map to the buffer first
-	renderDoor();       // after all E are killed
+	renderDoor();
 	if (StageType == EStage)
 	{
 		renderEnemy1();
@@ -2145,7 +2090,6 @@ void renderGame()
 		renderGaster2();
 		renderGaster3();
 		renderGaster4();
-		renderWeapon();
 	}
 	if (StageType == EMinigame1)
 	{
@@ -2304,12 +2248,12 @@ void renderGaster1() // Up
 				{
 					character = 177;
 					c.X = g_gaster1.m_cLocation.X + j;
-					c.Y = i + 1;
+					c.Y = i+1;
 					g_Console.writeToBuffer(c, character, charColor);
 				}
 			}
 		}
-
+		
 	}
 }
 void renderGaster2() // Left
@@ -2354,7 +2298,7 @@ void renderGaster2() // Left
 			character = 176;
 		c.X = g_gaster2.m_cLocation.X + 1;
 		c.Y = g_gaster2.m_cLocation.Y;
-		g_Console.writeToBuffer(c, character, charColor);
+		g_Console.writeToBuffer(c, character, charColor); 
 		if (g_gaster2.m_bFire)
 		{
 			for (int j = -1; j <= 1; j++)
@@ -2470,7 +2414,7 @@ void renderGaster4() // Up2
 			character = 176;
 		c.X = g_gaster4.m_cLocation.X;
 		c.Y = g_gaster4.m_cLocation.Y + 1;
-		g_Console.writeToBuffer(c, character, charColor);
+		g_Console.writeToBuffer(c, character, charColor); 
 		if (g_gaster4.m_bFire)
 		{
 			for (int j = -1; j <= 1; j++)
@@ -2560,7 +2504,7 @@ void renderEnemy6()
 }
 void renderbeat1()
 {
-	WORD charColor = 0x0F;
+	WORD charColor = 0x0E;
 	char character = '<';
 	if (g_minigame1_beat1.m_bLeft)
 		character = '>';
@@ -2571,7 +2515,7 @@ void renderbeat1()
 }
 void renderbeat2()
 {
-	WORD charColor = 0x0F;
+	WORD charColor = 0x0E;
 	char character = '<';
 	if (g_minigame1_beat2.m_bLeft)
 		character = '>';
@@ -2582,7 +2526,7 @@ void renderbeat2()
 }
 void renderbeat3()
 {
-	WORD charColor = 0x0F;
+	WORD charColor = 0x0E;
 	char character = '<';
 	if (g_minigame1_beat3.m_bLeft)
 		character = '>';
@@ -2593,7 +2537,7 @@ void renderbeat3()
 }
 void renderbeat4()
 {
-	WORD charColor = 0x0F;
+	WORD charColor = 0x0E;
 	char character = '<';
 	if (g_minigame1_beat4.m_bLeft)
 		character = '>';
@@ -2640,7 +2584,7 @@ void renderDoor()
 	WORD charColor = 0x00;
 	if (g_door.m_bActive == true)
 		charColor = 0x0B;
-	g_Console.writeToBuffer(g_door.m_cLocation, (char)219, charColor);
+	g_Console.writeToBuffer(g_door.m_cLocation, (char)'D', charColor);
 }
 void renderWeapon()
 {
@@ -2889,7 +2833,10 @@ void instructions()
 		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 	}
 	if (g_abKeyPressed[K_ESCAPE])
+	{
 		g_eGameState = S_TITLE;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+	}
 }
 void sound()
 {
@@ -3031,8 +2978,8 @@ void generate()
 		}
 	for (size_t i = 0; i < 80 * 24; i++)
 	{
-		if (Map[i] == '`' && i > 80 && i < 23 * 80 && ((Map[i - 80] == ' ') || Map[i + 80] == ' ' || Map[i + 1] == ' ' || Map[i - 1] == ' '))
-			Map[i] = 219;
+		if (Map[i] == '`' && i > 80 && i < 23 * 80 && ((Map[i - 80] == ' ') || Map[i + 80] == ' '|| Map[i + 1] == ' ' || Map[i - 1] == ' '))
+			Map[i] = 219;	
 	}
 }
 void weapdata()
@@ -3040,6 +2987,12 @@ void weapdata()
 	int i = 0;
 	std::string in;
 	std::ifstream weapondata("weapons.txt");
+	getline(weapondata, Weapons[i].Name); // Gets Spear
+	weapondata >> Weapons[i].ClipMax;
+	weapondata >> Weapons[i].Reload;
+	weapondata >> Weapons[i].Range;
+	i++;
+	weapondata.ignore();
 	getline(weapondata, Weapons[i].Name); // Gets Pistol
 	weapondata >> Weapons[i].ClipMax;
 	weapondata >> Weapons[i].Reload;
@@ -3047,12 +3000,6 @@ void weapdata()
 	i++;
 	weapondata.ignore();
 	getline(weapondata, Weapons[i].Name); // Gets Crossbow
-	weapondata >> Weapons[i].ClipMax;
-	weapondata >> Weapons[i].Reload;
-	weapondata >> Weapons[i].Range;
-	i++;
-	weapondata.ignore();
-	getline(weapondata, Weapons[i].Name); // Gets Spear
 	weapondata >> Weapons[i].ClipMax;
 	weapondata >> Weapons[i].Reload;
 	weapondata >> Weapons[i].Range;
@@ -3067,7 +3014,10 @@ void weapdata()
 }
 void reload()
 {
-	Weapons[currentWeapon].Clip += Weapons[currentWeapon].ClipMax;	// Adds ammo left in clip to total
+	if (currentWeapon)
+		Weapons[currentWeapon].Clip += Weapons[currentWeapon].ClipMax;	// Adds ammo left in clip to total
+	else
+		Weapons[1].Clip += Weapons[1].ClipMax;
 }
 void ost()
 {
@@ -3077,10 +3027,8 @@ void ost()
 		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	else if (StageType == EBoss)
 		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-	else if (StageType == EMinigame1 || StageType == EMinigame2)
+	else if (StageType == EMinigame1 || StageType == EMinigame2 || StageType == ETicTacToe)
 		PlaySound(TEXT("sound/minigame.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-	else if (StageType == ETicTacToe)
-		PlaySound(TEXT("sound/ultimate.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	b_play = true;
 }
 void convertToString()
@@ -3206,6 +3154,7 @@ void convertToString()
 			Minigame2Map.push_back(buffer[0]);
 	}
 	myfile12.close();
+
 	std::fstream tictactoe("map/tictactoe.txt");
 	for (short i = 0; i < 25 * 80; i++)
 	{
@@ -3278,87 +3227,133 @@ void continueSave()
 void tictactoePlay()
 {
 	bool bSomethingHappened = false;
-	if (number == 49)
+	if (number == 49 && !win)
 	{
 		if (g_abKeyPressed[K_1])
 			if (charOne == '1')
+			{
 				charOne = 79;
+				number++;
+			}
 		if (g_abKeyPressed[K_2])
 			if (charTwo == '2')
+			{
 				charTwo = 79;
+				number++;
+			}
 		if (g_abKeyPressed[K_3])
 			if (charThree == '3')
+			{
 				charThree = 79;
+				number++;
+			}
 		if (g_abKeyPressed[K_4])
 			if (charFour == '4')
+			{
 				charFour = 79;
+				number++;
+			}
 		if (g_abKeyPressed[K_5])
 			if (charFive == '5')
+			{
 				charFive = 79;
+				number++;
+			}
 		if (g_abKeyPressed[K_6])
 			if (charSix == '6')
+			{
 				charSix = 79;
+				number++;
+			}
 		if (g_abKeyPressed[K_7])
 			if (charSeven == '7')
+			{
 				charSeven = 79;
+				number++;
+			}
 		if (g_abKeyPressed[K_8])
 			if (charEight == '8')
+			{
 				charEight = 79;
+				number++;
+			}
 		if (g_abKeyPressed[K_9])
 			if (charNine == '9')
+			{
 				charNine = 79;
+				number++;
+			}
 	}
-	else if (number == 50)
+	else if (number == 50 && !win)
 	{
 		if (g_abKeyPressed[K_1])
 			if (charOne == '1')
+			{
 				charOne = 88;
+				number--;
+			}
 		if (g_abKeyPressed[K_2])
 			if (charTwo == '2')
+			{
 				charTwo = 88;
+				number--;
+			}
 		if (g_abKeyPressed[K_3])
 			if (charThree == '3')
+			{
 				charThree = 88;
+				number--;
+			}
 		if (g_abKeyPressed[K_4])
 			if (charFour == '4')
+			{
 				charFour = 88;
+				number--;
+			}
 		if (g_abKeyPressed[K_5])
 			if (charFive == '5')
+			{
 				charFive = 88;
+				number--;
+			}
 		if (g_abKeyPressed[K_6])
 			if (charSix == '6')
+			{
 				charSix = 88;
+				number--;
+			}
 		if (g_abKeyPressed[K_7])
 			if (charSeven == '7')
+			{
 				charSeven = 88;
+				number--;
+			}
 		if (g_abKeyPressed[K_8])
 			if (charEight == '8')
+			{
 				charEight = 88;
+				number--;
+			}
 		if (g_abKeyPressed[K_9])
 			if (charNine == '9')
+			{
 				charNine = 88;
+				number--;
+			}
 	}
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	if (g_abKeyPressed[K_1] || g_abKeyPressed[K_2] || g_abKeyPressed[K_3]
-		|| g_abKeyPressed[K_4] || g_abKeyPressed[K_5] || g_abKeyPressed[K_6]
-		|| g_abKeyPressed[K_7] || g_abKeyPressed[K_8] || g_abKeyPressed[K_9])
-	{
-		if (number < 50)
-			number++;
-		else
-			number--;
-		bSomethingHappened = true;
-	}
-	if (g_abKeyPressed[K_ESCAPE])
-	{
-		g_eGameState = S_MINIGAME;
-		b_play = false;
-	}
 	if (bSomethingHappened)
 	{
 		g_dBounceTime = g_dElapsedTime + 0.125; // set the bounce time to some time in the future to prevent accidental triggers // 125ms should be enough
 	}
+}
+void playercount()
+{
+	if (number < 50)
+		number++;
+	else
+		number--;
 }
 void renderTicTacToe()
 {
@@ -3393,8 +3388,8 @@ void renderTicTacToe()
 }
 void tictactoeWin()
 {
-	COORD c; c.X = 37; c.Y = 18;
-	if (   charOne == charTwo && charTwo == charThree
+	COORD c; c.X = 37; c.Y = 21;
+	if (charOne == charTwo && charTwo == charThree
 		|| charFour == charFive && charFive == charSix
 		|| charSeven == charEight && charEight == charNine
 		|| charOne == charFour && charFour == charSeven
@@ -3403,11 +3398,22 @@ void tictactoeWin()
 		|| charOne == charFive && charFive == charNine
 		|| charThree == charFive && charFive == charSeven)
 	{
+		/*if (number = '2')
+		{
+			g_Console.writeToBuffer(c, "Player 1 Win", 0x0f);
+		}
+		else if (number = '1')
+		{
+			g_Console.writeToBuffer(c, "Player 2 Win", 0x0f);
+		}*/
 		g_Console.writeToBuffer(c, "You Win", 0x0f);
+		win = true;
+
 		if (g_abKeyPressed[K_SPACE])
 		{
 			g_eGameState = S_MINIGAME;
 			b_play = false;
+			win = false;
 		}
 	}
 }
@@ -3424,7 +3430,7 @@ void minigame()
 	case MMrhythm:
 		m.Y = 6;
 		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Minigame 1", 0x0E);
+		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x0E);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "2. Pong", 0x03);
 		m.Y += 2;
@@ -3432,11 +3438,10 @@ void minigame()
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "4. Snake", 0x03);
 		break;
-
 	case MMpong:
 		m.Y = 6;
 		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Minigame 1", 0x03);
+		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "2. Pong", 0x0E);
 		m.Y += 2;
@@ -3444,11 +3449,10 @@ void minigame()
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "4. Snake", 0x03);
 		break;
-
 	case MMtictactoe:
 		m.Y = 6;
 		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Minigame 1", 0x03);
+		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "2. Pong", 0x03);
 		m.Y += 2;
@@ -3456,11 +3460,10 @@ void minigame()
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "4. Snake", 0x03);
 		break;
-
 	case MMsnake:
 		m.Y = 6;
 		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Minigame 1", 0x03);
+		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "2. Pong", 0x03);
 		m.Y += 2;
@@ -3468,12 +3471,48 @@ void minigame()
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "4. Snake", 0x0E);
 		break;
+	case MM1P:
+		m.Y = 6;
+		m.X = 33;
+		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "2. Pong", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x03);
+		m.Y += 1;
+		m.X += 3;
+		g_Console.writeToBuffer(m, "1 Player", 0x0E);
+		m.Y += 1;
+		g_Console.writeToBuffer(m, "2 Player", 0x03);
+		m.Y += 2;
+		m.X -= 3;
+		g_Console.writeToBuffer(m, "4. Snake", 0x03);
+		break;
+	case MM2P:
+		m.Y = 6;
+		m.X = 33;
+		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "2. Pong", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x03);
+		m.Y += 1;
+		m.X += 3;
+		g_Console.writeToBuffer(m, "1 Player", 0x03);
+		m.Y += 1;
+		g_Console.writeToBuffer(m, "2 Player", 0x0E);
+		m.Y += 2;
+		m.X -= 3;
+		g_Console.writeToBuffer(m, "4. Snake", 0x03);
+		break;
 	}
 }
 void minigameselect()
 {
-	if (!b_play)
-		ost();
+	g_bMinigame = true;
+	Lives = 5;
+	b_play = false;
+	ost();
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
@@ -3517,42 +3556,64 @@ void minigameselect()
 		MMgame = MMtictactoe;
 		bSomethingHappened = true;
 	}
+	else if (MMgame == MMtictactoe && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	{
+		MMgame = MM1P;
+		bSomethingHappened = true;
+	}
+	else if (MMgame == MM1P && (g_abKeyPressed[K_W] || g_abKeyPressed[K_S] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	{
+		MMgame = MM2P;
+		bSomethingHappened = true;
+	}
+	else if (MMgame == MM2P && (g_abKeyPressed[K_W] || g_abKeyPressed[K_S] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	{
+		MMgame = MM1P;
+		bSomethingHappened = true;
+	}
 	if (MMgame == MMrhythm && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
 	{
 		b_play = false;
-		g_bMinigame = true;
 		StageType = EMinigame1;
 		g_eGameState = S_GAME;
 		minigame1_init();
 		stages = 50;
 		int_stages = 50;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
 	else if (MMgame == MMpong && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
 	{
 		b_play = false;
-		g_bMinigame = true;
 		StageType = EMinigame2;
 		g_eGameState = S_GAME;
 		minigame2_init();
 		stages = 50;
 		int_stages = 50;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
-	else if (MMgame == MMtictactoe && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	else if (MMgame == MM2P && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME) 
 	{
 		b_play = false;
-		g_eGameState = S_GAME;
 		StageType = ETicTacToe;
-	}/*
+		g_eGameState = S_GAME;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+	}
+	/*
 	else if (MMgame = MMsnake && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
 	{
 		b_play = false;
 		g_eGameState = S_GAME;
-	}*/
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+	}
+	*/
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
 		g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
 	}
 	if (g_abKeyPressed[K_ESCAPE])
+	{
 		g_eGameState = S_TITLE;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+	}
 }
