@@ -30,6 +30,15 @@ enum EKEYS
 	K_D,
 	K_C,
 	K_E,
+	K_1,
+	K_2,
+	K_3,
+	K_4,
+	K_5,
+	K_6,
+	K_7,
+	K_8,
+	K_9,
 	K_ENTER,
 	K_COUNT
 };
@@ -43,7 +52,8 @@ enum EGAMESTATES
 	S_GAMEOVER,
 	S_INSTRUCTIONS,
 	S_COUNT,
-	S_CONTINUE
+	S_CONTINUE,
+	S_MINIGAME
 };
 enum EWEAPONSTATES
 {
@@ -61,7 +71,8 @@ enum ESTAGETYPE
 	EBoss,
 	EBossBattle,
 	EMinigame1,
-	EMinigame2
+	EMinigame2,
+	ETicTacToe
 };
 
 enum EMAINMENU
@@ -69,7 +80,15 @@ enum EMAINMENU
 	MMStart,
 	MMInstructions,
 	MMExit,
-	MMContinue
+	MMContinue,
+	MMminigame
+};
+enum EMINIGAME
+{
+	MMrhythm,
+	MMpong,
+	MMtictactoe,
+	MMsnake
 };
 
 // struct for the game character
@@ -160,4 +179,9 @@ void instructions();
 void convertToString();
 void save();
 void continueSave();
+void tictactoePlay();
+void renderTicTacToe();
+void tictactoeWin();
+void minigame();
+void minigameselect();
 #endif // _GAME_H

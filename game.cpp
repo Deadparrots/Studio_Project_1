@@ -36,6 +36,8 @@ std::vector<char>	SansMap;
 std::vector<char>	SansFightMap;
 std::vector<char>	Minigame1Map;
 std::vector<char>	Minigame2Map;
+std::vector<char>   tictactoeGame;
+std::vector<char>   minigameMenu;
 std::vector<char>	Scene1;
 std::vector<char>	Scene2;
 std::vector<char>	Scene3;
@@ -50,10 +52,13 @@ size_t		reloadsound = 0;
 bool		shootfailsound = false;
 int			MMSelect = MMStart;
 int			int_stages = 1;
+int			MMgame = MMrhythm;
 double		stages = 0.000 + int_stages;
 size_t		StageType = EMainMenu;
 bool		b_play = false;
 bool		bossSpeech = false;
+bool		ticgame = false;
+bool		g_bMinigame = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 2; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_INTRO;
@@ -62,6 +67,16 @@ EWEAPONSTATES g_eM2WeaponState = FireUp;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 int Lives = 3; // Number of lives the player has left (Base Value is 3)
 int currentWeapon = 0; // Current Weapon
+char number = 49;
+char charOne = 49;
+char charTwo = 50;
+char charThree = 51;
+char charFour = 52;
+char charFive = 53;
+char charSix = 54;
+char charSeven = 55;
+char charEight = 56;
+char charNine = 57;
 WeaponParameters Weapons[4]; // Number of Weapons
 // Console object
 Console g_Console(80, 24, "Monster Dungeon");
@@ -277,6 +292,15 @@ void getInput(void)
 	g_abKeyPressed[K_D] = isKeyPressed(68);
 	g_abKeyPressed[K_C] = isKeyPressed(67);
 	g_abKeyPressed[K_E] = isKeyPressed(69); // For Weapon Switching
+	g_abKeyPressed[K_1] = isKeyPressed(49);
+	g_abKeyPressed[K_2] = isKeyPressed(50);
+	g_abKeyPressed[K_3] = isKeyPressed(51);
+	g_abKeyPressed[K_4] = isKeyPressed(52);
+	g_abKeyPressed[K_5] = isKeyPressed(53);
+	g_abKeyPressed[K_6] = isKeyPressed(54);
+	g_abKeyPressed[K_7] = isKeyPressed(55);
+	g_abKeyPressed[K_8] = isKeyPressed(56);
+	g_abKeyPressed[K_9] = isKeyPressed(57);
 }
 void update(double dt)
 {
@@ -291,6 +315,8 @@ void update(double dt)
 	case S_TITLE: splashScreenWait(); // game logic for the splash screen
 		break;
 	case S_GAME: gameplay(); // gameplay logic when we are in the game
+		break;
+	case S_MINIGAME: minigameselect();
 		break;
 	}
 }
@@ -308,6 +334,8 @@ void render()
 	case S_GAMEOVER: gameOver();
 		break;
 	case S_INSTRUCTIONS: instructions();
+		break;
+	case S_MINIGAME: minigame();
 		break;
 	case S_CONTINUE: continueSave();
 		break;
@@ -329,8 +357,10 @@ void intro()
 		init();
 	}
 }
-void splashScreenWait() 
+void splashScreenWait()
 {
+	Lives = 3;
+	g_bMinigame = false;
 	if (!b_play)
 		ost();
 	bool bSomethingHappened = false;
@@ -353,7 +383,7 @@ void splashScreenWait()
 	}
 	else if (MMSelect == MMInstructions && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
 	{
-		MMSelect = MMExit;
+		MMSelect = MMminigame;
 		bSomethingHappened = true;
 	}
 	else if (MMSelect == MMInstructions && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
@@ -361,19 +391,39 @@ void splashScreenWait()
 		MMSelect = MMStart;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMExit && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if ((MMSelect == MMExit || MMSelect == MMminigame) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMInstructions;
 		bSomethingHappened = true;
 	}
-	else if ((MMSelect == MMStart || MMSelect == MMContinue) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMStart && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMminigame;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMContinue && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMExit;
 		bSomethingHappened = true;
 	}
 	else if (MMSelect == MMExit && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
 	{
+		MMSelect = MMContinue;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMminigame && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	{
 		MMSelect = MMStart;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMExit && (g_abKeyPressed[K_A] || g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMminigame;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMminigame && (g_abKeyPressed[K_A] || g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMExit;
 		bSomethingHappened = true;
 	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMInstructions && g_eGameState == S_TITLE)
@@ -382,12 +432,12 @@ void splashScreenWait()
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 	}
-	if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit && g_eGameState == S_TITLE)
+	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit && g_eGameState == S_TITLE)
 	{
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		g_bQuitGame = true;
 	}
-	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_TITLE)
+	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_TITLE)
 	{
 		StageType = EStage;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
@@ -397,12 +447,18 @@ void splashScreenWait()
 		g_eGameState = S_GAME;
 		save();
 	}
-	if (g_abKeyPressed[K_SPACE] && MMSelect == MMContinue && g_eGameState == S_TITLE)
+	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMContinue && g_eGameState == S_TITLE)
 	{
 		StageType = EStage;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 		g_eGameState = S_CONTINUE;
+	}
+	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMminigame && g_eGameState == S_TITLE)
+	{
+		g_eGameState = S_MINIGAME;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		b_play = false;
 	}
 	if (bSomethingHappened)
 	{
@@ -423,6 +479,8 @@ void gameplay()            // gameplay logic
 		minigame1_moveCharacter();
 	else if (StageType == EMinigame2)
 		minigame2_moveCharacter();
+	else if (StageType == ETicTacToe)
+		tictactoePlay();
 	sound(); // sound can be played here too.
 	if (!b_play)
 		ost();
@@ -447,11 +505,16 @@ void minigame1_moveCharacter()
 	}
 	else if (g_dElapsedTime >= int_stages + 3)
 	{
-		g_door.m_bActive = true;
-		g_minigame1_beat1.m_bActive = false;
-		g_minigame1_beat2.m_bActive = false;
-		g_minigame1_beat3.m_bActive = false;
-		g_minigame1_beat4.m_bActive = false;
+		if (g_bMinigame)
+			g_eGameState = S_MINIGAME;
+		else
+		{
+			g_door.m_bActive = true;
+			g_minigame1_beat1.m_bActive = false;
+			g_minigame1_beat2.m_bActive = false;
+			g_minigame1_beat3.m_bActive = false;
+			g_minigame1_beat4.m_bActive = false;
+		}
 	}
 	switch (minigame1random)
 	{
@@ -744,9 +807,14 @@ void minigame2_moveCharacter()
 	}
 	if (g_weapon.m_cLocation.X >= 78)
 	{
-		g_weapon.m_cLocation.X = 78;
-		g_door.m_bActive = true;
-		g_door.m_cLocation = g_sChar.m_cLocation;
+		if (g_bMinigame)
+			g_eGameState = S_MINIGAME;
+		else
+		{
+			g_weapon.m_cLocation.X = 78;
+			g_door.m_bActive = true;
+			g_door.m_cLocation = g_sChar.m_cLocation;
+		}
 	}
 	if (g_weapon.m_cLocation.X == g_minigame2_paddle1.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle1.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle1.m_cLocation.Y + 2))
 	{
@@ -1756,8 +1824,16 @@ void processUserInput()
 		g_dElapsedTime = 20;
 	if (Lives < 1 || g_abKeyPressed[K_ESCAPE])
 	{
-		PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME);
-		g_eGameState = S_GAMEOVER;
+		if (g_bMinigame)
+		{
+			g_eGameState = S_MINIGAME;
+			g_dBounceTime = g_dElapsedTime + 0.125;
+		}
+		else
+		{
+			PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME);
+			g_eGameState = S_GAMEOVER;
+		}
 	}
 	if (g_abKeyPressed[K_C])
 	{
@@ -1918,7 +1994,9 @@ void renderSplashScreen()  // renders the splash screen
 		m.X = g_Console.getConsoleSize().X / 2 - 6;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 2;
+		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		g_Console.writeToBuffer(m, "Minigames", 0x03);
+		m.X = g_Console.getConsoleSize().X / 2 + 4;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
 
@@ -1932,7 +2010,9 @@ void renderSplashScreen()  // renders the splash screen
 		m.X = g_Console.getConsoleSize().X / 2 - 6;
 		g_Console.writeToBuffer(m, "Instructions", 0x0E);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 2;
+		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		g_Console.writeToBuffer(m, "Minigames", 0x03);
+		m.X = g_Console.getConsoleSize().X / 2 + 4;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
 
@@ -1946,7 +2026,9 @@ void renderSplashScreen()  // renders the splash screen
 		m.X = g_Console.getConsoleSize().X / 2 - 6;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 2;
+		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		g_Console.writeToBuffer(m, "Minigames", 0x03);
+		m.X = g_Console.getConsoleSize().X / 2 + 4;
 		g_Console.writeToBuffer(m, "Exit", 0x0E);
 		break;
 
@@ -1960,7 +2042,25 @@ void renderSplashScreen()  // renders the splash screen
 		m.X = g_Console.getConsoleSize().X / 2 - 6;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 2;
+		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		g_Console.writeToBuffer(m, "Minigames", 0x03);
+		m.X = g_Console.getConsoleSize().X / 2 + 4;
+		g_Console.writeToBuffer(m, "Exit", 0x03);
+		break;
+
+	case MMminigame:
+		m.Y = 20;
+		m.X = 34;
+		g_Console.writeToBuffer(m, "Start", 0x03);
+		m.X = 40;
+		g_Console.writeToBuffer(m, "Continue", 0x03);
+		m.Y += 1;
+		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		g_Console.writeToBuffer(m, "Instructions", 0x03);
+		m.Y += 1;
+		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		g_Console.writeToBuffer(m, "Minigames", 0x0E);
+		m.X = g_Console.getConsoleSize().X / 2 + 4;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
 	}
@@ -2001,6 +2101,8 @@ void renderGame()
 		renderpaddle2();
 		renderWeapon();
 	}
+	if (StageType == ETicTacToe)
+		renderTicTacToe();
 	renderCharacter();  // renders the character into the buffer
 	renderUI();
 }
@@ -2918,7 +3020,7 @@ void ost()
 		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	else if (StageType == EBoss)
 		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-	else if (StageType == EMinigame1 || StageType == EMinigame2)
+	else if (StageType == EMinigame1 || StageType == EMinigame2 || StageType == ETicTacToe)
 		PlaySound(TEXT("sound/minigame.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	b_play = true;
 }
@@ -3045,6 +3147,27 @@ void convertToString()
 			Minigame2Map.push_back(buffer[0]);
 	}
 	myfile12.close();
+
+	std::fstream tictactoe("map/tictactoe.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		tictactoe.seekg(i);
+		char * buffer = new char[1];
+		tictactoe.read(buffer, 1);
+		if (buffer[0] != '\n')
+			tictactoeGame.push_back(buffer[0]);
+	}
+	tictactoe.close();
+	std::fstream MgameMenu("map/minigamemenu.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		MgameMenu.seekg(i);
+		char * buffer = new char[1];
+		MgameMenu.read(buffer, 1);
+		if (buffer[0] != '\n')
+			minigameMenu.push_back(buffer[0]);
+	}
+	MgameMenu.close();
 }
 void save()
 {
@@ -3093,4 +3216,277 @@ void continueSave()
 		init();
 	MMSelect = MMStart;
 	g_eGameState = S_GAME;
+}
+void tictactoePlay()
+{
+	bool bSomethingHappened = false;
+	if (number == 49)
+	{
+		if (g_abKeyPressed[K_1])
+			if (charOne == '1')
+				charOne = 79;
+		if (g_abKeyPressed[K_2])
+			if (charTwo == '2')
+				charTwo = 79;
+		if (g_abKeyPressed[K_3])
+			if (charThree == '3')
+				charThree = 79;
+		if (g_abKeyPressed[K_4])
+			if (charFour == '4')
+				charFour = 79;
+		if (g_abKeyPressed[K_5])
+			if (charFive == '5')
+				charFive = 79;
+		if (g_abKeyPressed[K_6])
+			if (charSix == '6')
+				charSix = 79;
+		if (g_abKeyPressed[K_7])
+			if (charSeven == '7')
+				charSeven = 79;
+		if (g_abKeyPressed[K_8])
+			if (charEight == '8')
+				charEight = 79;
+		if (g_abKeyPressed[K_9])
+			if (charNine == '9')
+				charNine = 79;
+	}
+	else if (number == 50)
+	{
+		if (g_abKeyPressed[K_1])
+			if (charOne == '1')
+				charOne = 88;
+		if (g_abKeyPressed[K_2])
+			if (charTwo == '2')
+				charTwo = 88;
+		if (g_abKeyPressed[K_3])
+			if (charThree == '3')
+				charThree = 88;
+		if (g_abKeyPressed[K_4])
+			if (charFour == '4')
+				charFour = 88;
+		if (g_abKeyPressed[K_5])
+			if (charFive == '5')
+				charFive = 88;
+		if (g_abKeyPressed[K_6])
+			if (charSix == '6')
+				charSix = 88;
+		if (g_abKeyPressed[K_7])
+			if (charSeven == '7')
+				charSeven = 88;
+		if (g_abKeyPressed[K_8])
+			if (charEight == '8')
+				charEight = 88;
+		if (g_abKeyPressed[K_9])
+			if (charNine == '9')
+				charNine = 88;
+	}
+	if (g_dBounceTime > g_dElapsedTime)
+		return;
+	if (g_abKeyPressed[K_1] || g_abKeyPressed[K_2] || g_abKeyPressed[K_3]
+		|| g_abKeyPressed[K_4] || g_abKeyPressed[K_5] || g_abKeyPressed[K_6]
+		|| g_abKeyPressed[K_7] || g_abKeyPressed[K_8] || g_abKeyPressed[K_9])
+	{
+		if (number < 50)
+			number++;
+		else
+			number--;
+		bSomethingHappened = true;
+	}
+	if (bSomethingHappened)
+	{
+		g_dBounceTime = g_dElapsedTime + 0.125; // set the bounce time to some time in the future to prevent accidental triggers // 125ms should be enough
+	}
+}
+void renderTicTacToe()
+{
+	std::vector<char>::iterator it = tictactoeGame.begin();
+	for (short i = 0; i < 80 * 24; ++i)
+	{
+		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
+	}
+	COORD one; one.X = 33; one.Y = 9;
+	COORD two; two.X = 40; two.Y = 9;
+	COORD three; three.X = 47; three.Y = 9;
+	COORD four; four.X = 33; four.Y = 12;
+	COORD five; five.X = 40; five.Y = 12;
+	COORD six; six.X = 47; six.Y = 12;
+	COORD seven; seven.X = 33; seven.Y = 15;
+	COORD eight; eight.X = 40; eight.Y = 15;
+	COORD nine; nine.X = 47; nine.Y = 15;
+	COORD player; player.X = 12; player.Y = 21; // player number
+	g_sChar.m_cLocation.X = 0;
+	g_sChar.m_cLocation.Y = 0;
+	g_Console.writeToBuffer(one, charOne, 0x0f);
+	g_Console.writeToBuffer(two, charTwo, 0x0f);
+	g_Console.writeToBuffer(three, charThree, 0x0f);
+	g_Console.writeToBuffer(four, charFour, 0x0f);
+	g_Console.writeToBuffer(five, charFive, 0x0f);
+	g_Console.writeToBuffer(six, charSix, 0x0f);
+	g_Console.writeToBuffer(seven, charSeven, 0x0f);
+	g_Console.writeToBuffer(eight, charEight, 0x0f);
+	g_Console.writeToBuffer(nine, charNine, 0x0f);
+	g_Console.writeToBuffer(player, number, 0x0f);
+	tictactoeWin();
+}
+void tictactoeWin()
+{
+	COORD c; c.X = 37; c.Y = 18;
+	if (charOne == charTwo && charTwo == charThree
+		|| charFour == charFive && charFive == charSix
+		|| charSeven == charEight && charEight == charNine
+		|| charOne == charFour && charFour == charSeven
+		|| charTwo == charFive && charFive == charEight
+		|| charThree == charSix && charSix == charNine
+		|| charOne == charFive && charFive == charNine
+		|| charThree == charFive && charFive == charSeven)
+	{
+		g_Console.writeToBuffer(c, "You Win", 0x0f);
+		if (g_abKeyPressed[K_SPACE])
+		{
+			g_eGameState = S_MINIGAME;
+			b_play = false;
+		}
+	}
+}
+void minigame()
+{
+	std::vector<char>::iterator it = minigameMenu.begin();
+	for (short i = 0; i < 80 * 24; ++i)
+	{
+		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
+	}
+	COORD m = g_Console.getConsoleSize();
+	switch (MMgame)
+	{
+	case MMrhythm:
+		m.Y = 6;
+		m.X = 33;
+		g_Console.writeToBuffer(m, "1. Minigame 1", 0x0E);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "2. Pong", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "4. Snake", 0x03);
+		break;
+	case MMpong:
+		m.Y = 6;
+		m.X = 33;
+		g_Console.writeToBuffer(m, "1. Minigame 1", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "2. Pong", 0x0E);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "4. Snake", 0x03);
+		break;
+	case MMtictactoe:
+		m.Y = 6;
+		m.X = 33;
+		g_Console.writeToBuffer(m, "1. Minigame 1", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "2. Pong", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x0E);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "4. Snake", 0x03);
+		break;
+	case MMsnake:
+		m.Y = 6;
+		m.X = 33;
+		g_Console.writeToBuffer(m, "1. Minigame 1", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "2. Pong", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x03);
+		m.Y += 2;
+		g_Console.writeToBuffer(m, "4. Snake", 0x0E);
+		break;
+	}
+}
+void minigameselect()
+{
+	g_bMinigame = true;
+	Lives = 5;
+	b_play = false;
+	ost();
+	bool bSomethingHappened = false;
+	if (g_dBounceTime > g_dElapsedTime)
+		return;
+	if (MMgame == MMrhythm && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	{
+		MMgame = MMpong;
+		bSomethingHappened = true;
+	}
+	else if (MMgame == MMpong && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	{
+		MMgame = MMtictactoe;
+		bSomethingHappened = true;
+	}
+	else if (MMgame == MMtictactoe && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	{
+		MMgame = MMsnake;
+		bSomethingHappened = true;
+	}
+	else if (MMgame == MMsnake && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	{
+		MMgame = MMrhythm;
+		bSomethingHappened = true;
+	}
+	else if (MMgame == MMrhythm && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
+	{
+		MMgame = MMsnake;
+		bSomethingHappened = true;
+	}
+	else if (MMgame == MMpong && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
+	{
+		MMgame = MMrhythm;
+		bSomethingHappened = true;
+	}
+	else if (MMgame == MMtictactoe && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
+	{
+		MMgame = MMpong;
+		bSomethingHappened = true;
+	}
+	else if (MMgame == MMsnake && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
+	{
+		MMgame = MMtictactoe;
+		bSomethingHappened = true;
+	}
+	if (MMgame == MMrhythm && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	{
+		b_play = false;
+		StageType = EMinigame1;
+		g_eGameState = S_GAME;
+		minigame1_init();
+		stages = 50;
+		int_stages = 50;
+	}
+	else if (MMgame == MMpong && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	{
+		b_play = false;
+		StageType = EMinigame2;
+		g_eGameState = S_GAME;
+		minigame2_init();
+		stages = 50;
+		int_stages = 50;
+	}
+	else if (MMgame == MMtictactoe && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	{
+		b_play = false;
+		g_eGameState = S_GAME;
+		StageType = ETicTacToe;
+	}/*
+	 else if (MMgame = MMsnake && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	 {
+	 b_play = false;
+	 g_eGameState = S_GAME;
+	 }*/
+	if (bSomethingHappened)
+	{
+		// set the bounce time to some time in the future to prevent accidental triggers
+		g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
+	}
+	if (g_abKeyPressed[K_ESCAPE])
+		g_eGameState = S_TITLE;
 }
