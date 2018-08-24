@@ -60,6 +60,7 @@ bool		bossSpeech = false;
 bool		ticgame = false;
 bool		g_bMinigame = false;
 bool        win = false;
+bool        multi = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 2; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_INTRO;
@@ -68,7 +69,7 @@ EWEAPONSTATES g_eM2WeaponState = FireUp;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 int Lives = 3; // Number of lives the player has left (Base Value is 3)
 int currentWeapon = 0; // Current Weapon
-char number = 49;
+size_t b_number = 1;
 char charOne = 49;
 char charTwo = 50;
 char charThree = 51;
@@ -485,6 +486,8 @@ void gameplay()            // gameplay logic
 		minigame2_moveCharacter();
 	else if (StageType == ETicTacToe)
 		tictactoePlay();
+	else if (StageType == ETicTacToe2)
+		tictactoeMulti();
 	sound(); // sound can be played here too.
 	if (!b_play)
 		ost();
@@ -2105,7 +2108,7 @@ void renderGame()
 		renderpaddle2();
 		renderWeapon();
 	}
-	if (StageType == ETicTacToe)
+	if (StageType == ETicTacToe || StageType == ETicTacToe2)
 		renderTicTacToe();
 	renderCharacter();  // renders the character into the buffer
 	renderUI();
@@ -3226,119 +3229,212 @@ void continueSave()
 }
 void tictactoePlay()
 {
+	if (b_number == 1)
+	{
+		if (g_abKeyPressed[K_1] && charOne == '1')
+		{
+			charOne = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_2] && charTwo == '2')
+		{
+			charTwo = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_3] && charThree == '3')
+		{
+			charThree = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_4] && charFour == '4')
+		{
+			charFour = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_5] && charFive == '5')
+		{
+			charFive = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_6] && charSix == '6')
+		{
+			charSix = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_7] && charSeven == '7')
+		{
+			charSeven = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_8] && charEight == '8')
+		{
+			charEight = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_9] && charNine == '9')
+		{
+			charNine = 79;
+			b_number = 0;
+		}
+	}
+	else if (b_number == 0)
+	{
+		b_number = 1;
+		if (charOne == '1' && (charTwo == charThree || charFour == charSeven || charFive == charNine)) // Counter/Win priority
+			charOne = 88;
+		else if (charTwo == '2' && (charOne == charThree || charFive == charEight))
+			charTwo = 88;
+		else if (charThree == '3' && (charOne == charTwo || charSix == charNine || charFive == charSeven))
+			charThree = 88;
+		else if (charFour == '4' && (charOne == charSeven || charFive == charSix))
+			charFour = 88;
+		else if (charFive == '5' && (charFour == charSix || charTwo == charEight || charOne == charNine || charThree == charSeven))
+			charFive = 88;
+		else if (charSix == '6' && (charThree == charNine || charFour == charFive))
+			charSix = 88;
+		else if (charSeven == '7' && (charOne == charFour || charEight == charNine || charFive == charThree))
+			charSeven = 88;
+		else if (charEight == '8' && (charSeven == charNine || charTwo == charFive))
+			charEight = 88;
+		else if (charNine == '9' && (charOne == charFive || charSeven == charEight || charThree == charSix))
+			charNine = 88;
+		else if (charFive == '5') // Middle slot next priority
+			charFive = 88;
+		else if (charOne == '1') // Corner slots next priority
+			charOne = 88;
+		else if (charThree == '3')
+			charThree = 88;
+		else if (charSeven == '7')
+			charSeven = 88;
+		else if (charNine == '9')
+			charNine = 88;
+		else if (charTwo == '2') // The rest of the slots not as important
+			charTwo = 88;
+		else if (charFour == '4')
+			charFour = 88;
+		else if (charSix == '6')
+			charSix = 88;
+		else if (charEight == '8')
+			charEight = 88;
+		else
+			b_number = 2;
+	}
+}
+void tictactoeMulti()
+{
 	bool bSomethingHappened = false;
-	if (number == 49 && !win)
+	if (b_number == 1 && !win)
 	{
 		if (g_abKeyPressed[K_1])
 			if (charOne == '1')
 			{
 				charOne = 79;
-				number++;
+				b_number++;
 			}
 		if (g_abKeyPressed[K_2])
 			if (charTwo == '2')
 			{
 				charTwo = 79;
-				number++;
+				b_number++;
 			}
 		if (g_abKeyPressed[K_3])
 			if (charThree == '3')
 			{
 				charThree = 79;
-				number++;
+				b_number++;
 			}
 		if (g_abKeyPressed[K_4])
 			if (charFour == '4')
 			{
 				charFour = 79;
-				number++;
+				b_number++;
 			}
 		if (g_abKeyPressed[K_5])
 			if (charFive == '5')
 			{
 				charFive = 79;
-				number++;
+				b_number++;
 			}
 		if (g_abKeyPressed[K_6])
 			if (charSix == '6')
 			{
 				charSix = 79;
-				number++;
+				b_number++;
 			}
 		if (g_abKeyPressed[K_7])
 			if (charSeven == '7')
 			{
 				charSeven = 79;
-				number++;
+				b_number++;
 			}
 		if (g_abKeyPressed[K_8])
 			if (charEight == '8')
 			{
 				charEight = 79;
-				number++;
+				b_number++;
 			}
 		if (g_abKeyPressed[K_9])
 			if (charNine == '9')
 			{
 				charNine = 79;
-				number++;
+				b_number++;
 			}
 	}
-	else if (number == 50 && !win)
+	else if (b_number == 2 && !win)
 	{
 		if (g_abKeyPressed[K_1])
 			if (charOne == '1')
 			{
 				charOne = 88;
-				number--;
+				b_number--;
 			}
 		if (g_abKeyPressed[K_2])
 			if (charTwo == '2')
 			{
 				charTwo = 88;
-				number--;
+				b_number--;
 			}
 		if (g_abKeyPressed[K_3])
 			if (charThree == '3')
 			{
 				charThree = 88;
-				number--;
+				b_number--;
 			}
 		if (g_abKeyPressed[K_4])
 			if (charFour == '4')
 			{
 				charFour = 88;
-				number--;
+				b_number--;
 			}
 		if (g_abKeyPressed[K_5])
 			if (charFive == '5')
 			{
 				charFive = 88;
-				number--;
+				b_number--;
 			}
 		if (g_abKeyPressed[K_6])
 			if (charSix == '6')
 			{
 				charSix = 88;
-				number--;
+				b_number--;
 			}
 		if (g_abKeyPressed[K_7])
 			if (charSeven == '7')
 			{
 				charSeven = 88;
-				number--;
+				b_number--;
 			}
 		if (g_abKeyPressed[K_8])
 			if (charEight == '8')
 			{
 				charEight = 88;
-				number--;
+				b_number--;
 			}
 		if (g_abKeyPressed[K_9])
 			if (charNine == '9')
 			{
 				charNine = 88;
-				number--;
+				b_number--;
 			}
 	}
 	if (g_dBounceTime > g_dElapsedTime)
@@ -3347,13 +3443,6 @@ void tictactoePlay()
 	{
 		g_dBounceTime = g_dElapsedTime + 0.125; // set the bounce time to some time in the future to prevent accidental triggers // 125ms should be enough
 	}
-}
-void playercount()
-{
-	if (number < 50)
-		number++;
-	else
-		number--;
 }
 void renderTicTacToe()
 {
@@ -3371,7 +3460,7 @@ void renderTicTacToe()
 	COORD seven; seven.X = 33; seven.Y = 15;
 	COORD eight; eight.X = 40; eight.Y = 15;
 	COORD nine; nine.X = 47; nine.Y = 15;
-	COORD player; player.X = 12; player.Y = 21; // player number
+	COORD player; player.X = 5; player.Y = 21; // player b_number
 	g_sChar.m_cLocation.X = 0;
 	g_sChar.m_cLocation.Y = 0;
 	g_Console.writeToBuffer(one, charOne, 0x0f);
@@ -3383,13 +3472,28 @@ void renderTicTacToe()
 	g_Console.writeToBuffer(seven, charSeven, 0x0f);
 	g_Console.writeToBuffer(eight, charEight, 0x0f);
 	g_Console.writeToBuffer(nine, charNine, 0x0f);
-	g_Console.writeToBuffer(player, number, 0x0f);
+	if (multi)
+	{
+		g_Console.writeToBuffer(player, "Player", 0x0f);
+		player.X += 7;
+		std::string playerNo = to_string(b_number);
+		g_Console.writeToBuffer(player, playerNo, 0x0f);
+	}
 	tictactoeWin();
 }
 void tictactoeWin()
 {
 	COORD c; c.X = 37; c.Y = 21;
-	if (charOne == charTwo && charTwo == charThree
+	if (b_number == 2)
+	{
+		g_Console.writeToBuffer(c, "Tie", 0x0f);
+		if (g_abKeyPressed[K_SPACE])
+		{
+			g_eGameState = S_MINIGAME;
+			b_play = false;
+		}
+	}
+	else if (charOne == charTwo && charTwo == charThree
 		|| charFour == charFive && charFive == charSix
 		|| charSeven == charEight && charEight == charNine
 		|| charOne == charFour && charFour == charSeven
@@ -3398,22 +3502,14 @@ void tictactoeWin()
 		|| charOne == charFive && charFive == charNine
 		|| charThree == charFive && charFive == charSeven)
 	{
-		/*if (number = '2')
-		{
-			g_Console.writeToBuffer(c, "Player 1 Win", 0x0f);
-		}
-		else if (number = '1')
-		{
-			g_Console.writeToBuffer(c, "Player 2 Win", 0x0f);
-		}*/
-		g_Console.writeToBuffer(c, "You Win", 0x0f);
-		win = true;
-
+		if (b_number == 0)
+			g_Console.writeToBuffer(c, "You Win", 0x0f);
+		else
+			g_Console.writeToBuffer(c, "You Lose", 0x0f);
 		if (g_abKeyPressed[K_SPACE])
 		{
 			g_eGameState = S_MINIGAME;
 			b_play = false;
-			win = false;
 		}
 	}
 }
@@ -3434,7 +3530,7 @@ void minigame()
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "2. Pong", 0x03);
 		m.Y += 2;
-		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x03);
+		g_Console.writeToBuffer(m, "3. Tic Tac Toe >", 0x03);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "4. Snake", 0x03);
 		break;
@@ -3445,7 +3541,7 @@ void minigame()
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "2. Pong", 0x0E);
 		m.Y += 2;
-		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x03);
+		g_Console.writeToBuffer(m, "3. Tic Tac Toe >", 0x03);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "4. Snake", 0x03);
 		break;
@@ -3456,7 +3552,7 @@ void minigame()
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "2. Pong", 0x03);
 		m.Y += 2;
-		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x0E);
+		g_Console.writeToBuffer(m, "3. Tic Tac Toe >", 0x0E);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "4. Snake", 0x03);
 		break;
@@ -3467,7 +3563,7 @@ void minigame()
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "2. Pong", 0x03);
 		m.Y += 2;
-		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x03);
+		g_Console.writeToBuffer(m, "3. Tic Tac Toe >", 0x03);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "4. Snake", 0x0E);
 		break;
@@ -3479,7 +3575,7 @@ void minigame()
 		g_Console.writeToBuffer(m, "2. Pong", 0x03);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x03);
-		m.Y += 1;
+		m.Y += 2;
 		m.X += 3;
 		g_Console.writeToBuffer(m, "1 Player", 0x0E);
 		m.Y += 1;
@@ -3496,7 +3592,7 @@ void minigame()
 		g_Console.writeToBuffer(m, "2. Pong", 0x03);
 		m.Y += 2;
 		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x03);
-		m.Y += 1;
+		m.Y += 2;
 		m.X += 3;
 		g_Console.writeToBuffer(m, "1 Player", 0x03);
 		m.Y += 1;
@@ -3556,9 +3652,14 @@ void minigameselect()
 		MMgame = MMtictactoe;
 		bSomethingHappened = true;
 	}
-	else if (MMgame == MMtictactoe && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	else if (MMgame == MMtictactoe && (g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D]) && g_eGameState == S_MINIGAME)
 	{
 		MMgame = MM1P;
+		bSomethingHappened = true;
+	}
+	else if ((MMgame == MM1P || MMgame == MM2P) && (g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_A]) && g_eGameState == S_MINIGAME)
+	{
+		MMgame = MMtictactoe;
 		bSomethingHappened = true;
 	}
 	else if (MMgame == MM1P && (g_abKeyPressed[K_W] || g_abKeyPressed[K_S] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
@@ -3580,6 +3681,7 @@ void minigameselect()
 		stages = 50;
 		int_stages = 50;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		bSomethingHappened = true;
 	}
 	else if (MMgame == MMpong && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
 	{
@@ -3590,13 +3692,45 @@ void minigameselect()
 		stages = 50;
 		int_stages = 50;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		bSomethingHappened = true;
+	}
+	else if (MMgame == MM1P && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	{
+		b_play = false;
+		multi = false;
+		g_eGameState = S_GAME;
+		StageType = ETicTacToe;
+		b_number = 1;
+		charOne = 49;
+		charTwo = 50;
+		charThree = 51;
+		charFour = 52;
+		charFive = 53;
+		charSix = 54;
+		charSeven = 55;
+		charEight = 56;
+		charNine = 57;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		bSomethingHappened = true;
 	}
 	else if (MMgame == MM2P && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME) 
 	{
 		b_play = false;
-		StageType = ETicTacToe;
+		multi = true;
 		g_eGameState = S_GAME;
+		StageType = ETicTacToe2;
+		b_number = 1;
+		charOne = 49;
+		charTwo = 50;
+		charThree = 51;
+		charFour = 52;
+		charFive = 53;
+		charSix = 54;
+		charSeven = 55;
+		charEight = 56;
+		charNine = 57;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		bSomethingHappened = true;
 	}
 	/*
 	else if (MMgame = MMsnake && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
@@ -3614,6 +3748,16 @@ void minigameselect()
 	if (g_abKeyPressed[K_ESCAPE])
 	{
 		g_eGameState = S_TITLE;
+		MMgame = EMinigame1;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
+}
+WORD charColouring(char character)
+{
+	if (character == 79)
+		return 0x0C;
+	else if (character == 88)
+		return 0x0B;
+	else
+		return 0x0F;
 }

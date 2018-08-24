@@ -71,7 +71,8 @@ enum ESTAGETYPE
 	EBossBattle,
 	EMinigame1,
 	EMinigame2,
-	ETicTacToe
+	ETicTacToe,
+	ETicTacToe2
 };
 
 enum EMAINMENU
@@ -181,9 +182,10 @@ void convertToString();
 void save();
 void continueSave();
 void tictactoePlay();
+void tictactoeMulti();
 void renderTicTacToe();
 void tictactoeWin();
 void minigame();
 void minigameselect();
-void playercount();
+WORD charColouring(char character);
 #endif // _GAME_H
