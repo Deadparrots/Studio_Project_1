@@ -1146,21 +1146,6 @@ void bossbattle_moveCharacter()
 	// End Boss stuff
 
 
-	// Updating the location of the character based on the key press
-	// providing a beep sound whenver we shift the character
-	if (g_abKeyPressed[K_E])
-	{
-		if (currentWeapon < 3)
-		{
-			currentWeapon++;
-		}
-		else
-		{
-			currentWeapon = 0;
-		}
-		g_dBounceTime = g_dElapsedTime + 0.2;
-	}
-
 	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
 	{
 		if (SansFightMap[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
@@ -1192,62 +1177,6 @@ void bossbattle_moveCharacter()
 			g_sChar.m_cLocation.X++;
 			bSomethingHappened = true;
 		}
-	}
-	if (
-		(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == false) ||
-		(g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == false)
-		)
-	{
-		reload();
-		reloadsound += 2;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y)
-	{
-		g_enemy1.m_bActive = false;
-		g_enemy1.m_cLocation.X = 0;
-		g_enemy1.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y)
-	{
-		g_enemy2.m_bActive = false;
-		g_enemy2.m_cLocation.X = 0;
-		g_enemy2.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y)
-	{
-		g_enemy3.m_bActive = false;
-		g_enemy3.m_cLocation.X = 0;
-		g_enemy3.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y)
-	{
-		g_enemy4.m_bActive = false;
-		g_enemy4.m_cLocation.X = 0;
-		g_enemy4.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y)
-	{
-		g_enemy5.m_bActive = false;
-		g_enemy5.m_cLocation.X = 0;
-		g_enemy5.m_cLocation.Y = 0;
-	}
-	if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y)
-	{
-		g_enemy6.m_bActive = false;
-		g_enemy6.m_cLocation.X = 0;
-		g_enemy6.m_cLocation.Y = 0;
-	}
-	if (((g_sChar.m_cLocation.X == g_gaster1.m_cLocation.X - 1 || g_sChar.m_cLocation.X == g_gaster1.m_cLocation.X || g_sChar.m_cLocation.X == g_gaster1.m_cLocation.X + 1) && g_gaster1.m_bFire) ||
-		((g_sChar.m_cLocation.Y == g_gaster2.m_cLocation.Y - 1 || g_sChar.m_cLocation.Y == g_gaster2.m_cLocation.Y || g_sChar.m_cLocation.Y == g_gaster2.m_cLocation.Y + 1) && g_gaster2.m_bFire) ||
-		((g_sChar.m_cLocation.Y == g_gaster3.m_cLocation.Y - 1 || g_sChar.m_cLocation.Y == g_gaster3.m_cLocation.Y || g_sChar.m_cLocation.Y == g_gaster3.m_cLocation.Y + 1) && g_gaster3.m_bFire) ||
-		((g_sChar.m_cLocation.X == g_gaster4.m_cLocation.X - 1 || g_sChar.m_cLocation.X == g_gaster4.m_cLocation.X || g_sChar.m_cLocation.X == g_gaster4.m_cLocation.X + 1) && g_gaster4.m_bFire))
-	{
-		g_sChar.m_bActive = false;
-		bSomethingHappened = true;
 	}
 	if (bSomethingHappened)
 	{
@@ -1303,7 +1232,7 @@ void boss_moveCharacter()
 }
 void moveCharacter()
 {
-	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
+	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0) && currentWeapon)
 	{
 		shootfailsound = true;
 	}
@@ -2056,7 +1985,6 @@ void renderGame()
 		renderGaster2();
 		renderGaster3();
 		renderGaster4();
-		renderWeapon();
 	}
 	if (StageType == EMinigame1)
 	{
