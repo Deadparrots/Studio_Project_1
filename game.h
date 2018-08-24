@@ -183,4 +183,5 @@ void renderTicTacToe();
 void tictactoeWin();
 void minigame();
 void minigameselect();
+WORD charColouring(char character);
 #endif // _GAME_H

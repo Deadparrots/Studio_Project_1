@@ -67,7 +67,7 @@ EWEAPONSTATES g_eM2WeaponState = FireUp;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 int Lives = 3; // Number of lives the player has left (Base Value is 3)
 int currentWeapon = 0; // Current Weapon
-char number = 49;
+size_t b_number = 1;
 char charOne = 49;
 char charTwo = 50;
 char charThree = 51;
@@ -3225,83 +3225,100 @@ void continueSave()
 }
 void tictactoePlay()
 {
-	bool bSomethingHappened = false;
-	if (number == 49)
+	if (b_number == 1)
 	{
-		if (g_abKeyPressed[K_1])
-			if (charOne == '1')
-				charOne = 79;
-		if (g_abKeyPressed[K_2])
-			if (charTwo == '2')
-				charTwo = 79;
-		if (g_abKeyPressed[K_3])
-			if (charThree == '3')
-				charThree = 79;
-		if (g_abKeyPressed[K_4])
-			if (charFour == '4')
-				charFour = 79;
-		if (g_abKeyPressed[K_5])
-			if (charFive == '5')
-				charFive = 79;
-		if (g_abKeyPressed[K_6])
-			if (charSix == '6')
-				charSix = 79;
-		if (g_abKeyPressed[K_7])
-			if (charSeven == '7')
-				charSeven = 79;
-		if (g_abKeyPressed[K_8])
-			if (charEight == '8')
-				charEight = 79;
-		if (g_abKeyPressed[K_9])
-			if (charNine == '9')
-				charNine = 79;
+		if (g_abKeyPressed[K_1] && charOne == '1')
+		{
+			charOne = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_2] && charTwo == '2')
+		{
+			charTwo = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_3] && charThree == '3')
+		{
+			charThree = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_4] && charFour == '4')
+		{
+			charFour = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_5] && charFive == '5')
+		{
+			charFive = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_6] && charSix == '6')
+		{
+			charSix = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_7] && charSeven == '7')
+		{
+			charSeven = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_8] && charEight == '8')
+		{
+			charEight = 79;
+			b_number = 0;
+		}
+		else if (g_abKeyPressed[K_9] && charNine == '9')
+		{
+			charNine = 79;
+			b_number = 0;
+		}
 	}
-	else if (number == 50)
+	else if (b_number == 0)
 	{
-		if (g_abKeyPressed[K_1])
-			if (charOne == '1')
-				charOne = 88;
-		if (g_abKeyPressed[K_2])
-			if (charTwo == '2')
-				charTwo = 88;
-		if (g_abKeyPressed[K_3])
-			if (charThree == '3')
-				charThree = 88;
-		if (g_abKeyPressed[K_4])
-			if (charFour == '4')
-				charFour = 88;
-		if (g_abKeyPressed[K_5])
-			if (charFive == '5')
-				charFive = 88;
-		if (g_abKeyPressed[K_6])
-			if (charSix == '6')
-				charSix = 88;
-		if (g_abKeyPressed[K_7])
-			if (charSeven == '7')
-				charSeven = 88;
-		if (g_abKeyPressed[K_8])
-			if (charEight == '8')
-				charEight = 88;
-		if (g_abKeyPressed[K_9])
-			if (charNine == '9')
-				charNine = 88;
+		b_number = 1;
+		if (charOne == '1' && (charTwo == charThree || charFour == charSeven || charFive == charNine)) // Counter/Win priority
+			charOne = 88;
+		else if (charTwo == '2' && (charOne == charThree || charFive == charEight))
+			charTwo = 88;
+		else if (charThree == '3' && (charOne == charTwo || charSix == charNine || charFive == charSeven))
+			charThree = 88;
+		else if (charFour == '4' && (charOne == charSeven || charFive == charSix))
+			charFour = 88;
+		else if (charFive == '5' && (charFour == charSix || charTwo == charEight || charOne == charNine || charThree == charSeven))
+			charFive = 88;
+		else if (charSix == '6' && (charThree == charNine || charFour == charFive))
+			charSix = 88;
+		else if (charSeven == '7' && (charOne == charFour || charEight == charNine || charFive == charThree))
+			charSeven = 88;
+		else if (charEight == '8' && (charSeven == charNine || charTwo == charFive))
+			charEight = 88;
+		else if (charNine == '9' && (charOne == charFive || charSeven == charEight || charThree == charSix))
+			charNine = 88;
+		else if (charFive == '5') // Middle slot next priority
+			charFive = 88;
+		else if (charOne == '1') // Corner slots next priority
+			charOne = 88;
+		else if (charThree == '3')
+			charThree = 88;
+		else if (charSeven == '7')
+			charSeven = 88;
+		else if (charNine == '9')
+			charNine = 88;
+		else if (charTwo == '2') // The rest of the slots not as important
+			charTwo = 88;
+		else if (charFour == '4')
+			charFour = 88;
+		else if (charSix == '6')
+			charSix = 88;
+		else if (charEight == '8')
+			charEight = 88;
+		else
+			b_number = 2;
 	}
-	if (g_dBounceTime > g_dElapsedTime)
-		return;
-	if (g_abKeyPressed[K_1] || g_abKeyPressed[K_2] || g_abKeyPressed[K_3]
+	/*if (g_abKeyPressed[K_1] || g_abKeyPressed[K_2] || g_abKeyPressed[K_3]
 		|| g_abKeyPressed[K_4] || g_abKeyPressed[K_5] || g_abKeyPressed[K_6]
 		|| g_abKeyPressed[K_7] || g_abKeyPressed[K_8] || g_abKeyPressed[K_9])
-	{
-		if (number < 50)
-			number++;
-		else
-			number--;
-		bSomethingHappened = true;
-	}
-	if (bSomethingHappened)
-	{
-		g_dBounceTime = g_dElapsedTime + 0.125; // set the bounce time to some time in the future to prevent accidental triggers // 125ms should be enough
-	}
+			b_number = 0;*/
 }
 void renderTicTacToe()
 {
@@ -3319,25 +3336,30 @@ void renderTicTacToe()
 	COORD seven; seven.X = 33; seven.Y = 15;
 	COORD eight; eight.X = 40; eight.Y = 15;
 	COORD nine; nine.X = 47; nine.Y = 15;
-	COORD player; player.X = 12; player.Y = 21; // player number
-	g_sChar.m_cLocation.X = 0;
-	g_sChar.m_cLocation.Y = 0;
-	g_Console.writeToBuffer(one, charOne, 0x0f);
-	g_Console.writeToBuffer(two, charTwo, 0x0f);
-	g_Console.writeToBuffer(three, charThree, 0x0f);
-	g_Console.writeToBuffer(four, charFour, 0x0f);
-	g_Console.writeToBuffer(five, charFive, 0x0f);
-	g_Console.writeToBuffer(six, charSix, 0x0f);
-	g_Console.writeToBuffer(seven, charSeven, 0x0f);
-	g_Console.writeToBuffer(eight, charEight, 0x0f);
-	g_Console.writeToBuffer(nine, charNine, 0x0f);
-	g_Console.writeToBuffer(player, number, 0x0f);
+	g_Console.writeToBuffer(one, charOne, charColouring(charOne));
+	g_Console.writeToBuffer(two, charTwo, charColouring(charTwo));
+	g_Console.writeToBuffer(three, charThree, charColouring(charThree));
+	g_Console.writeToBuffer(four, charFour, charColouring(charFour));
+	g_Console.writeToBuffer(five, charFive, charColouring(charFive));
+	g_Console.writeToBuffer(six, charSix, charColouring(charSix));
+	g_Console.writeToBuffer(seven, charSeven, charColouring(charSeven));
+	g_Console.writeToBuffer(eight, charEight, charColouring(charEight));
+	g_Console.writeToBuffer(nine, charNine, charColouring(charNine));
 	tictactoeWin();
 }
 void tictactoeWin()
 {
 	COORD c; c.X = 37; c.Y = 21;
-	if (charOne == charTwo && charTwo == charThree
+	if (b_number == 2)
+	{
+		g_Console.writeToBuffer(c, "Tie", 0x0f);
+		if (g_abKeyPressed[K_SPACE])
+		{
+			g_eGameState = S_MINIGAME;
+			b_play = false;
+		}
+	}
+	else if (charOne == charTwo && charTwo == charThree
 		|| charFour == charFive && charFive == charSix
 		|| charSeven == charEight && charEight == charNine
 		|| charOne == charFour && charFour == charSeven
@@ -3346,7 +3368,10 @@ void tictactoeWin()
 		|| charOne == charFive && charFive == charNine
 		|| charThree == charFive && charFive == charSeven)
 	{
-		g_Console.writeToBuffer(c, "You Win", 0x0f);
+		if (b_number == 0)
+			g_Console.writeToBuffer(c, "You Win", 0x0f);
+		else
+			g_Console.writeToBuffer(c, "You Lose", 0x0f);
 		if (g_abKeyPressed[K_SPACE])
 		{
 			g_eGameState = S_MINIGAME;
@@ -3412,6 +3437,8 @@ void minigame()
 }
 void minigameselect()
 {
+	g_sChar.m_cLocation.X = 0;
+	g_sChar.m_cLocation.Y = 0;
 	g_bMinigame = true;
 	Lives = 5;
 	b_play = false;
@@ -3484,6 +3511,16 @@ void minigameselect()
 		b_play = false;
 		g_eGameState = S_GAME;
 		StageType = ETicTacToe;
+		b_number = 1;
+		charOne = 49;
+		charTwo = 50;
+		charThree = 51;
+		charFour = 52;
+		charFive = 53;
+		charSix = 54;
+		charSeven = 55;
+		charEight = 56;
+		charNine = 57;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
 	/*
@@ -3504,4 +3541,13 @@ void minigameselect()
 		g_eGameState = S_TITLE;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
+}
+WORD charColouring(char character)
+{
+	if (character == 79)
+		return 0x0C;
+	else if (character == 88)
+		return 0x0B;
+	else
+		return 0x0F;
 }
