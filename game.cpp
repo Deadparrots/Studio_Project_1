@@ -1446,10 +1446,12 @@ void moveCharacter()
 		if (currentWeapon < 3)
 		{
 			currentWeapon++;
+			g_shootmaxdist = Weapons[currentWeapon].Range;
 		}
 		else
 		{
 			currentWeapon = 0;
+			g_shootmaxdist = Weapons[currentWeapon].Range;
 		}
 		g_dBounceTime = g_dElapsedTime + 0.2;
 	}
