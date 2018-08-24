@@ -3474,6 +3474,14 @@ void renderTicTacToe()
 	g_Console.writeToBuffer(nine, charNine, 0x0f);
 	if (multi)
 	{
+		COORD c = g_Console.getConsoleSize();
+		c.X = 24;
+		c.Y = 18;
+		g_Console.writeToBuffer(c, "PLAYER 1", 0x0f);
+		c.X += 3;
+		c.Y += 1;
+		g_Console.writeToBuffer(c, "PLAYER 2", 0x0f);
+
 		g_Console.writeToBuffer(player, "Player", 0x0f);
 		player.X += 7;
 		std::string playerNo = to_string(b_number);
@@ -3484,32 +3492,57 @@ void renderTicTacToe()
 void tictactoeWin()
 {
 	COORD c; c.X = 37; c.Y = 21;
-	if (b_number == 2)
+	if (!multi)
 	{
-		g_Console.writeToBuffer(c, "Tie", 0x0f);
-		if (g_abKeyPressed[K_SPACE])
+		if (b_number == 2)
 		{
-			g_eGameState = S_MINIGAME;
-			b_play = false;
+			g_Console.writeToBuffer(c, "Tie", 0x0f);
+			if (g_abKeyPressed[K_SPACE])
+			{
+				g_eGameState = S_MINIGAME;
+				b_play = false;
+			}
+		}
+		else if (charOne == charTwo && charTwo == charThree
+			|| charFour == charFive && charFive == charSix
+			|| charSeven == charEight && charEight == charNine
+			|| charOne == charFour && charFour == charSeven
+			|| charTwo == charFive && charFive == charEight
+			|| charThree == charSix && charSix == charNine
+			|| charOne == charFive && charFive == charNine
+			|| charThree == charFive && charFive == charSeven)
+		{
+			if (b_number == 0)
+				g_Console.writeToBuffer(c, "You Win", 0x0f);
+			else
+				g_Console.writeToBuffer(c, "You Lose", 0x0f);
+			if (g_abKeyPressed[K_SPACE])
+			{
+				g_eGameState = S_MINIGAME;
+				b_play = false;
+			}
 		}
 	}
-	else if (charOne == charTwo && charTwo == charThree
-		|| charFour == charFive && charFive == charSix
-		|| charSeven == charEight && charEight == charNine
-		|| charOne == charFour && charFour == charSeven
-		|| charTwo == charFive && charFive == charEight
-		|| charThree == charSix && charSix == charNine
-		|| charOne == charFive && charFive == charNine
-		|| charThree == charFive && charFive == charSeven)
+	else
 	{
-		if (b_number == 0)
-			g_Console.writeToBuffer(c, "You Win", 0x0f);
-		else
-			g_Console.writeToBuffer(c, "You Lose", 0x0f);
-		if (g_abKeyPressed[K_SPACE])
+		if (charOne == charTwo && charTwo == charThree
+			|| charFour == charFive && charFive == charSix
+			|| charSeven == charEight && charEight == charNine
+			|| charOne == charFour && charFour == charSeven
+			|| charTwo == charFive && charFive == charEight
+			|| charThree == charSix && charSix == charNine
+			|| charOne == charFive && charFive == charNine
+			|| charThree == charFive && charFive == charSeven)
 		{
-			g_eGameState = S_MINIGAME;
-			b_play = false;
+			win = true;
+			if (b_number == 1)
+			{
+				g_Console.writeToBuffer(c, "Player 2 win", 0x0f);
+			}
+			if (b_number == 2)
+			{
+				g_Console.writeToBuffer(c, "Player 1 win", 0x0f);
+			}
 		}
 	}
 }
