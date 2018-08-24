@@ -288,7 +288,6 @@ void getInput(void)
 	g_abKeyPressed[K_RIGHT] = isKeyPressed(VK_RIGHT);
 	g_abKeyPressed[K_SPACE] = isKeyPressed(VK_SPACE);
 	g_abKeyPressed[K_ESCAPE] = isKeyPressed(VK_ESCAPE);
-	g_abKeyPressed[K_ENTER] = isKeyPressed(13);
 	g_abKeyPressed[K_W] = isKeyPressed(87);
 	g_abKeyPressed[K_A] = isKeyPressed(65);
 	g_abKeyPressed[K_S] = isKeyPressed(83);
@@ -1824,7 +1823,7 @@ void moveCharacter()
 }
 void processUserInput()
 {
-	if (g_abKeyPressed[K_ENTER] && StageType == EBossBattle && g_dElapsedTime < 20)
+	if (g_abKeyPressed[K_SPACE] && StageType == EBossBattle && g_dElapsedTime < 20)
 		g_dElapsedTime = 20;
 	if (Lives < 1 || g_abKeyPressed[K_ESCAPE])
 	{

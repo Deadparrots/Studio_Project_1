@@ -39,7 +39,6 @@ enum EKEYS
 	K_7,
 	K_8,
 	K_9,
-	K_ENTER,
 	K_COUNT
 };
 
