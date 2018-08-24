@@ -381,7 +381,7 @@ void splashScreenWait()
 	}
 	else if (MMSelect == MMInstructions && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
 	{
-		MMSelect = MMExit;
+		MMSelect = MMminigame;
 		bSomethingHappened = true;
 	}
 	else if (MMSelect == MMInstructions && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
@@ -396,10 +396,10 @@ void splashScreenWait()
 	}
 	else if ((MMSelect == MMStart || MMSelect == MMContinue) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
 	{
-		MMSelect = MMExit;
+		MMSelect = MMminigame;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMExit && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMminigame && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMStart;
 		bSomethingHappened = true;
@@ -3349,6 +3349,11 @@ void tictactoePlay()
 		else
 			number--;
 		bSomethingHappened = true;
+	}
+	if (g_abKeyPressed[K_ESCAPE])
+	{
+		g_eGameState = S_MINIGAME;
+		b_play = false;
 	}
 	if (bSomethingHappened)
 	{
