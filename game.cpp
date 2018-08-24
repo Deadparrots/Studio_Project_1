@@ -63,7 +63,7 @@ double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger k
 int Lives = 3; // Number of lives the player has left (Base Value is 3)
 int currentWeapon = 0; // Current Weapon
 WeaponParameters Weapons[4]; // Number of Weapons
-							 // Console object
+// Console object
 Console g_Console(80, 24, "Monster Dungeon");
 void minigame1_init()
 {
@@ -84,8 +84,8 @@ void minigame1_init()
 	g_door.m_cLocation.X = 40;
 	g_door.m_cLocation.Y = 13;
 	g_door.m_bActive = false;
-	if (Lives + int_stages / 10 <= 99)
-		Lives += int_stages / 10;
+	if (Lives + int_stages/10 <= 99)
+		Lives += int_stages/10;
 	else
 		Lives = 99;
 }
@@ -329,7 +329,7 @@ void intro()
 		init();
 	}
 }
-void splashScreenWait()
+void splashScreenWait() 
 {
 	if (!b_play)
 		ost();
@@ -483,93 +483,93 @@ void minigame1_moveCharacter()
 		break;
 	}
 	case 1:
-	{
-		if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
 		{
-			g_minigame1_beat1.m_bActive = true;
-			g_minigame1_beat1.m_cLocation.X = 77;
-			g_minigame1_beat1.m_bLeft = false;
-		}
-		else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
-		{
-			g_minigame1_beat2.m_bActive = true;
-			g_minigame1_beat2.m_cLocation.X = 77;
-			g_minigame1_beat2.m_bLeft = false;
-		}
-		else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.4)
-		{
-			g_minigame1_beat3.m_bActive = true;
-			g_minigame1_beat3.m_cLocation.X = 77;
-			g_minigame1_beat3.m_bLeft = false;
-		}
-		else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.6)
-		{
-			g_minigame1_beat4.m_bActive = true;
-			g_minigame1_beat4.m_cLocation.X = 77;
-			g_minigame1_beat4.m_bLeft = false;
-		}
-		break;
-	}
-	case 2:
-	{
-		if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
-		{
-			g_minigame1_beat1.m_bActive = true;
-			if (rand() % 2)
+			if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
 			{
-				g_minigame1_beat1.m_cLocation.X = 2;
-				g_minigame1_beat1.m_bLeft = true;
-			}
-			else
-			{
+				g_minigame1_beat1.m_bActive = true;
 				g_minigame1_beat1.m_cLocation.X = 77;
 				g_minigame1_beat1.m_bLeft = false;
 			}
-		}
-		else if (g_dElapsedTime < minigame1time + 0.35 && g_dElapsedTime >= minigame1time + 0.25)
-		{
-			g_minigame1_beat2.m_bActive = true;
-			if (rand() % 2)
+			else if (g_dElapsedTime < minigame1time + 0.3 && g_dElapsedTime >= minigame1time + 0.2)
 			{
-				g_minigame1_beat2.m_cLocation.X = 2;
-				g_minigame1_beat2.m_bLeft = true;
-			}
-			else
-			{
+				g_minigame1_beat2.m_bActive = true;
 				g_minigame1_beat2.m_cLocation.X = 77;
 				g_minigame1_beat2.m_bLeft = false;
 			}
-		}
-		else if (g_dElapsedTime < minigame1time + 0.6 && g_dElapsedTime >= minigame1time + 0.5)
-		{
-			g_minigame1_beat3.m_bActive = true;
-			if (rand() % 2)
+			else if (g_dElapsedTime < minigame1time + 0.5 && g_dElapsedTime >= minigame1time + 0.4)
 			{
-				g_minigame1_beat3.m_cLocation.X = 2;
-				g_minigame1_beat3.m_bLeft = true;
-			}
-			else
-			{
+				g_minigame1_beat3.m_bActive = true;
 				g_minigame1_beat3.m_cLocation.X = 77;
 				g_minigame1_beat3.m_bLeft = false;
 			}
-		}
-		else if (g_dElapsedTime < minigame1time + 0.85 && g_dElapsedTime >= minigame1time + 0.75)
-		{
-			g_minigame1_beat4.m_bActive = true;
-			if (rand() % 2)
+			else if (g_dElapsedTime < minigame1time + 0.7 && g_dElapsedTime >= minigame1time + 0.6)
 			{
-				g_minigame1_beat4.m_cLocation.X = 2;
-				g_minigame1_beat4.m_bLeft = true;
-			}
-			else
-			{
+				g_minigame1_beat4.m_bActive = true;
 				g_minigame1_beat4.m_cLocation.X = 77;
 				g_minigame1_beat4.m_bLeft = false;
 			}
+			break;
 		}
-		break;
-	}
+	case 2:
+		{
+			if (g_dElapsedTime < minigame1time + 0.1 && g_dElapsedTime >= minigame1time)
+			{
+				g_minigame1_beat1.m_bActive = true;
+				if (rand() % 2)
+				{
+					g_minigame1_beat1.m_cLocation.X = 2;
+					g_minigame1_beat1.m_bLeft = true;
+				}
+				else
+				{
+					g_minigame1_beat1.m_cLocation.X = 77;
+					g_minigame1_beat1.m_bLeft = false;
+				}
+			}
+			else if (g_dElapsedTime < minigame1time + 0.35 && g_dElapsedTime >= minigame1time + 0.25)
+			{
+				g_minigame1_beat2.m_bActive = true;
+				if (rand() % 2)
+				{
+					g_minigame1_beat2.m_cLocation.X = 2;
+					g_minigame1_beat2.m_bLeft = true;
+				}
+				else
+				{
+					g_minigame1_beat2.m_cLocation.X = 77;
+					g_minigame1_beat2.m_bLeft = false;
+				}
+			}
+			else if (g_dElapsedTime < minigame1time + 0.6 && g_dElapsedTime >= minigame1time + 0.5)
+			{
+				g_minigame1_beat3.m_bActive = true;
+				if (rand() % 2)
+				{
+					g_minigame1_beat3.m_cLocation.X = 2;
+					g_minigame1_beat3.m_bLeft = true;
+				}
+				else
+				{
+					g_minigame1_beat3.m_cLocation.X = 77;
+					g_minigame1_beat3.m_bLeft = false;
+				}
+			}
+			else if (g_dElapsedTime < minigame1time + 0.85 && g_dElapsedTime >= minigame1time + 0.75)
+			{
+				g_minigame1_beat4.m_bActive = true;
+				if (rand() % 2)
+				{
+					g_minigame1_beat4.m_cLocation.X = 2;
+					g_minigame1_beat4.m_bLeft = true;
+				}
+				else
+				{
+					g_minigame1_beat4.m_cLocation.X = 77;
+					g_minigame1_beat4.m_bLeft = false;
+				}
+			}
+			break;
+		}
 	}
 	// Minigame stuff end
 	if (g_abKeyPressed[K_LEFT])
@@ -774,11 +774,11 @@ void minigame2_moveCharacter()
 		}
 	}
 	g_minigame2_paddle1.m_cLocation.Y = g_sChar.m_cLocation.Y;
-	if (g_dElapsedTime < int_stages + 5 && g_eWeaponState == FireRight && g_minigame2_paddle2.m_cLocation.Y <= g_weapon.m_cLocation.Y + 1 && g_minigame2_paddle2.m_cLocation.Y >= g_weapon.m_cLocation.Y - 1 && g_weapon.m_cLocation.X >= 40)
+	if (g_dElapsedTime < int_stages + 5 && g_eWeaponState == FireRight && g_minigame2_paddle2.m_cLocation.Y <= g_weapon.m_cLocation.Y + 1  && g_minigame2_paddle2.m_cLocation.Y >= g_weapon.m_cLocation.Y - 1 && g_weapon.m_cLocation.X >= 38)
 		g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
 	if (bSomethingHappened)
 	{
-		g_dBounceTime = g_dElapsedTime + 0.03 + 0.1 / stages; // 125ms should be enough
+		g_dBounceTime = g_dElapsedTime + 0.03 + 0.1/stages; // 125ms should be enough
 	}
 }
 void bossbattle_moveCharacter()
@@ -1618,7 +1618,7 @@ void moveCharacter()
 		if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 80] == ' ')
 			g_enemy6.m_cLocation.Y--;
 		break;
-	}
+	}	
 	if (g_weapon.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == true)
 	{
 		switch (rand() % 100 / (int_stages + 1) + 5)
@@ -2219,12 +2219,12 @@ void renderGaster1() // Up
 				{
 					character = 177;
 					c.X = g_gaster1.m_cLocation.X + j;
-					c.Y = i + 1;
+					c.Y = i+1;
 					g_Console.writeToBuffer(c, character, charColor);
 				}
 			}
 		}
-
+		
 	}
 }
 void renderGaster2() // Left
@@ -2269,7 +2269,7 @@ void renderGaster2() // Left
 			character = 176;
 		c.X = g_gaster2.m_cLocation.X + 1;
 		c.Y = g_gaster2.m_cLocation.Y;
-		g_Console.writeToBuffer(c, character, charColor);
+		g_Console.writeToBuffer(c, character, charColor); 
 		if (g_gaster2.m_bFire)
 		{
 			for (int j = -1; j <= 1; j++)
@@ -2385,7 +2385,7 @@ void renderGaster4() // Up2
 			character = 176;
 		c.X = g_gaster4.m_cLocation.X;
 		c.Y = g_gaster4.m_cLocation.Y + 1;
-		g_Console.writeToBuffer(c, character, charColor);
+		g_Console.writeToBuffer(c, character, charColor); 
 		if (g_gaster4.m_bFire)
 		{
 			for (int j = -1; j <= 1; j++)
@@ -2946,8 +2946,8 @@ void generate()
 		}
 	for (size_t i = 0; i < 80 * 24; i++)
 	{
-		if (Map[i] == '`' && i > 80 && i < 23 * 80 && ((Map[i - 80] == ' ') || Map[i + 80] == ' ' || Map[i + 1] == ' ' || Map[i - 1] == ' '))
-			Map[i] = 219;
+		if (Map[i] == '`' && i > 80 && i < 23 * 80 && ((Map[i - 80] == ' ') || Map[i + 80] == ' '|| Map[i + 1] == ' ' || Map[i - 1] == ' '))
+			Map[i] = 219;	
 	}
 }
 void weapdata()
