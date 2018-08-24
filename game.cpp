@@ -59,15 +59,16 @@ bool		b_play = false;
 bool		bossSpeech = false;
 bool		ticgame = false;
 bool		g_bMinigame = false;
-int g_shootdist = 0;
-int g_shootmaxdist = 2; // Shooting distance of weapon. Can be changed.
-EGAMESTATES g_eGameState = S_INTRO;
-EWEAPONSTATES g_eWeaponState = Hold;
-EWEAPONSTATES g_eM2WeaponState = FireUp;
-double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
-int Lives = 3; // Number of lives the player has left (Base Value is 3)
-int currentWeapon = 0; // Current Weapon
-size_t b_number = 1;
+int			g_shootdist = 0;
+int			g_shootmaxdist = 2; // Shooting distance of weapon. Can be changed.
+EGAMESTATES		g_eGameState = S_INTRO;
+EWEAPONSTATES	g_eWeaponState = Hold;
+EWEAPONSTATES	g_eM2WeaponState = FireUp;
+double		g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
+int			Lives = 3; // Number of lives the player has left (Base Value is 3)
+int			currentWeapon = 0; // Current Weapon
+size_t		b_number = 1;
+size_t		introPage = 0;
 char charOne = 49;
 char charTwo = 50;
 char charThree = 51;
@@ -352,12 +353,30 @@ void intro()
 		ost();
 		b_play = true;
 	}
-	if ((g_dElapsedTime > 35) || g_abKeyPressed[K_W] || g_abKeyPressed[K_A] || g_abKeyPressed[K_S] || g_abKeyPressed[K_D] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_SPACE])
+	bool bSomethingHappened = false;
+	if (g_dBounceTime > g_dElapsedTime)
+		return;
+	if (g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_D] || g_abKeyPressed[K_S])
+	{
+		introPage++;
+		bSomethingHappened = true;
+	}
+	else if (introPage > 0 && (g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_A] || g_abKeyPressed[K_W]))
+	{
+		introPage--;
+		bSomethingHappened = true;
+	}
+	if (g_abKeyPressed[K_SPACE] || introPage > 4)
 	{
 		g_eGameState = S_TITLE;
 		StageType = EMainMenu;
 		init();
-		g_dBounceTime = g_dElapsedTime + 0.15;
+		bSomethingHappened = true;
+	}
+	if (bSomethingHappened)
+	{
+		// set the bounce time to some time in the future to prevent accidental triggers
+		g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
 	}
 }
 void splashScreenWait()
@@ -369,7 +388,7 @@ void splashScreenWait()
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	if ((MMSelect == MMStart || MMSelect == MMContinue) && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	if (MMSelect == MMStart && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMInstructions;
 		bSomethingHappened = true;
@@ -394,7 +413,7 @@ void splashScreenWait()
 		MMSelect = MMStart;
 		bSomethingHappened = true;
 	}
-	else if ((MMSelect == MMExit || MMSelect == MMminigame) && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMminigame && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMInstructions;
 		bSomethingHappened = true;
@@ -404,12 +423,12 @@ void splashScreenWait()
 		MMSelect = MMminigame;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMContinue && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMContinue && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMExit;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMExit && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	else if (MMSelect == MMExit && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMContinue;
 		bSomethingHappened = true;
@@ -1937,7 +1956,7 @@ void clearScreen()
 }
 void renderIntro()
 {
-	if (g_dElapsedTime <= 7)
+	if (introPage == 0)
 	{
 		std::vector<char>::iterator it = Scene1.begin();
 		for (short i = 0; i < 80 * 24; ++i)
@@ -1945,7 +1964,7 @@ void renderIntro()
 			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
 	}
-	if (g_dElapsedTime > 7 && g_dElapsedTime <= 14)
+	if (introPage == 1)
 	{
 		std::vector<char>::iterator it = Scene2.begin();
 		for (short i = 0; i < 80 * 24; ++i)
@@ -1953,7 +1972,7 @@ void renderIntro()
 			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
 	}
-	if (g_dElapsedTime > 14 && g_dElapsedTime <= 21)
+	if (introPage == 2)
 	{
 		std::vector<char>::iterator it = Scene3.begin();
 		for (short i = 0; i < 80 * 24; ++i)
@@ -1961,7 +1980,7 @@ void renderIntro()
 			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
 	}
-	if (g_dElapsedTime > 21 && g_dElapsedTime <= 28)
+	if (introPage == 3)
 	{
 		std::vector<char>::iterator it = Scene4.begin();
 		for (short i = 0; i < 80 * 24; ++i)
@@ -1969,7 +1988,7 @@ void renderIntro()
 			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
 	}
-	if (g_dElapsedTime > 28 && g_dElapsedTime <= 35)
+	if (introPage == 4)
 	{
 		std::vector<char>::iterator it = Scene5.begin();
 		for (short i = 0; i < 80 * 24; ++i)
@@ -1991,81 +2010,81 @@ void renderSplashScreen()  // renders the splash screen
 	{
 	case MMStart:
 		m.Y = 20;
-		m.X = 34;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Start", 0x0E);
-		m.X = 40;
+		m.X = 44;
 		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Minigames", 0x03);
-		m.X = g_Console.getConsoleSize().X / 2 + 4;
+		m.X = 46;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
 
 	case MMInstructions:
 		m.Y = 20;
-		m.X = 34;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Start", 0x03);
-		m.X = 40;
+		m.X = 44;
 		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Instructions", 0x0E);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Minigames", 0x03);
-		m.X = g_Console.getConsoleSize().X / 2 + 4;
+		m.X = 46;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
 
 	case MMExit:
 		m.Y = 20;
-		m.X = 34;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Start", 0x03);
-		m.X = 40;
+		m.X = 44;
 		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Minigames", 0x03);
-		m.X = g_Console.getConsoleSize().X / 2 + 4;
+		m.X = 46;
 		g_Console.writeToBuffer(m, "Exit", 0x0E);
 		break;
 
 	case MMContinue:
 		m.Y = 20;
-		m.X = 34;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Start", 0x03);
-		m.X = 40;
+		m.X = 44;
 		g_Console.writeToBuffer(m, "Continue", 0x0E);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Minigames", 0x03);
-		m.X = g_Console.getConsoleSize().X / 2 + 4;
+		m.X = 46;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
 
 	case MMminigame:
 		m.Y = 20;
-		m.X = 34;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Start", 0x03);
-		m.X = 40;
+		m.X = 44;
 		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
 		m.Y += 1;
-		m.X = g_Console.getConsoleSize().X / 2 - 6;
+		m.X = 30;
 		g_Console.writeToBuffer(m, "Minigames", 0x0E);
-		m.X = g_Console.getConsoleSize().X / 2 + 4;
+		m.X = 46;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
 	}
