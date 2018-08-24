@@ -55,7 +55,7 @@ size_t		StageType = EMainMenu;
 bool		b_play = false;
 bool		bossSpeech = false;
 int g_shootdist = 0;
-int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
+int g_shootmaxdist = 2; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_INTRO;
 EWEAPONSTATES g_eWeaponState = Hold;
 EWEAPONSTATES g_eM2WeaponState = FireUp;
@@ -1312,46 +1312,38 @@ void moveCharacter()
 		if (g_abKeyPressed[K_UP] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireUp;
-			if (g_abKeyPressed[K_W])
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y - 1;
-			else
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound = true;
-			Weapons[currentWeapon].Clip--;
+			if (currentWeapon)
+				Weapons[currentWeapon].Clip--;
 		}
 		if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireDown;
-			if (g_abKeyPressed[K_S])
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y + 1;
-			else
-				g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			shootsound = true;
-			Weapons[currentWeapon].Clip--;
+			if (currentWeapon)
+				Weapons[currentWeapon].Clip--;
 		}
 		if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireLeft;
-			if (g_abKeyPressed[K_A])
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X - 1;
-			else
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound = true;
-			Weapons[currentWeapon].Clip--;
+			if (currentWeapon)
+				Weapons[currentWeapon].Clip--;
 		}
 		if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireRight;
-			if (g_abKeyPressed[K_D])
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X + 1;
-			else
-				g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
 			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
 			shootsound = true;
-			Weapons[currentWeapon].Clip--;
+			if (currentWeapon)
+				Weapons[currentWeapon].Clip--;
 		}
 	}
 	if (g_eWeaponState == FireUp)
@@ -2984,7 +2976,10 @@ void weapdata()
 }
 void reload()
 {
-	Weapons[currentWeapon].Clip += Weapons[currentWeapon].ClipMax;	// Adds ammo left in clip to total
+	if (currentWeapon)
+		Weapons[currentWeapon].Clip += Weapons[currentWeapon].ClipMax;	// Adds ammo left in clip to total
+	else
+		Weapons[1].Clip += Weapons[2].ClipMax;
 }
 void ost()
 {
