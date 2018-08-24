@@ -2907,7 +2907,7 @@ void reload()
 	if (currentWeapon)
 		Weapons[currentWeapon].Clip += Weapons[currentWeapon].ClipMax;	// Adds ammo left in clip to total
 	else
-		Weapons[1].Clip += Weapons[2].ClipMax;
+		Weapons[1].Clip += Weapons[1].ClipMax;
 }
 void ost()
 {
