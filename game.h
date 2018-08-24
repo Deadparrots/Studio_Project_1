@@ -30,16 +30,8 @@ enum EKEYS
 	K_D,
 	K_C,
 	K_E,
-	K_1,
-	K_2,
-	K_3,
-	K_4,
-	K_5,
-	K_6,
-	K_7,
-	K_8,
-	K_9,
-	K_COUNT
+	K_COUNT,
+	K_N
 };
 
 // Enumeration for the different screen states
@@ -50,9 +42,7 @@ enum EGAMESTATES
 	S_GAME,
 	S_GAMEOVER,
 	S_INSTRUCTIONS,
-	S_COUNT,
-	S_CONTINUE,
-	S_MINIGAME
+	S_COUNT
 };
 enum EWEAPONSTATES
 {
@@ -69,25 +59,15 @@ enum ESTAGETYPE
 	EStage,
 	EBoss,
 	EBossBattle,
-	EMinigame1,
-	EMinigame2,
-	ETicTacToe
+	EMiniGameSnake
 };
 
 enum EMAINMENU
 {
 	MMStart,
 	MMInstructions,
-	MMExit,
-	MMContinue,
-	MMminigame
-};
-enum EMINIGAME
-{
-	MMrhythm,
-	MMpong,
-	MMtictactoe,
-	MMsnake
+	MMExit
+
 };
 
 // struct for the game character
@@ -96,14 +76,6 @@ struct SGameChar
 	COORD m_cLocation;
 	bool  m_bActive;
 };
-
-struct SMinigame1
-{
-	COORD m_cLocation;
-	bool  m_bActive;
-	bool  m_bLeft;
-};
-
 struct SBossGaster
 {
 	COORD m_cLocation;
@@ -122,9 +94,15 @@ struct WeaponParameters
 	int Range; // Range
 };
 
+class Projectile
+{
+public:
+	COORD p_Location; // Coordinates for the location of the bullet
+	int Direction; // Direction of bullet (0^,1>,2<,3v)
+	int Distance; // Range
+};
+
 void init(void);      // initialize your variables, allocate memory, etc
-void minigame1_init();
-void minigame2_init();
 void boss_init();
 void boss_battle_init();
 void getInput(void);      // get input from player
@@ -134,8 +112,6 @@ void shutdown(void);      // do clean up, free memory
 void intro();
 void splashScreenWait();    // waits for time to pass in splash screen
 void gameplay();            // gameplay logic
-void minigame1_moveCharacter();
-void minigame2_moveCharacter();
 void moveCharacter();       // moves the character, collision detection, physics, etc
 void boss_moveCharacter();
 void bossbattle_moveCharacter();
@@ -157,12 +133,6 @@ void renderEnemy3();
 void renderEnemy4();
 void renderEnemy5();
 void renderEnemy6();
-void renderbeat1();
-void renderbeat2();
-void renderbeat3();
-void renderbeat4();
-void renderpaddle1();
-void renderpaddle2();
 void renderDoor();
 void renderWeapon();
 void renderBossSpeech();
@@ -176,12 +146,8 @@ void ost();
 void gameOver();
 void instructions();
 void convertToString();
-void save();
-void continueSave();
-void tictactoePlay();
-void renderTicTacToe();
-void tictactoeWin();
-void minigame();
-void minigameselect();
-WORD charColouring(char character);
+void renderSnake();
+void renderApple();
+void snakeInput();
+void snakeMovement();
 #endif // _GAME_H
