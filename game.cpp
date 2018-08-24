@@ -353,11 +353,12 @@ void intro()
 		ost();
 		b_play = true;
 	}
-	if ((g_dElapsedTime > 35) || g_abKeyPressed[K_W] || g_abKeyPressed[K_A] || g_abKeyPressed[K_S] || g_abKeyPressed[K_D] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_RIGHT])
+	if ((g_dElapsedTime > 35) || g_abKeyPressed[K_W] || g_abKeyPressed[K_A] || g_abKeyPressed[K_S] || g_abKeyPressed[K_D] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_SPACE])
 	{
 		g_eGameState = S_TITLE;
 		StageType = EMainMenu;
 		init();
+		g_dBounceTime = g_dElapsedTime + 0.15;
 	}
 }
 void splashScreenWait()
@@ -3336,7 +3337,7 @@ void renderTicTacToe()
 }
 void tictactoeWin()
 {
-	COORD c; c.X = 37; c.Y = 18;
+	COORD c; c.X = 37; c.Y = 21;
 	if (charOne == charTwo && charTwo == charThree
 		|| charFour == charFive && charFive == charSix
 		|| charSeven == charEight && charEight == charNine
