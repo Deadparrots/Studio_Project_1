@@ -51,12 +51,14 @@ bool		shootsound = false;
 size_t		reloadsound = 0;
 bool		shootfailsound = false;
 int			MMSelect = MMStart;
+int         MMgame = MMrhythm;
 int			int_stages = 1;
 double		stages = 0.000 + int_stages;
 size_t		StageType = EMainMenu;
 bool		b_play = false;
 bool		bossSpeech = false;
 bool        ticgame = false;
+bool        g_bMinigame = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
 EGAMESTATES g_eGameState = S_INTRO;
@@ -496,6 +498,10 @@ void minigame1_moveCharacter()
 	}
 	else if (g_dElapsedTime >= int_stages + 3)
 	{
+		if (g_bMinigame)
+		{
+			g_eGameState = S_MINIGAME;
+		}
 		g_door.m_bActive = true;
 		g_minigame1_beat1.m_bActive = false;
 		g_minigame1_beat2.m_bActive = false;
@@ -793,6 +799,10 @@ void minigame2_moveCharacter()
 	}
 	if (g_weapon.m_cLocation.X >= 78)
 	{
+		if (g_bMinigame)
+		{
+			g_eGameState = S_MINIGAME;
+		}
 		g_weapon.m_cLocation.X = 78;
 		g_door.m_bActive = true;
 		g_door.m_cLocation = g_sChar.m_cLocation;
@@ -2134,7 +2144,6 @@ void renderGame()
 		renderEnemy5();
 		renderEnemy6();
 		renderWeapon();
-		renderUI();
 	}
 	if (StageType == EBossBattle)
 	{
@@ -2144,7 +2153,6 @@ void renderGame()
 		renderGaster3();
 		renderGaster4();
 		renderWeapon();
-		renderUI();
 	}
 	if (StageType == EMinigame1)
 	{
@@ -2153,7 +2161,6 @@ void renderGame()
 		renderbeat3();
 		renderbeat4();
 		renderWeapon();
-		renderUI();
 	}
 	if (StageType == EMinigame2)
 	{
@@ -2164,6 +2171,7 @@ void renderGame()
 	if (StageType == ETicTacToe)
 		renderTicTacToe();
 	renderCharacter();  // renders the character into the buffer
+	renderUI();
 }
 void renderMap()
 {
@@ -2639,7 +2647,7 @@ void renderDoor()
 	WORD charColor = 0x00;
 	if (g_door.m_bActive == true)
 		charColor = 0x0B;
-	g_Console.writeToBuffer(g_door.m_cLocation, (char)'D', charColor);
+	g_Console.writeToBuffer(g_door.m_cLocation, (char)219, charColor);
 }
 void renderWeapon()
 {
@@ -3361,16 +3369,18 @@ void renderTicTacToe()
 	{
 		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 	}
-	COORD one; one.X = 33; one.Y = 7;
-	COORD two; two.X = 40; two.Y = 7;
-	COORD three; three.X = 47; three.Y = 7;
-	COORD four; four.X = 33; four.Y = 10;
-	COORD five; five.X = 40; five.Y = 10;
-	COORD six; six.X = 47; six.Y = 10;
-	COORD seven; seven.X = 33; seven.Y = 13;
-	COORD eight; eight.X = 40; eight.Y = 13;
-	COORD nine; nine.X = 47; nine.Y = 13;
-	COORD player; player.X = 12; player.Y = 20; // player number
+	COORD one; one.X = 33; one.Y = 9;
+	COORD two; two.X = 40; two.Y = 9;
+	COORD three; three.X = 47; three.Y = 9;
+	COORD four; four.X = 33; four.Y = 12;
+	COORD five; five.X = 40; five.Y = 12;
+	COORD six; six.X = 47; six.Y = 12;
+	COORD seven; seven.X = 33; seven.Y = 15;
+	COORD eight; eight.X = 40; eight.Y = 15;
+	COORD nine; nine.X = 47; nine.Y = 15;
+	COORD player; player.X = 12; player.Y = 21; // player number
+	g_sChar.m_cLocation.X = 0;
+	g_sChar.m_cLocation.Y = 0;
 	g_Console.writeToBuffer(one, charOne, 0x0f);
 	g_Console.writeToBuffer(two, charTwo, 0x0f);
 	g_Console.writeToBuffer(three, charThree, 0x0f);
@@ -3385,8 +3395,8 @@ void renderTicTacToe()
 }
 void tictactoeWin()
 {
-	COORD c; c.X = 35; c.Y = 20;
-	if (charOne == charTwo && charTwo == charThree
+	COORD c; c.X = 37; c.Y = 18;
+	if (   charOne == charTwo && charTwo == charThree
 		|| charFour == charFive && charFive == charSix
 		|| charSeven == charEight && charEight == charNine
 		|| charOne == charFour && charFour == charSeven
@@ -3398,8 +3408,10 @@ void tictactoeWin()
 		g_Console.writeToBuffer(c, "You Win", 0x0f);
 		if (g_abKeyPressed[K_SPACE])
 		{
-			StageType = EStage;
+			init();
+			g_eGameState = S_MINIGAME;
 			b_play = false;
+			ticgame = false;
 		}
 	}
 }
@@ -3411,7 +3423,7 @@ void minigame()
 		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 	}
 	COORD m = g_Console.getConsoleSize();
-	switch (MMSelect)
+	switch (MMgame)
 	{
 	case MMrhythm:
 		m.Y = 6;
@@ -3461,7 +3473,6 @@ void minigame()
 		g_Console.writeToBuffer(m, "4. Snake", 0x0E);
 		break;
 	}
-	MMSelect = MMrhythm;
 }
 void minigameselect()
 {
@@ -3470,58 +3481,82 @@ void minigameselect()
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	if (MMSelect == MMrhythm && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	if (MMgame == MMrhythm && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
 	{
-		MMSelect = MMpong;
+		MMgame = MMpong;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMpong && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	else if (MMgame == MMpong && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
 	{
-		MMSelect = MMtictactoe;
+		MMgame = MMtictactoe;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMtictactoe && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	else if (MMgame == MMtictactoe && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
 	{
-		MMSelect = MMsnake;
+		MMgame = MMsnake;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMsnake && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	else if (MMgame == MMsnake && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
 	{
-		MMSelect = MMrhythm;
+		MMgame = MMrhythm;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMrhythm && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
+	else if (MMgame == MMrhythm && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
 	{
-		MMSelect = MMsnake;
+		MMgame = MMsnake;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMpong && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
+	else if (MMgame == MMpong && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
 	{
-		MMSelect = MMrhythm;
+		MMgame = MMrhythm;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMtictactoe && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
+	else if (MMgame == MMtictactoe && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
 	{
-		MMSelect = MMpong;
+		MMgame = MMpong;
 		bSomethingHappened = true;
 	}
-	else if (MMSelect == MMsnake && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
+	else if (MMgame == MMsnake && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
 	{
-		MMSelect = MMtictactoe;
+		MMgame = MMtictactoe;
 		bSomethingHappened = true;
 	}
-	if (MMSelect == MMrhythm && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	if (MMgame == MMrhythm && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
 	{
+		b_play = false;
+		g_bMinigame = true;
 		StageType = EMinigame1;
-		Beep(1000, 500);
+		g_eGameState = S_GAME;
+		minigame1_init();
+		stages = 50;
+		int_stages = 50;
+	}
+	else if (MMgame == MMpong && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	{
+		b_play = false;
+		g_bMinigame = true;
+		StageType = EMinigame2;
+		g_eGameState = S_GAME;
+		minigame2_init();
+		stages = 50;
+		int_stages = 50;
+	}
+	else if (MMgame == MMtictactoe && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	{
+		b_play = false;
+		g_eGameState = S_GAME;
+		StageType = ETicTacToe;
+	}
+	else if (MMgame = MMsnake && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	{
+		b_play = false;
+		g_eGameState = S_GAME;
 	}
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
 		g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
 	}
-	if (g_abKeyPressed[K_M])
-		StageType = ETicTacToe;
 	if (g_abKeyPressed[K_ESCAPE])
 		g_eGameState = S_TITLE;
 }
