@@ -447,8 +447,8 @@ void splashScreenWait()
 		b_play = false;
 		Weapons[0].Clip = Weapons[0].ClipMax;
 		int_stages = 1;
-		g_eGameState = S_GAME;
 		save();
+		g_eGameState = S_CONTINUE;
 	}
 	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMContinue && g_eGameState == S_TITLE)
 	{
@@ -459,9 +459,9 @@ void splashScreenWait()
 	}
 	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMminigame && g_eGameState == S_TITLE)
 	{
-		g_eGameState = S_MINIGAME;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
+		g_eGameState = S_MINIGAME;
 	}
 	if (bSomethingHappened)
 	{
@@ -1831,6 +1831,8 @@ void processUserInput()
 		{
 			g_eGameState = S_MINIGAME;
 			g_dBounceTime = g_dElapsedTime + 0.125;
+			PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+			b_play = false;
 		}
 		else
 		{
@@ -2106,7 +2108,9 @@ void renderGame()
 	}
 	if (StageType == ETicTacToe)
 		renderTicTacToe();
-	renderCharacter();  // renders the character into the buffer
+	else
+		renderCharacter();  // renders the character into the buffer
+	if (!g_bMinigame)
 	renderUI();
 }
 void renderMap()
@@ -3225,7 +3229,49 @@ void continueSave()
 }
 void tictactoePlay()
 {
-	if (b_number == 1)
+	if (b_number == 0)
+	{
+		b_number = 1;
+		if (charOne == '1' && (charTwo == charThree || charFour == charSeven || charFive == charNine)) // Counter/Win priority
+			charOne = 88;
+		else if (charTwo == '2' && (charOne == charThree || charFive == charEight))
+			charTwo = 88;
+		else if (charThree == '3' && (charOne == charTwo || charSix == charNine || charFive == charSeven))
+			charThree = 88;
+		else if (charFour == '4' && (charOne == charSeven || charFive == charSix))
+			charFour = 88;
+		else if (charFive == '5' && (charFour == charSix || charTwo == charEight || charOne == charNine || charThree == charSeven))
+			charFive = 88;
+		else if (charSix == '6' && (charThree == charNine || charFour == charFive))
+			charSix = 88;
+		else if (charSeven == '7' && (charOne == charFour || charEight == charNine || charFive == charThree))
+			charSeven = 88;
+		else if (charEight == '8' && (charSeven == charNine || charTwo == charFive))
+			charEight = 88;
+		else if (charNine == '9' && (charOne == charFive || charSeven == charEight || charThree == charSix))
+			charNine = 88;
+		else if (charFive == '5') // Middle slot next priority
+			charFive = 88;
+		else if (charOne == '1') // Corner slots next priority
+			charOne = 88;
+		else if (charThree == '3')
+			charThree = 88;
+		else if (charSeven == '7')
+			charSeven = 88;
+		else if (charNine == '9')
+			charNine = 88;
+		else if (charTwo == '2') // The rest of the slots not as important
+			charTwo = 88;
+		else if (charFour == '4')
+			charFour = 88;
+		else if (charSix == '6')
+			charSix = 88;
+		else if (charEight == '8')
+			charEight = 88;
+		else
+			b_number = 2;
+	}
+	else if (b_number == 1)
 	{
 		if (g_abKeyPressed[K_1] && charOne == '1')
 		{
@@ -3273,52 +3319,6 @@ void tictactoePlay()
 			b_number = 0;
 		}
 	}
-	else if (b_number == 0)
-	{
-		b_number = 1;
-		if (charOne == '1' && (charTwo == charThree || charFour == charSeven || charFive == charNine)) // Counter/Win priority
-			charOne = 88;
-		else if (charTwo == '2' && (charOne == charThree || charFive == charEight))
-			charTwo = 88;
-		else if (charThree == '3' && (charOne == charTwo || charSix == charNine || charFive == charSeven))
-			charThree = 88;
-		else if (charFour == '4' && (charOne == charSeven || charFive == charSix))
-			charFour = 88;
-		else if (charFive == '5' && (charFour == charSix || charTwo == charEight || charOne == charNine || charThree == charSeven))
-			charFive = 88;
-		else if (charSix == '6' && (charThree == charNine || charFour == charFive))
-			charSix = 88;
-		else if (charSeven == '7' && (charOne == charFour || charEight == charNine || charFive == charThree))
-			charSeven = 88;
-		else if (charEight == '8' && (charSeven == charNine || charTwo == charFive))
-			charEight = 88;
-		else if (charNine == '9' && (charOne == charFive || charSeven == charEight || charThree == charSix))
-			charNine = 88;
-		else if (charFive == '5') // Middle slot next priority
-			charFive = 88;
-		else if (charOne == '1') // Corner slots next priority
-			charOne = 88;
-		else if (charThree == '3')
-			charThree = 88;
-		else if (charSeven == '7')
-			charSeven = 88;
-		else if (charNine == '9')
-			charNine = 88;
-		else if (charTwo == '2') // The rest of the slots not as important
-			charTwo = 88;
-		else if (charFour == '4')
-			charFour = 88;
-		else if (charSix == '6')
-			charSix = 88;
-		else if (charEight == '8')
-			charEight = 88;
-		else
-			b_number = 2;
-	}
-	/*if (g_abKeyPressed[K_1] || g_abKeyPressed[K_2] || g_abKeyPressed[K_3]
-		|| g_abKeyPressed[K_4] || g_abKeyPressed[K_5] || g_abKeyPressed[K_6]
-		|| g_abKeyPressed[K_7] || g_abKeyPressed[K_8] || g_abKeyPressed[K_9])
-			b_number = 0;*/
 }
 void renderTicTacToe()
 {
@@ -3353,11 +3353,7 @@ void tictactoeWin()
 	if (b_number == 2)
 	{
 		g_Console.writeToBuffer(c, "Tie", 0x0f);
-		if (g_abKeyPressed[K_SPACE])
-		{
-			g_eGameState = S_MINIGAME;
-			b_play = false;
-		}
+		
 	}
 	else if (charOne == charTwo && charTwo == charThree
 		|| charFour == charFive && charFive == charSix
@@ -3368,15 +3364,29 @@ void tictactoeWin()
 		|| charOne == charFive && charFive == charNine
 		|| charThree == charFive && charFive == charSeven)
 	{
-		if (b_number == 0)
-			g_Console.writeToBuffer(c, "You Win", 0x0f);
-		else
-			g_Console.writeToBuffer(c, "You Lose", 0x0f);
-		if (g_abKeyPressed[K_SPACE])
+		if (b_number == 0 || b_number == 3)
 		{
-			g_eGameState = S_MINIGAME;
-			b_play = false;
+			g_Console.writeToBuffer(c, "You Win", 0x0f);
+			b_number = 3;
 		}
+		else if (b_number == 1 || b_number == 4)
+		{
+			g_Console.writeToBuffer(c, "You Lose", 0x0f);
+			b_number = 4;
+		}
+	}
+	if (g_abKeyPressed[K_SPACE])
+	{
+		b_number = 1;
+		charOne = 49;
+		charTwo = 50;
+		charThree = 51;
+		charFour = 52;
+		charFive = 53;
+		charSix = 54;
+		charSeven = 55;
+		charEight = 56;
+		charNine = 57;
 	}
 }
 void minigame()
@@ -3437,8 +3447,6 @@ void minigame()
 }
 void minigameselect()
 {
-	g_sChar.m_cLocation.X = 0;
-	g_sChar.m_cLocation.Y = 0;
 	g_bMinigame = true;
 	Lives = 5;
 	b_play = false;
@@ -3539,7 +3547,9 @@ void minigameselect()
 	if (g_abKeyPressed[K_ESCAPE])
 	{
 		g_eGameState = S_TITLE;
+		StageType = EMainMenu;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		b_play = false;
 	}
 }
 WORD charColouring(char character)
