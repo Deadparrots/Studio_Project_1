@@ -57,7 +57,6 @@ double		stages = 0.000 + int_stages;
 size_t		StageType = EMainMenu;
 bool		b_play = false;
 bool		bossSpeech = false;
-bool        ticgame = false;
 bool        g_bMinigame = false;
 int g_shootdist = 0;
 int g_shootmaxdist = 10; // Shooting distance of weapon. Can be changed.
@@ -1984,12 +1983,6 @@ void processUserInput()
 				Lives++;
 		}
 	}
-	if (g_abKeyPressed[K_M] && !ticgame)
-	{
-		b_play = false;
-		StageType = ETicTacToe;
-		ticgame = true;
-	}
 }
 void clearScreen()
 {
@@ -3408,10 +3401,8 @@ void tictactoeWin()
 		g_Console.writeToBuffer(c, "You Win", 0x0f);
 		if (g_abKeyPressed[K_SPACE])
 		{
-			init();
 			g_eGameState = S_MINIGAME;
 			b_play = false;
-			ticgame = false;
 		}
 	}
 }
@@ -3546,12 +3537,12 @@ void minigameselect()
 		b_play = false;
 		g_eGameState = S_GAME;
 		StageType = ETicTacToe;
-	}
+	}/*
 	else if (MMgame = MMsnake && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
 	{
 		b_play = false;
 		g_eGameState = S_GAME;
-	}
+	}*/
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
