@@ -2829,7 +2829,10 @@ void instructions()
 		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 	}
 	if (g_abKeyPressed[K_ESCAPE])
+	{
 		g_eGameState = S_TITLE;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+	}
 }
 void sound()
 {
@@ -3461,6 +3464,7 @@ void minigameselect()
 		minigame1_init();
 		stages = 50;
 		int_stages = 50;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
 	else if (MMgame == MMpong && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
 	{
@@ -3470,23 +3474,31 @@ void minigameselect()
 		minigame2_init();
 		stages = 50;
 		int_stages = 50;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
 	else if (MMgame == MMtictactoe && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
 	{
 		b_play = false;
 		g_eGameState = S_GAME;
 		StageType = ETicTacToe;
-	}/*
-	 else if (MMgame = MMsnake && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
-	 {
-	 b_play = false;
-	 g_eGameState = S_GAME;
-	 }*/
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+	}
+	/*
+	else if (MMgame = MMsnake && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	{
+		b_play = false;
+		g_eGameState = S_GAME;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+	}
+	*/
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
 		g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
 	}
 	if (g_abKeyPressed[K_ESCAPE])
+	{
 		g_eGameState = S_TITLE;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+	}
 }
