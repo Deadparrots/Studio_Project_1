@@ -6,5 +6,5 @@ Crossbow
 0
 Rifle
 0
-5
+3
 1
