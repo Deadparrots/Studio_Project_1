@@ -39,7 +39,8 @@ enum EKEYS
 	K_7,
 	K_8,
 	K_9,
-	K_COUNT
+	K_COUNT,
+	K_N
 };
 
 // Enumeration for the different screen states
@@ -71,7 +72,8 @@ enum ESTAGETYPE
 	EBossBattle,
 	EMinigame1,
 	EMinigame2,
-	ETicTacToe
+	ETicTacToe,
+	EMiniGameSnake
 };
 
 enum EMAINMENU
@@ -120,6 +122,14 @@ struct WeaponParameters
 	int Reload; // Reload Speed
 	int ProjectileSpeed; // Projectile Speed
 	int Range; // Range
+};
+
+class Projectile
+{
+public:
+	COORD p_Location; // Coordinates for the location of the bullet
+	int Direction; // Direction of bullet (0^,1>,2<,3v)
+	int Distance; // Range
 };
 
 void init(void);      // initialize your variables, allocate memory, etc
@@ -184,4 +194,8 @@ void tictactoeWin();
 void minigame();
 void minigameselect();
 WORD charColouring(char character);
+void renderSnake();
+void renderApple();
+void snakeInput();
+void snakeMovement();
 #endif // _GAME_H
