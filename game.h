@@ -125,15 +125,6 @@ struct WeaponParameters
 	int ProjectileSpeed; // Projectile Speed
 	int Range; // Range
 };
-
-class Projectile
-{
-public:
-	COORD p_Location; // Coordinates for the location of the bullet
-	int Direction; // Direction of bullet (0^,1>,2<,3v)
-	int Distance; // Range
-};
-
 void init(void);      // initialize your variables, allocate memory, etc
 void minigame1_init();
 void minigame2_init();
@@ -201,4 +192,6 @@ void renderSnake();
 void renderApple();
 void snakeInput();
 void snakeMovement();
+void highscoreSave();
+void highscoreLoad();
 #endif // _GAME_H
