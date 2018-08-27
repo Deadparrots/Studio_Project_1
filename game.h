@@ -39,8 +39,7 @@ enum EKEYS
 	K_7,
 	K_8,
 	K_9,
-	K_COUNT,
-	K_N
+	K_COUNT
 };
 
 // Enumeration for the different screen states
@@ -73,6 +72,7 @@ enum ESTAGETYPE
 	EMinigame1,
 	EMinigame2,
 	ETicTacToe,
+	ETicTacToe2,
 	EMiniGameSnake
 };
 
@@ -89,7 +89,9 @@ enum EMINIGAME
 	MMrhythm,
 	MMpong,
 	MMtictactoe,
-	MMsnake
+	MMsnake,
+	MM1P,
+	MM2P,
 };
 
 // struct for the game character
@@ -191,6 +193,7 @@ void continueSave();
 void tictactoePlay();
 void renderTicTacToe();
 void tictactoeWin();
+void tictactoeMulti();
 void minigame();
 void minigameselect();
 WORD charColouring(char character);
