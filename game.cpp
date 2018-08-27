@@ -73,15 +73,15 @@ EWEAPONSTATES	g_eWeaponState = Hold;
 EWEAPONSTATES	g_eM2WeaponState = FireUp;
 size_t		b_number = 1;
 size_t		introPage = 0;
-char charOne = 49;
-char charTwo = 50;
-char charThree = 51;
-char charFour = 52;
-char charFive = 53;
-char charSix = 54;
-char charSeven = 55;
-char charEight = 56;
-char charNine = 57;
+char        charOne = 49;
+char        charTwo = 50;
+char        charThree = 51;
+char        charFour = 52;
+char        charFive = 53;
+char        charSix = 54;
+char        charSeven = 55;
+char        charEight = 56;
+char        charNine = 57;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 int		Lives = 3; // Number of lives the player has left (Base Value is 3)
 int		currentWeapon = 0; // Current Weapon
@@ -94,7 +94,7 @@ bool AppleCollected = true;
 // Snake Mini Stuff
 
 double rhytime_t = 0;
-double pong_t = 0;
+double pong_t = 0.0000,pong_t2 = 0.0000,pong_t3 = 0.0000;
 int snake_length = 0;
 
 // Console object
@@ -411,6 +411,8 @@ void render()
 		break;
 	case S_MINIGAME: minigame();
 		break;
+	case S_HIGHSCORE: highscoreLoad();
+		break;
 	case S_CONTINUE: continueSave();
 		break;
 	}
@@ -597,10 +599,10 @@ void minigame1_moveCharacter()
 	}	
 	else if (g_dElapsedTime < int_stages && g_dElapsedTime >= 4.9 && g_dElapsedTime >= minigame1time + 1)	
 	{	
-		minigame1time++;	
-		minigame1random = 2;	
-	}	
-	else if (g_dElapsedTime >= int_stages + 3)	
+		minigame1time++;
+		minigame1random = 2;
+	}
+	else if (g_dElapsedTime >= int_stages + 3)
 	{	
 		if (g_bMinigame)	
 			g_eGameState = S_MINIGAME;	
@@ -959,12 +961,13 @@ void minigame2_moveCharacter()
 	}	
 	g_minigame2_paddle1.m_cLocation.Y = g_sChar.m_cLocation.Y;
 
-	if (g_bforscore && g_eWeaponState == FireRight && g_minigame2_paddle2.m_cLocation.Y <= g_weapon.m_cLocation.Y + 1 && g_minigame2_paddle2.m_cLocation.Y >= g_weapon.m_cLocation.Y - 1 && g_weapon.m_cLocation.X >= 38) // unlimited
+	if (g_bforscore) // unlimited gameplay
 	{
-		g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
-		if (Lives < 2)
+		if(g_eWeaponState == FireRight && g_minigame2_paddle2.m_cLocation.Y <= g_weapon.m_cLocation.Y + 1 && g_minigame2_paddle2.m_cLocation.Y >= g_weapon.m_cLocation.Y - 1 && g_weapon.m_cLocation.X >= 38)
+			g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
+		if ((Lives == 0 || g_abKeyPressed[K_1]) && StageType == EMinigame2)
 		{
-			pong_t = g_dElapsedTime;
+			highscoreLoad();
 			highscoreSave();
 		}
 	}
@@ -2523,6 +2526,10 @@ void processUserInput()
 			g_eGameState = S_GAMEOVER;
 		}
 	}
+	if (g_abKeyPressed[K_9])
+	{
+		g_eGameState = S_HIGHSCORE;
+	}
 	if (g_abKeyPressed[K_C])
 	{
 		g_enemy1.m_bActive = false;
@@ -2632,8 +2639,11 @@ void processUserInput()
 				StageType = EBoss;
 			else if (int_stages % 10 == 0)	
 				StageType = EMinigame1;	
-			else if (int_stages % 5 == 0)	
+			else if (int_stages % 5 == 0)
+			{
 				StageType = EMinigame2;
+				g_bforscore = false;
+			}
 			else
 			{
 				if (StageType == EBossBattle || StageType == EMinigame1 || StageType == EMinigame2)
@@ -2714,7 +2724,6 @@ void renderSplashScreen()  // renders the splash screen
 	{
 		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 	}
-
 	COORD m = g_Console.getConsoleSize();
 	switch (MMSelect)
 	{
@@ -3962,7 +3971,19 @@ void convertToString()
 			SnakeMap.push_back(buffer[0]);
 		}
 	}
-	myfile13.close(); 
+	myfile13.close();
+	std::fstream score("map/ladder.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile11.seekg(i);
+		char * buffer = new char[i];
+		score.read(buffer, 1);
+		if (buffer[0] != '\n')
+		{
+			Highscore.push_back(buffer[0]);
+		}
+	}
+	score.close();
 }					
 void save()
 {
@@ -3988,6 +4009,7 @@ void continueSave()
 	}
 	stats >> Lives;
 	stats >> int_stages;
+	stats.close();
 	stages = 0.000 + int_stages;
 	if (int_stages == 50)
 		StageType = EBoss;
@@ -4014,12 +4036,55 @@ void continueSave()
 }
 void highscoreSave()
 {
-	std::ofstream score("map/highscore.txt");
+	std::fstream score("map/highscore.txt");
+
+	if (g_dElapsedTime > pong_t)
+	{
+		pong_t3 = pong_t2;
+		pong_t2 = pong_t;
+		pong_t = g_dElapsedTime;
+	}
+	else if (g_dElapsedTime > pong_t2 && g_dElapsedTime < pong_t)
+	{
+		pong_t3 = pong_t2;
+		pong_t2 = g_dElapsedTime;
+	}
+	else if (g_dElapsedTime > pong_t3 && g_dElapsedTime < pong_t2)
+		pong_t3 = g_dElapsedTime;
+
 	score << pong_t << std::endl;
+	score << pong_t2 << std::endl;
+	score << pong_t3 << std::endl;
 	score.close();
 }
 void highscoreLoad()
 {
+	std::vector<char>::iterator it = Highscore.begin();
+	for (short i = 0; i < 80 * 24; ++i)
+	{
+		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
+	}
+	if (g_abKeyPressed[K_ESCAPE])
+	{
+		g_eGameState = S_TITLE;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+	}
+	std::ifstream score("map/highscore.txt");
+	score >> pong_t;
+	score >> pong_t2;
+	score >> pong_t3;
+	std::string first = to_string(pong_t);
+	std::string second = to_string(pong_t2);
+	std::string third = to_string(pong_t3);
+	COORD c = g_Console.getConsoleSize();
+	c.X = 37;
+	c.Y = 6;
+	g_Console.writeToBuffer(c, first, 0x0f);
+	c.Y += 1;
+	g_Console.writeToBuffer(c, second, 0x0f);
+	c.Y += 1;
+	g_Console.writeToBuffer(c, third, 0x0f);
+	score.close();
 
 }
 void tictactoePlay()
@@ -4543,7 +4608,7 @@ void minigameselect()
 		StageType = EMinigame2;
 		g_eGameState = S_GAME;
 		minigame2_init();
-	    Lives = 3;
+	    Lives = 5;
 		stages = 50;
 		int_stages = 50;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
