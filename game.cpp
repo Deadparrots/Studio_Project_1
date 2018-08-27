@@ -69,9 +69,7 @@ int		g_shootmaxdist = 2; // Shooting distance of weapon. Can be changed.
 EGAMESTATES	g_eGameState = S_INTRO;
 EWEAPONSTATES	g_eWeaponState = Hold;
 EWEAPONSTATES	g_eM2WeaponState = FireUp;
-double		g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
-int		Lives = 3; // Number of lives the player has left (Base Value is 3)
-int		currentWeapon = 0; // Current Weapon
+
 size_t		b_number = 1;
 size_t		introPage = 0;
 char charOne = 49;
@@ -83,11 +81,9 @@ char charSix = 54;
 char charSeven = 55;
 char charEight = 56;
 char charNine = 57;
-EGAMESTATES g_eGameState = S_INTRO;
-EWEAPONSTATES g_eWeaponState = Hold;
 double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
-int Lives = 3; // Number of lives the player has left (Base Value is 3)
-int currentWeapon = 0; // Current Weapon
+int		Lives = 3; // Number of lives the player has left (Base Value is 3)
+int		currentWeapon = 0; // Current Weapon
 WeaponParameters Weapons[4]; // Number of Weapons
 
 // Snake Mini Stuff
@@ -144,20 +140,18 @@ void minigame2_init()
 	g_sChar.m_cLocation.X = 10;
 	g_sChar.m_cLocation.Y = 13;
 	g_eWeaponState = FireLeft;
-	g_weapon.m_cLocation.X = 69;
-	g_weapon.m_cLocation.Y = 13;
+	Bullet.p_Location.X = 69;
+	Bullet.p_Location.Y = 13;
 	g_minigame2_paddle1.m_bActive = true;
 	g_minigame2_paddle2.m_bActive = true;
 	g_minigame2_paddle1.m_cLocation.X = g_sChar.m_cLocation.X;
 	g_minigame2_paddle1.m_cLocation.Y = g_sChar.m_cLocation.Y;
 	g_minigame2_paddle2.m_cLocation.X = 70;
-	g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
-	g_weapon.m_bActive = true;
+	g_minigame2_paddle2.m_cLocation.Y = Bullet.p_Location.Y;
 	g_door.m_cLocation.X = 10;
 	g_door.m_cLocation.Y = 13;
 	g_door.m_bActive = false;
 }
-
 void boss_init()
 {
 	b_play = false;
@@ -563,7 +557,6 @@ void splashScreenWait()
 		g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
 	}
 }
-}
 void gameplay()            // gameplay logic
 {
 	processUserInput(); // checks if you should change states or do something else with the game, e.g. pause, exit
@@ -585,7 +578,6 @@ void gameplay()            // gameplay logic
 	if (!b_play)
 		ost();
 }
-
 void minigame1_moveCharacter()	
 {	
 	// Minigame stuff go here	
@@ -739,38 +731,44 @@ void minigame1_moveCharacter()
 	// Minigame stuff end	
 	if (g_abKeyPressed[K_LEFT])	
 	{	
-		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X - 3;	
-		g_weapon.m_cLocation.Y = 13;	
+		Bullet.p_Location.X = g_sChar.m_cLocation.X - 3;	
+		Bullet.p_Location.Y = 13;
+		if (Shots.size() > 0)
+			Shots.erase(Shots.begin() + 0);
+		Shots.push_back(Bullet);
 	}	
 	else if (g_abKeyPressed[K_RIGHT])	
 	{	
-		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X + 3;	
-		g_weapon.m_cLocation.Y = 13;	
+		Bullet.p_Location.X = g_sChar.m_cLocation.X + 3;	
+		Bullet.p_Location.Y = 13;
+		if (Shots.size() > 0)
+			Shots.erase(Shots.begin() + 0);
+		Shots.push_back(Bullet);
 	}	
 	else	
 	{	
-		g_weapon.m_cLocation.X = 0;	
-		g_weapon.m_cLocation.Y = 0;	
+		Bullet.p_Location.X = 0;	
+		Bullet.p_Location.Y = 0;	
 	}	
-	if (g_weapon.m_cLocation.X == g_minigame1_beat1.m_cLocation.X && g_minigame1_beat1.m_bActive == true)	
+	if (Bullet.p_Location.X == g_minigame1_beat1.m_cLocation.X && g_minigame1_beat1.m_bActive == true)	
 	{	
 		minigame1sound = true;	
 		g_minigame1_beat1.m_bActive = false;	
 		g_minigame1_beat1.m_cLocation.X = 2;	
 	}	
-	if (g_weapon.m_cLocation.X == g_minigame1_beat2.m_cLocation.X && g_minigame1_beat2.m_bActive == true)	
+	if (Bullet.p_Location.X == g_minigame1_beat2.m_cLocation.X && g_minigame1_beat2.m_bActive == true)	
 	{	
 		minigame1sound = true;	
 		g_minigame1_beat2.m_bActive = false;	
 		g_minigame1_beat2.m_cLocation.X = 77;	
 	}	
-	if (g_weapon.m_cLocation.X == g_minigame1_beat3.m_cLocation.X && g_minigame1_beat3.m_bActive == true)	
+	if (Bullet.p_Location.X == g_minigame1_beat3.m_cLocation.X && g_minigame1_beat3.m_bActive == true)	
 	{	
 		minigame1sound = true;	
 		g_minigame1_beat3.m_bActive = false;	
 		g_minigame1_beat3.m_cLocation.X = 2;	
 	}	
-	if (g_weapon.m_cLocation.X == g_minigame1_beat4.m_cLocation.X && g_minigame1_beat4.m_bActive == true)	
+	if (Bullet.p_Location.X == g_minigame1_beat4.m_cLocation.X && g_minigame1_beat4.m_bActive == true)	
 	{	
 		minigame1sound = true;	
 		g_minigame1_beat4.m_bActive = false;	
@@ -854,22 +852,28 @@ void minigame2_moveCharacter()
 	{	
 		if (g_eM2WeaponState == FireUp)	
 		{	
-			if (Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 80] == ' ' || Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 80] == '|')	
+			if (Minigame2Map[Bullet.p_Location.X + Bullet.p_Location.Y * 80 - 80] == ' ' || Minigame2Map[Bullet.p_Location.X + Bullet.p_Location.Y * 80 - 80] == '|')	
 			{	
-				g_weapon.m_cLocation.X--;	
-				g_weapon.m_cLocation.Y--;	
-				bSomethingHappened = true;	
+				Bullet.p_Location.X--;	
+				Bullet.p_Location.Y--;	
+				bSomethingHappened = true;
+				if (Shots.size() > 0)
+					Shots.erase(Shots.begin() + 0);
+				Shots.push_back(Bullet);
 			}	
 			else	
 				g_eM2WeaponState = FireDown;	
 		}	
 		else if (g_eM2WeaponState == FireDown)	
 		{	
-			if (Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 80] == ' ' || Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 80] == '|')	
+			if (Minigame2Map[Bullet.p_Location.X + Bullet.p_Location.Y * 80 + 80] == ' ' || Minigame2Map[Bullet.p_Location.X + Bullet.p_Location.Y * 80 + 80] == '|')	
 			{	
-				g_weapon.m_cLocation.X--;	
-				g_weapon.m_cLocation.Y++;	
-				bSomethingHappened = true;	
+				Bullet.p_Location.X--;	
+				Bullet.p_Location.Y++;	
+				bSomethingHappened = true;
+				if (Shots.size() > 0)
+					Shots.erase(Shots.begin() + 0);
+				Shots.push_back(Bullet);
 			}	
 			else	
 				g_eM2WeaponState = FireUp;	
@@ -879,50 +883,56 @@ void minigame2_moveCharacter()
 	{	
 		if (g_eM2WeaponState == FireUp)	
 		{	
-			if (Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 80] == ' ' || Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 80] == '|')	
+			if (Minigame2Map[Bullet.p_Location.X + Bullet.p_Location.Y * 80 - 80] == ' ' || Minigame2Map[Bullet.p_Location.X + Bullet.p_Location.Y * 80 - 80] == '|')	
 			{	
-				g_weapon.m_cLocation.X++;	
-				g_weapon.m_cLocation.Y--;	
-				bSomethingHappened = true;	
+				Bullet.p_Location.X++;	
+				Bullet.p_Location.Y--;	
+				bSomethingHappened = true;
+				if (Shots.size() > 0)
+					Shots.erase(Shots.begin() + 0);
+				Shots.push_back(Bullet);
 			}	
 			else	
 				g_eM2WeaponState = FireDown;	
 		}	
 		else if (g_eM2WeaponState == FireDown)	
 		{	
-			if (Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 80] == ' ' || Minigame2Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 80] == '|')	
+			if (Minigame2Map[Bullet.p_Location.X + Bullet.p_Location.Y * 80 + 80] == ' ' || Minigame2Map[Bullet.p_Location.X + Bullet.p_Location.Y * 80 + 80] == '|')	
 			{	
-				g_weapon.m_cLocation.X++;	
-				g_weapon.m_cLocation.Y++;	
-				bSomethingHappened = true;	
+				Bullet.p_Location.X++;	
+				Bullet.p_Location.Y++;	
+				bSomethingHappened = true;
+				if (Shots.size() > 0)
+					Shots.erase(Shots.begin() + 0);
+				Shots.push_back(Bullet);
 			}	
 			else	
 				g_eM2WeaponState = FireUp;	
 		}	
 	}	
-	if (g_weapon.m_cLocation.X == 1)	
+	if (Bullet.p_Location.X == 1)	
 	{	
 		g_sChar.m_bActive = false;	
 		g_eWeaponState = FireRight;	
-		g_weapon.m_cLocation.X = 2;	
+		Bullet.p_Location.X = 2;	
 	}	
-	if (g_weapon.m_cLocation.X >= 78)	
+	if (Bullet.p_Location.X >= 78)	
 	{	
 		if (g_bMinigame)	
 			g_eGameState = S_MINIGAME;	
 		else	
 		{	
-			g_weapon.m_cLocation.X = 78;	
+			Bullet.p_Location.X = 78;	
 			g_door.m_bActive = true;	
 			g_door.m_cLocation = g_sChar.m_cLocation;	
 		}	
 	}	
-	if (g_weapon.m_cLocation.X == g_minigame2_paddle1.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle1.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle1.m_cLocation.Y + 2))	
+	if (Bullet.p_Location.X == g_minigame2_paddle1.m_cLocation.X && (Bullet.p_Location.Y >= g_minigame2_paddle1.m_cLocation.Y - 2 && Bullet.p_Location.Y <= g_minigame2_paddle1.m_cLocation.Y + 2))	
 	{	
 		g_eWeaponState = FireRight;	
 		shootsound = true;	
 	}	
-	if (g_weapon.m_cLocation.X == g_minigame2_paddle2.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle2.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle2.m_cLocation.Y + 2))	
+	if (Bullet.p_Location.X == g_minigame2_paddle2.m_cLocation.X && (Bullet.p_Location.Y >= g_minigame2_paddle2.m_cLocation.Y - 2 && Bullet.p_Location.Y <= g_minigame2_paddle2.m_cLocation.Y + 2))	
 	{	
 		g_eWeaponState = FireLeft;	
 		shootsound = true;	
@@ -944,8 +954,8 @@ void minigame2_moveCharacter()
 		}	
 	}	
 	g_minigame2_paddle1.m_cLocation.Y = g_sChar.m_cLocation.Y;	
-	if (g_dElapsedTime < int_stages + 5 && g_eWeaponState == FireRight && g_minigame2_paddle2.m_cLocation.Y <= g_weapon.m_cLocation.Y + 1  && g_minigame2_paddle2.m_cLocation.Y >= g_weapon.m_cLocation.Y - 1 && g_weapon.m_cLocation.X >= 38)	
-		g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;	
+	if (g_dElapsedTime < int_stages + 5 && g_eWeaponState == FireRight && g_minigame2_paddle2.m_cLocation.Y <= Bullet.p_Location.Y + 1  && g_minigame2_paddle2.m_cLocation.Y >= Bullet.p_Location.Y - 1 && Bullet.p_Location.X >= 38)	
+		g_minigame2_paddle2.m_cLocation.Y = Bullet.p_Location.Y;	
 	if (bSomethingHappened)	
 	{	
 		g_dBounceTime = g_dElapsedTime + 0.03 + 0.1/stages; // 125ms should be enough	
@@ -1420,6 +1430,8 @@ void moveCharacter()
 	if (Weapons[currentWeapon].Clip > 0)
 	{
 		Bullet.Distance = 0;
+		if (currentWeapon == 0)
+			Weapons[currentWeapon].Clip = 2;
 		if (g_abKeyPressed[K_UP] && g_eWeaponState == Hold)
 		{
 			g_eWeaponState = FireUp;
@@ -2328,9 +2340,10 @@ void renderMap()
 		std::vector<char>::iterator it = Minigame2Map.begin();
 		for (short i = 0; i < 80 * 24; ++i)
 		{
-			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F};
+			g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 		}
 	}
+
 	else if (StageType == EMiniGameSnake)
 	{
 		std::vector<char>::iterator it = SnakeMap.begin();
@@ -2708,7 +2721,7 @@ void renderEnemy6()
 	g_Console.writeToBuffer(g_enemy6.m_cLocation, character, charColor);
 }
 						
--void renderbeat1()
+void renderbeat1()
 {
 	WORD charColor = 0x0E;
 	char character = '<';
@@ -3397,8 +3410,7 @@ void convertToString()
 		}
 	}
 	myfile13.close(); 
-}
-						
+}					
 void save()
 {
 	std::ofstream stats("map/stats.txt");
@@ -3759,7 +3771,7 @@ void minigameselect()
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
 	*/
-	if (bSomethingHappened)
+	if(bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
 		g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
@@ -3781,7 +3793,6 @@ WORD charColouring(char character)
 	else
 		return 0x0F;
 }						
-
 void renderSnake()
 {
 	for (size_t i = 0; SnakeLocation.size() > i; i++)
@@ -3800,7 +3811,6 @@ void renderSnake()
 		}
 	}
 }
-
 void renderApple()
 {
 	if (AppleCollected == true)
@@ -3814,7 +3824,6 @@ void renderApple()
 	}
 	g_Console.writeToBuffer(Apple,"a",0x0c);
 }
-
 void snakeInput()
 {
 	if (StageType == EMiniGameSnake)
@@ -3847,32 +3856,31 @@ void snakeInput()
 		}
 	}
 }
-
 void snakeMovement()
 {
-	if (delay > 15) // Once every 15 frames move by 1.
+	if(delay > 15) // Once every 15 frames move by 1.
 	{
-		if (Direction == 'W')
+		if(Direction == 'W')
 		{
 			g_snake.Y--;
 			SnakeLocation.push_back(g_snake);
 		}
-		if (Direction == 'A')
+		if(Direction == 'A')
 		{
 			g_snake.X--;
 			SnakeLocation.push_back(g_snake);
 		}
-		if (Direction == 'S')
+		if(Direction == 'S')
 		{
 			g_snake.Y++;
 			SnakeLocation.push_back(g_snake);
 		}
-		if (Direction == 'D')
+		if(Direction == 'D')
 		{
 			g_snake.X++;
 			SnakeLocation.push_back(g_snake);
 		}
-		if (SnakeLocation.size() > snake_Size) // Controls the size of the snake
+		if(SnakeLocation.size() > snake_Size) // Controls the size of the snake
 		{
 			SnakeLocation.erase(SnakeLocation.begin());
 		}
