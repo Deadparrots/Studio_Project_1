@@ -30,16 +30,8 @@ enum EKEYS
 	K_D,
 	K_C,
 	K_E,
-	K_1,
-	K_2,
-	K_3,
-	K_4,
-	K_5,
-	K_6,
-	K_7,
-	K_8,
-	K_9,
-	K_COUNT
+	K_Q,
+	K_COUNT,
 };
 
 // Enumeration for the different screen states
@@ -51,8 +43,8 @@ enum EGAMESTATES
 	S_GAMEOVER,
 	S_INSTRUCTIONS,
 	S_COUNT,
-	S_CONTINUE,
-	S_MINIGAME
+
+	S_SHOP
 };
 enum EWEAPONSTATES
 {
@@ -70,28 +62,23 @@ enum ESTAGETYPE
 	EBoss,
 	EBossBattle,
 	EMinigame1,
-	EMinigame2,
-	ETicTacToe,
-	ETicTacToe2,
-	EMiniGameSnake
+
+	EShop
 };
 
 enum EMAINMENU
 {
 	MMStart,
 	MMInstructions,
-	MMExit,
-	MMContinue,
-	MMminigame
+	MMExit
 };
-enum EMINIGAME
+
+enum ESHOP
 {
-	MMrhythm,
-	MMpong,
-	MMtictactoe,
-	MMsnake,
-	MM1P,
-	MM2P,
+	MMLive,
+	MMW1,
+	MMW2,
+	MMBack
 };
 
 // struct for the game character
@@ -118,6 +105,7 @@ struct SBossGaster
 struct WeaponParameters
 {
 	std::string Name;
+
 	int Clip; // Ammo in Clip
 	int ClipMax; // Max size of Clip
 	int AmmoTotal; // Total Ammo
@@ -125,9 +113,8 @@ struct WeaponParameters
 	int ProjectileSpeed; // Projectile Speed
 	int Range; // Range
 };
+
 void init(void);      // initialize your variables, allocate memory, etc
-void minigame1_init();
-void minigame2_init();
 void boss_init();
 void boss_battle_init();
 void getInput(void);      // get input from player
@@ -138,7 +125,6 @@ void intro();
 void splashScreenWait();    // waits for time to pass in splash screen
 void gameplay();            // gameplay logic
 void minigame1_moveCharacter();
-void minigame2_moveCharacter();
 void moveCharacter();       // moves the character, collision detection, physics, etc
 void boss_moveCharacter();
 void bossbattle_moveCharacter();
@@ -164,9 +150,11 @@ void renderbeat1();
 void renderbeat2();
 void renderbeat3();
 void renderbeat4();
-void renderpaddle1();
-void renderpaddle2();
 void renderDoor();
+void renderShopkeeper();
+void shop();
+void shopoption();
+
 void renderWeapon();
 void renderBossSpeech();
 void renderFramerate();     // renders debug information, frame rate, elapsed time, etc
@@ -179,19 +167,4 @@ void ost();
 void gameOver();
 void instructions();
 void convertToString();
-void save();
-void continueSave();
-void tictactoePlay();
-void renderTicTacToe();
-void tictactoeWin();
-void tictactoeMulti();
-void minigame();
-void minigameselect();
-WORD charColouring(char character);
-void renderSnake();
-void renderApple();
-void snakeInput();
-void snakeMovement();
-void highscoreSave();
-void highscoreLoad();
 #endif // _GAME_H

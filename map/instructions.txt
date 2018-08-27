@@ -6,18 +6,19 @@
 #                                 [A][S][D]                                    #
 #                                                                              #
 #                                                                              #
-#                                                                              #
-#                                                                              #
 #                           PRESS    [^]    TO FIRE                            #
 #                                 [<][v][>]                                    #
 #                                                                              #
 #                                                                              #
+#                          PRESS [E] TO CHANGE WEAPON                          #
 #                                                                              #
+#                                                                              #
+#                            PRESS [Q] TO GO SHOP                              #
+#                         WITH All ENEMIES ARE KILLED                          #
 #                                                                              #
 #                                                                              #
 #                            PRESS [ESC] TO GO BACK                            #
 #                                TO MAIN MENU                                  #
-#                                                                              #
 #                                                                              #
 #                                                                              #
 #                                                                              #
