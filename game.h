@@ -39,7 +39,8 @@ enum EKEYS
 	K_7,
 	K_8,
 	K_9,
-	K_COUNT
+	K_COUNT,
+	K_N
 };
 
 // Enumeration for the different screen states
@@ -72,7 +73,8 @@ enum ESTAGETYPE
 	EMinigame1,
 	EMinigame2,
 	ETicTacToe,
-	ETicTacToe2
+	ETicTacToe2,
+	EMiniGameSnake
 };
 
 enum EMAINMENU
@@ -90,7 +92,7 @@ enum EMINIGAME
 	MMtictactoe,
 	MMsnake,
 	MM1P,
-	MM2P
+	MM2P,
 };
 
 // struct for the game character
@@ -123,6 +125,14 @@ struct WeaponParameters
 	int Reload; // Reload Speed
 	int ProjectileSpeed; // Projectile Speed
 	int Range; // Range
+};
+
+class Projectile
+{
+public:
+	COORD p_Location; // Coordinates for the location of the bullet
+	int Direction; // Direction of bullet (0^,1>,2<,3v)
+	int Distance; // Range
 };
 
 void init(void);      // initialize your variables, allocate memory, etc
@@ -182,10 +192,14 @@ void convertToString();
 void save();
 void continueSave();
 void tictactoePlay();
-void tictactoeMulti();
 void renderTicTacToe();
 void tictactoeWin();
+void tictactoeMulti();
 void minigame();
 void minigameselect();
 WORD charColouring(char character);
+void renderSnake();
+void renderApple();
+void snakeInput();
+void snakeMovement();
 #endif // _GAME_H
