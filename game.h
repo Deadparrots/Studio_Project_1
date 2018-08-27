@@ -39,8 +39,7 @@ enum EKEYS
 	K_7,
 	K_8,
 	K_9,
-	K_COUNT,
-	K_N
+	K_COUNT
 };
 
 // Enumeration for the different screen states

@@ -342,7 +342,6 @@ void getInput(void)
 	g_abKeyPressed[K_D] = isKeyPressed(68);
 	g_abKeyPressed[K_C] = isKeyPressed(67);
 	g_abKeyPressed[K_E] = isKeyPressed(69); // For Weapon Switching
-	g_abKeyPressed[K_N] = isKeyPressed(78);
 	g_abKeyPressed[K_1] = isKeyPressed(49);
 	g_abKeyPressed[K_2] = isKeyPressed(50);
 	g_abKeyPressed[K_3] = isKeyPressed(51);
@@ -382,7 +381,7 @@ void update(double dt)
 		break;
 	case S_GAME: gameplay(); // gameplay logic when we are in the game
 		break;
-		case S_MINIGAME: minigameselect();
+	case S_MINIGAME: minigameselect();
 		break;
 	}
 }
@@ -2015,15 +2014,6 @@ void processUserInput()
 		if(StageType == EBossBattle)
 			g_dElapsedTime = 20;
 	}
-	if (g_abKeyPressed[K_N])
-	{
-		StageType = EMiniGameSnake;
-		g_snake.X = 40;
-		g_snake.Y = 15;
-		snake_Size = 1;
-		g_sChar.m_cLocation.X = 0;
-		g_sChar.m_cLocation.Y = 0;
-	}
 	if (g_sChar.m_bActive == false) // Took damage
 	{
 		g_sChar.m_bActive = true;
@@ -3254,7 +3244,7 @@ void ost()
 		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	else if (StageType == EBoss)
 		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-	else if (StageType == EMinigame1 || StageType == EMinigame2 || StageType == ETicTacToe)
+	else if (StageType == EMinigame1 || StageType == EMinigame2 || StageType == ETicTacToe || StageType == ETicTacToe2 || StageType == EMiniGameSnake)
 		PlaySound(TEXT("sound/minigame.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	b_play = true;
 }
@@ -4007,13 +3997,17 @@ void minigameselect()
 		charNine = 57;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
-	/*else if (MMgame = MMsnake && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
+	else if (MMgame == MMsnake && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
 	{
 		b_play = false;
 		g_eGameState = S_GAME;
 		StageType = EMiniGameSnake;
-		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
-	}*/
+		g_snake.X = 40;
+		g_snake.Y = 15;
+		snake_Size = 1;
+		g_sChar.m_cLocation.X = 0;
+		g_sChar.m_cLocation.Y = 0;
+	}
 	if(bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
@@ -4040,7 +4034,7 @@ void renderSnake()
 {
 	for (size_t i = 0; SnakeLocation.size() > i; i++)
 	{
-		g_Console.writeToBuffer(SnakeLocation[i],'#',0x0a);
+		g_Console.writeToBuffer(SnakeLocation[i],254,0x0a);
 		for (size_t j = 0; SnakeLocation.size() > j; j++)
 		{
 			if (i == j)
@@ -4049,7 +4043,8 @@ void renderSnake()
 			}
 			if (SnakeLocation[i].X == SnakeLocation[j].X && SnakeLocation[i].Y == SnakeLocation[j].Y)
 			{
-				g_eGameState = S_GAMEOVER;
+				g_eGameState = S_MINIGAME;
+				b_play = false;
 			}
 		}
 	}
@@ -4089,8 +4084,8 @@ void snakeInput()
 		}
 		if (SnakeMap[g_snake.X + g_snake.Y * 80] != ' ' && SnakeMap[g_snake.X + g_snake.Y * 80] != 'a')
 		{
-			// If not empty or apple, die
-			g_eGameState = S_GAMEOVER;
+			g_eGameState = S_MINIGAME;
+			b_play = false;
 		}
 		if (g_snake.X == Apple.X && g_snake.Y == Apple.Y)
 		{
