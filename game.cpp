@@ -2636,7 +2636,7 @@ void processUserInput()
 				StageType = EMinigame2;
 			else
 			{
-				if (StageType == EBossBattle)
+				if (StageType == EBossBattle || StageType == EMinigame1 || StageType == EMinigame2)
 					b_play = false;
 				StageType = EStage;
 			}
@@ -4015,7 +4015,7 @@ void continueSave()
 void highscoreSave()
 {
 	std::ofstream score("map/highscore.txt");
-	score << g_dElapsedTime << std::endl;
+	score << pong_t << std::endl;
 	score.close();
 }
 void highscoreLoad()
@@ -4543,7 +4543,7 @@ void minigameselect()
 		StageType = EMinigame2;
 		g_eGameState = S_GAME;
 		minigame2_init();
-	    Lives = 2;
+	    Lives = 3;
 		stages = 50;
 		int_stages = 50;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
@@ -4587,12 +4587,13 @@ void minigameselect()
 	else if (MMgame == MMsnake && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
 	{
 		b_play = false;
+		snake_Size = 1;
+		SnakeLocation.resize(1);
 		g_dElapsedTime = 0;
 		g_eGameState = S_GAME;
 		StageType = EMiniGameSnake;
 		g_snake.X = 40;
 		g_snake.Y = 15;
-		snake_Size = 1;
 		g_sChar.m_cLocation.X = 0;
 		g_sChar.m_cLocation.Y = 0;
 	}
@@ -4674,11 +4675,6 @@ void snakeInput()
 		{
 			g_eGameState = S_MINIGAME;
 			b_play = false;
-		}
-		if (g_abKeyPressed[K_ESCAPE])
-		{
-			snake_Size = 1;
-			SnakeLocation.erase(SnakeLocation.begin());
 		}
 		if (g_snake.X == Apple.X && g_snake.Y == Apple.Y)
 		{
