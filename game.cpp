@@ -31,7 +31,7 @@ SMinigame1	g_minigame1_beat3;
 SMinigame1	g_minigame1_beat4;
 
 SGameChar	g_door;
-//SGameChar	g_shopkeeper;
+SGameChar	g_shopkeeper;
 
 std::vector<char>	Title;
 std::vector<char>	GameOver;
@@ -234,9 +234,16 @@ void init(void)
 	g_door.m_cLocation.Y = enemyY;
 	g_door.m_bActive = false;
 
-	//g_shopkeeper.m_cLocation.X = enemyX;
-	//g_shopkeeper.m_cLocation.Y = enemyY;
-	//g_shopkeeper.m_bActive = false;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		if (Map[enemyX + enemyY * 80] == ' ')
+			break;
+	}
+	g_shopkeeper.m_cLocation.X = enemyX;
+	g_shopkeeper.m_cLocation.Y = enemyY;
+	g_shopkeeper.m_bActive = false;
 
 	g_weapon.m_cLocation.X = 10;
 	g_weapon.m_cLocation.Y = 2;
@@ -1803,11 +1810,11 @@ void processUserInput()
 	{ 
 		g_door.m_bActive = true;
 
-		if (g_abKeyPressed[K_Q])
-		{
-			g_eGameState = S_SHOP;
-		}
-		//g_shopkeeper.m_bActive = true;
+		//if (g_abKeyPressed[K_Q])
+		//{
+		//	g_eGameState = S_SHOP;
+		//}
+		g_shopkeeper.m_bActive = true;
 
 	}
 
@@ -1847,19 +1854,19 @@ void processUserInput()
 
 
 
-	//if (g_shopkeeper.m_bActive == true && g_sChar.m_cLocation.X == g_shopkeeper.m_cLocation.X && g_sChar.m_cLocation.Y == g_shopkeeper.m_cLocation.Y)
-	//{
-	//	StageType = EShop;
-	//	g_eGameState = S_SHOP;
+	if (g_shopkeeper.m_bActive == true && g_sChar.m_cLocation.X == g_shopkeeper.m_cLocation.X && g_sChar.m_cLocation.Y == g_shopkeeper.m_cLocation.Y)
+	{
+		StageType = EShop;
+		g_eGameState = S_SHOP;
 
-	//	g_door.m_bActive = false;
+		g_door.m_bActive = false;
 
-	//	g_sChar.m_cLocation.X = 0;
-	//	g_sChar.m_cLocation.Y = 0;
+		g_sChar.m_cLocation.X = 0;
+		g_sChar.m_cLocation.Y = 0;
 
-	//	g_shopkeeper.m_cLocation.X = 0;
-	//	g_shopkeeper.m_cLocation.Y = 0;
-	//}
+		g_shopkeeper.m_cLocation.X = 0;
+		g_shopkeeper.m_cLocation.Y = 0;
+	}
 
 
 }
@@ -1963,7 +1970,7 @@ void renderGame()
 {
 	renderMap();        // renders the map to the buffer first
 	renderDoor();
-	//renderShopkeeper();
+
 	renderCharacter();  // renders the character into the buffer
 	if (StageType == EStage)
 	{
@@ -1974,6 +1981,7 @@ void renderGame()
 		renderEnemy5();
 		renderEnemy6();
 		renderWeapon();
+		renderShopkeeper();
 	}
 	if (StageType == EBossBattle)
 	{
@@ -2472,24 +2480,24 @@ void renderDoor()
 }
 
 
-//void renderShopkeeper()
-//{
-//	if (int_stages % 1 == 0)
-//	{
-//		// Draw the location of the moving shopkeeper
-//		WORD charColor = 0x00;
-//
-//			if (g_shopkeeper.m_bActive == true) {
-//
-//				charColor = 0x0D;
-//
-//			}
-//			else if (StageType == EShop) {
-//				charColor = 0x00;
-//			}
-//			g_Console.writeToBuffer(g_shopkeeper.m_cLocation, (char)'S', charColor);
-//	}
-//}
+void renderShopkeeper()
+{
+	if (int_stages % 1 == 0)
+	{
+		// Draw the location of the moving shopkeeper
+		WORD charColor = 0x00;
+
+			if (g_shopkeeper.m_bActive == true) {
+
+				charColor = 0x0D;
+
+			}
+			else if (StageType == EShop) {
+				charColor = 0x00;
+			}
+			g_Console.writeToBuffer(g_shopkeeper.m_cLocation, (char)'S', charColor);
+	}
+}
 
 void renderWeapon()
 {
@@ -3256,7 +3264,7 @@ void reload()
 {
 	Weapons[currentWeapon].Clip += Weapons[currentWeapon].ClipMax;	// Adds ammo left in clip to total
 
-	Coin += 300; //Add Coin
+	Coin += 3; //Add Coin
 }
 void ost()
 {
