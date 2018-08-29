@@ -55,7 +55,8 @@ enum EGAMESTATES
 	S_CONTINUE,
 	S_MINIGAME,
 	S_HIGHSCORE,
-	S_Inputname
+	S_Inputname,
+	S_SHOP
 };
 
 enum EWEAPONSTATES
@@ -78,6 +79,7 @@ enum ESTAGETYPE
 	ETicTacToe,
 	ETicTacToe2,
 	EMiniGameSnake,
+	EShop
 };
 
 enum EMAINMENU
@@ -88,6 +90,7 @@ enum EMAINMENU
 	MMContinue,
 	MMminigame
 };
+
 
 enum ENAME
 {
@@ -105,6 +108,14 @@ enum EMINIGAME
 	MM1P,
 	MM2P,
 	MMHighscore
+};
+
+enum ESHOP
+{
+	MMLive,
+	MMW1,
+	MMW2,
+	MMBack
 };
 
 // struct for the game character
@@ -133,9 +144,7 @@ struct WeaponParameters
 	std::string Name;
 	int Clip; // Ammo in Clip
 	int ClipMax; // Max size of Clip
-	int AmmoTotal; // Total Ammo
 	int Reload; // Reload Speed
-	int ProjectileSpeed; // Projectile Speed
 	int Range; // Range
 };
 
@@ -174,6 +183,9 @@ void renderEnemy3();
 void renderEnemy4();
 void renderEnemy5();
 void renderEnemy6();
+void renderShopkeeper();
+void shop();
+void shopoption();
 void renderbeat1();
 void renderbeat2();
 void renderbeat3();
