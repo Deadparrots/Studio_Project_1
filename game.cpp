@@ -2020,7 +2020,6 @@ void processUserInput()
 			highscoreSave();
 			g_eGameState = S_MINIGAME;
 			g_dBounceTime = g_dElapsedTime + 0.125;
-			PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 			b_play = false;
 		}
 		else
@@ -3715,55 +3714,55 @@ void tictactoeMulti()
 			if (charOne == '1')
 			{
 				charOne = 79;
-				b_number++;
+				b_number = 2;
 			}
 		if (g_abKeyPressed[K_2])
 			if (charTwo == '2')
 			{
 				charTwo = 79;
-				b_number++;
+				b_number = 2;
 			}
 		if (g_abKeyPressed[K_3])
 			if (charThree == '3')
 			{
 				charThree = 79;
-				b_number++;
+				b_number = 2;
 			}
 		if (g_abKeyPressed[K_4])
 			if (charFour == '4')
 			{
 				charFour = 79;
-				b_number++;
+				b_number = 2;
 			}
 		if (g_abKeyPressed[K_5])
 			if (charFive == '5')
 			{
 				charFive = 79;
-				b_number++;
+				b_number = 2;
 			}
 		if (g_abKeyPressed[K_6])
 			if (charSix == '6')
 			{
 				charSix = 79;
-				b_number++;
+				b_number = 2;
 			}
 		if (g_abKeyPressed[K_7])
 			if (charSeven == '7')
 			{
 				charSeven = 79;
-				b_number++;
+				b_number = 2;
 			}
 		if (g_abKeyPressed[K_8])
 			if (charEight == '8')
 			{
 				charEight = 79;
-				b_number++;
+				b_number = 2;
 			}
 		if (g_abKeyPressed[K_9])
 			if (charNine == '9')
 			{
 				charNine = 79;
-				b_number++;
+				b_number = 2;
 			}
 	}
 	else if (b_number == 2 && !win)
@@ -3772,55 +3771,55 @@ void tictactoeMulti()
 			if (charOne == '1')
 			{
 				charOne = 88;
-				b_number--;
+				b_number = 1;
 			}
 		if (g_abKeyPressed[K_2])
 			if (charTwo == '2')
 			{
 				charTwo = 88;
-				b_number--;
+				b_number = 1;
 			}
 		if (g_abKeyPressed[K_3])
 			if (charThree == '3')
 			{
 				charThree = 88;
-				b_number--;
+				b_number = 1;
 			}
 		if (g_abKeyPressed[K_4])
 			if (charFour == '4')
 			{
 				charFour = 88;
-				b_number--;
+				b_number = 1;
 			}
 		if (g_abKeyPressed[K_5])
 			if (charFive == '5')
 			{
 				charFive = 88;
-				b_number--;
+				b_number = 1;
 			}
 		if (g_abKeyPressed[K_6])
 			if (charSix == '6')
 			{
 				charSix = 88;
-				b_number--;
+				b_number = 1;
 			}
 		if (g_abKeyPressed[K_7])
 			if (charSeven == '7')
 			{
 				charSeven = 88;
-				b_number--;
+				b_number = 1;
 			}
 		if (g_abKeyPressed[K_8])
 			if (charEight == '8')
 			{
 				charEight = 88;
-				b_number--;
+				b_number = 1;
 			}
 		if (g_abKeyPressed[K_9])
 			if (charNine == '9')
 			{
 				charNine = 88;
-				b_number--;
+				b_number = 1;
 			}
 	}
 	if (g_dBounceTime > g_dElapsedTime)
@@ -4187,6 +4186,7 @@ void minigameselect()
 		g_snake.Y = 15;
 		g_sChar.m_cLocation.X = 0;
 		g_sChar.m_cLocation.Y = 0;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
 	if(bSomethingHappened)
 	{
