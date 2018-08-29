@@ -1010,7 +1010,7 @@ void minigame2_moveCharacter()
 		g_eWeaponState = FireRight;
 		rally++;
 		if (g_bforscore)
-			stages++;
+			stages += 2;
 		shootsound = true;	
 	}	
 	if (g_weapon.m_cLocation.X == g_minigame2_paddle2.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle2.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle2.m_cLocation.Y + 2))	
