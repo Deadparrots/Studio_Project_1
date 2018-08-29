@@ -3704,12 +3704,12 @@ void highscoreLoad()
 	score >> snake_length;
 	score >> snake_length2;
 	score >> snake_length3;
-	std::string first = to_string(pong_t);
-	std::string second = to_string(pong_t2);
-	std::string third = to_string(pong_t3);
-	std::string length1 = to_string(snake_length);
-	std::string length2 = to_string(snake_length2);
-	std::string length3 = to_string(snake_length3);
+	std::string first = std::to_string(pong_t);
+	std::string second = std::to_string(pong_t2);
+	std::string third = std::to_string(pong_t3);
+	std::string length1 = std::to_string(snake_length);
+	std::string length2 = std::to_string(snake_length2);
+	std::string length3 = std::to_string(snake_length3);
 	COORD c = g_Console.getConsoleSize();
 	c.X = 37;
 	c.Y = 6;
@@ -3984,7 +3984,7 @@ void renderTicTacToe()
 
 		g_Console.writeToBuffer(player, "Player", 0x0f);
 		player.X += 7;
-		std::string playerNo = to_string(b_number);
+		std::string playerNo = std::to_string(b_number);
 		g_Console.writeToBuffer(player, playerNo, 0x0f);
 	}
 	tictactoeWin();
