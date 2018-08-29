@@ -1,0 +1,10 @@
+Spear
+1
+Pistol
+72
+Crossbow
+0
+Rifle
+0
+1
+2
