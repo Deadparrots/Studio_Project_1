@@ -2051,7 +2051,6 @@ void processUserInput()
 			else
 				g_eGameState = S_MINIGAME;
 			g_dBounceTime = g_dElapsedTime + 0.125;
-			PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 			b_play = false;
 		}
 		else
