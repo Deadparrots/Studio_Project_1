@@ -94,7 +94,7 @@ char        charEight = 56;
 char        charNine = 57;
 double      g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 int		    Lives = 3; // Number of lives the player has left (Base Value is 3)
-int			Coin = 0;
+size_t		Coin = 0;
 int		    currentWeapon = 0; // Current Weapon
 WeaponParameters Weapons[4]; // Number of Weapons
 
