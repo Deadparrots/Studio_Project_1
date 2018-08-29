@@ -946,10 +946,7 @@ void minigame2_moveCharacter()
 			{	
 				g_weapon.m_cLocation.X--;	
 				g_weapon.m_cLocation.Y--;	
-				bSomethingHappened = true;/*
-				if (Shots.size() > 0)
-					Shots.erase(Shots.begin() + 0);
-				Shots.push_back(Bullet);*/
+				bSomethingHappened = true;
 			}	
 			else	
 				g_eM2WeaponState = FireDown;	
@@ -960,10 +957,7 @@ void minigame2_moveCharacter()
 			{	
 				g_weapon.m_cLocation.X--;	
 				g_weapon.m_cLocation.Y++;	
-				bSomethingHappened = true;/*
-				if (Shots.size() > 0)
-					Shots.erase(Shots.begin() + 0);
-				Shots.push_back(Bullet);*/
+				bSomethingHappened = true;
 			}	
 			else	
 				g_eM2WeaponState = FireUp;	
@@ -977,10 +971,7 @@ void minigame2_moveCharacter()
 			{	
 				g_weapon.m_cLocation.X++;	
 				g_weapon.m_cLocation.Y--;	
-				bSomethingHappened = true;/*
-				if (Shots.size() > 0)
-					Shots.erase(Shots.begin() + 0);
-				Shots.push_back(Bullet);*/
+				bSomethingHappened = true;
 			}	
 			else	
 				g_eM2WeaponState = FireDown;	
@@ -991,10 +982,7 @@ void minigame2_moveCharacter()
 			{	
 				g_weapon.m_cLocation.X++;	
 				g_weapon.m_cLocation.Y++;	
-				bSomethingHappened = true;/*
-				if (Shots.size() > 0)
-					Shots.erase(Shots.begin() + 0);
-				Shots.push_back(Bullet);*/
+				bSomethingHappened = true;
 			}	
 			else	
 				g_eM2WeaponState = FireUp;	
@@ -1021,6 +1009,8 @@ void minigame2_moveCharacter()
 	{	
 		g_eWeaponState = FireRight;
 		rally++;
+		if (g_bforscore)
+			stages++;
 		shootsound = true;	
 	}	
 	if (g_weapon.m_cLocation.X == g_minigame2_paddle2.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle2.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle2.m_cLocation.Y + 2))	
@@ -1057,9 +1047,7 @@ void minigame2_moveCharacter()
 		    g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
 	}
 	if (bSomethingHappened)	
-	{	
 		g_dBounceTime = g_dElapsedTime + 0.03 + 0.1/stages; // 125ms should be enough	
-	}	
 }
 void bossbattle_moveCharacter()
 {
@@ -2066,8 +2054,10 @@ void processUserInput()
 		g_enemy4.m_bActive = false;
 		g_enemy5.m_bActive = false;
 		g_enemy6.m_bActive = false;
-		if(StageType == EBossBattle)
+		if (StageType == EBossBattle)
 			g_dElapsedTime = 20;
+		if (StageType == EMinigame2)
+			g_sChar.m_cLocation.Y = g_weapon.m_cLocation.Y;
 	}
 	if (g_sChar.m_bActive == false) // Took damage
 	{
@@ -4039,22 +4029,22 @@ void tictactoePlay()
 			charNine = 88;
 		else if (charFive == '5') // Middle slot next priority
 			charFive = 88;
-		else if (charOne == '1') // Corner slots next priority
-			charOne = 88;
-		else if (charThree == '3')
-			charThree = 88;
 		else if (charSeven == '7')
 			charSeven = 88;
-		else if (charNine == '9')
-			charNine = 88;
-		else if (charTwo == '2') // The rest of the slots not as important
+		else if (charThree == '3')
+			charThree = 88;
+		else if (charEight == '8')
+			charEight = 88;
+		else if (charTwo == '2')
 			charTwo = 88;
+		else if (charOne == '1')
+			charOne = 88;
 		else if (charFour == '4')
 			charFour = 88;
 		else if (charSix == '6')
 			charSix = 88;
-		else if (charEight == '8')
-			charEight = 88;
+		else if (charNine == '9')
+			charNine = 88;
 		else
 			b_number = 2;
 	}
@@ -4536,8 +4526,7 @@ void minigameselect()
 		g_eGameState = S_GAME;
 		minigame2_init();
 	    Lives = 2;
-		stages = 5;
-		int_stages = 50;
+		stages = 10;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
 	else if (MMgame == MM1P && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
