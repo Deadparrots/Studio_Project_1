@@ -24,6 +24,7 @@ enum EKEYS
 	K_RIGHT,
 	K_ESCAPE,
 	K_SPACE,
+	K_ENTER,
 	K_W,
 	K_A,
 	K_S,
@@ -54,6 +55,7 @@ enum EGAMESTATES
 	S_CONTINUE,
 	S_MINIGAME,
 	S_HIGHSCORE,
+	S_Inputname,
 	S_SHOP
 };
 
@@ -87,6 +89,14 @@ enum EMAINMENU
 	MMExit,
 	MMContinue,
 	MMminigame
+};
+
+
+enum ENAME
+{
+	NFIRST,
+	NSECOND,
+	NTHIRD
 };
 
 enum EMINIGAME
