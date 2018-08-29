@@ -4248,19 +4248,19 @@ void snakeInput()
 {
 	if (StageType == EMiniGameSnake)
 	{
-		if (g_abKeyPressed[K_W])
+		if (g_abKeyPressed[K_W] && Direction != 'S')
 		{
 			Direction = 'W';
 		}
-		if (g_abKeyPressed[K_A])
+		if (g_abKeyPressed[K_A] && Direction != 'D')
 		{
 			Direction = 'A';
 		}
-		if (g_abKeyPressed[K_S])
+		if (g_abKeyPressed[K_S] && Direction != 'W')
 		{
 			Direction = 'S';
 		}
-		if (g_abKeyPressed[K_D])
+		if (g_abKeyPressed[K_D] && Direction != 'A')
 		{
 			Direction = 'D';
 		}
