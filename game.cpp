@@ -69,7 +69,6 @@ bool        win = false;
 bool		g_bMinigame = false;
 bool        g_bforscore = false;
 bool        newScore = false;
-int         testName = 0;
 int		    g_shootdist = 0;
 int		    g_shootmaxdist = 2; // Shooting distance of weapon. Can be changed.
 EGAMESTATES	    g_eGameState = S_INTRO;
@@ -102,6 +101,11 @@ bool        AppleCollected = true;
 int rally = 0;
 int pong_t = 0,pong_t2 = 0, pong_t3 = 0;
 int snake_length = 0, snake_length2 = 0, snake_length3 = 0;
+int changedline = 0;
+int firstLetter = 65;
+int secondLetter = 65;
+int thirdLetter = 65;
+std::string NameHandler[6];
 
 // Console object
 Console g_Console(80, 24, "Monster Dungeon"); // name at the top
@@ -3543,137 +3547,50 @@ void continueSave()
 void highscoreSave()
 {
 	std::fstream score("map/highscore.txt");
-
-	if (rally > pong_t && StageType == EMinigame2)
+	short savenamelocation = 0;
+	if (rally >= pong_t && StageType == EMinigame2)
 	{
 		pong_t3 = pong_t2;
 		pong_t2 = pong_t;
 		pong_t = rally;
+		changedline = 0;
 		newScore = true;
 	}
-	else if (rally > pong_t2 && rally < pong_t && StageType == EMinigame2)
+	else if (rally >= pong_t2 && rally < pong_t && StageType == EMinigame2)
 	{
 		pong_t3 = pong_t2;
 		pong_t2 = rally;
+		changedline = 1;
 		newScore = true;
 	}
-	else if (rally > pong_t3 && rally < pong_t2 && StageType == EMinigame2)
+	else if (rally >= pong_t3 && rally < pong_t2 && StageType == EMinigame2)
 	{
 		pong_t3 = rally;
+		changedline = 2;
 		newScore = true;
 	}
 
-	if (snake_Size > snake_length && StageType == EMiniGameSnake)
+	if (snake_Size >= snake_length && StageType == EMiniGameSnake)
 	{
 		snake_length3 = snake_length2;
 		snake_length2 = snake_length;
 		snake_length = snake_Size;
+		changedline = 3;
 		newScore = true;
 	}
-	else if (snake_Size > snake_length2 && snake_Size < snake_length && StageType == EMiniGameSnake)
+	else if (snake_Size >= snake_length2 && snake_Size < snake_length && StageType == EMiniGameSnake)
 	{
 		snake_length3 = snake_length2;
 		snake_length2 = snake_Size;
+		changedline = 4;
 		newScore = true;
 	}
-	else if (snake_Size > snake_length3 && snake_Size < snake_length2 && StageType == EMiniGameSnake)
+	else if (snake_Size >= snake_length3 && snake_Size < snake_length2 && StageType == EMiniGameSnake)
 	{
 		snake_length3 = snake_Size;
+		changedline = 5;
 		newScore = true;
 
-	}
-
-	// size_t letter = 65;
-	int firstLetter = 65;
-	int secondLetter = 65;
-	int thirdLetter = 65;
-	COORD c = g_Console.getConsoleSize();
-	c.X = 40;
-	c.Y = 10;
-	bool bSomethingHappened = false;
-	if (g_dBounceTime > g_dElapsedTime)
-		return;
-
-	if (newScore)
-	{
-		switch (EName)
-		{
-		case NFIRST:
-			g_Console.writeToBuffer(c, firstLetter, 0x0f);
-			break;
-		case NSECOND:
-			g_Console.writeToBuffer(c, secondLetter, 0x0f);
-			break;
-		case NTHIRD:
-			g_Console.writeToBuffer(c, thirdLetter, 0x0f);
-			break;
-		}
-
-		if (EName == NFIRST && g_eGameState == S_Inputname)
-		{
-			if (g_abKeyPressed[K_DOWN] && firstLetter < 91)
-				firstLetter++;
-			else
-				firstLetter = 65;
-
-			if (g_abKeyPressed[K_UP] && firstLetter < 91)
-				firstLetter--;
-			else
-				firstLetter = 90;
-
-			if (g_abKeyPressed[K_ENTER])
-			{
-				score << firstLetter;
-				c.X += 1;
-				EName = NSECOND;
-			}
-		}
-		if (EName == NSECOND && g_eGameState == S_Inputname)
-		{
-			if (g_abKeyPressed[K_DOWN] && secondLetter < 91)
-				secondLetter++;
-			else
-				secondLetter = 65;
-
-			if (g_abKeyPressed[K_UP] && secondLetter > 64)
-				secondLetter--;
-			else
-				secondLetter = 90;
-
-			if (g_abKeyPressed[K_ENTER])
-			{
-				score << secondLetter;
-				c.X += 1;
-				EName = NTHIRD;
-			}
-		}
-		if (EName == NTHIRD && g_eGameState == S_Inputname)
-		{
-			if (g_abKeyPressed[K_DOWN] && thirdLetter < 91)
-				thirdLetter++;
-			else
-				thirdLetter = 65;
-
-			if (g_abKeyPressed[K_UP] && thirdLetter > 64)
-				thirdLetter--;
-			else
-				thirdLetter = 90;
-
-			if (g_abKeyPressed[K_ENTER])
-			{
-				score << thirdLetter << std::endl;
-				g_eGameState = S_HIGHSCORE;
-			}
-			if (g_abKeyPressed[K_ENTER] && g_eGameState == S_HIGHSCORE)
-			{
-				g_eGameState = S_MINIGAME;
-			}
-		}
-		if (bSomethingHappened)
-		{
-			// set the bounce time to some time in the future to prevent accidental triggers
-			g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
-		}
 	}
 
 	score << pong_t << std::endl;
@@ -3682,6 +3599,183 @@ void highscoreSave()
 	score << snake_length << std::endl;
 	score << snake_length2 << std::endl;
 	score << snake_length3 << std::endl;
+
+	COORD c = g_Console.getConsoleSize();
+	std::stringstream stringmerge;
+	c.X = 40;
+	c.Y = 10;
+	bool bSomethingHappened = false;
+
+	if (newScore)
+	{
+
+		if (EName == NFIRST)
+			g_Console.writeToBuffer(c, firstLetter, 0x0d);
+		else
+			g_Console.writeToBuffer(c, firstLetter, 0x0f);
+		c.X += 1;
+		if (EName == NSECOND)
+			g_Console.writeToBuffer(c, secondLetter, 0x0d);
+		else
+			g_Console.writeToBuffer(c, secondLetter, 0x0f);
+		c.X += 1;
+		if (EName == NTHIRD)
+			g_Console.writeToBuffer(c, thirdLetter, 0x0d);
+		else
+			g_Console.writeToBuffer(c, thirdLetter, 0x0f);
+
+
+		if (EName == NFIRST && g_eGameState == S_Inputname && delay > 5)
+		{
+			if (g_abKeyPressed[K_DOWN] && firstLetter < 91)
+			{
+				bSomethingHappened = true;
+				firstLetter++;
+
+			}
+			else if (firstLetter == 91)
+				firstLetter = 65;
+
+			if (g_abKeyPressed[K_UP] && firstLetter < 91 && firstLetter > 64)
+			{
+				bSomethingHappened = true;
+				firstLetter--;
+
+			}
+			else if (firstLetter == 64)
+				firstLetter = 90;
+
+			if (g_abKeyPressed[K_RIGHT])
+			{
+				EName = NSECOND;
+				bSomethingHappened = true;
+			}
+			if (g_abKeyPressed[K_LEFT])
+			{
+				EName = NTHIRD;
+				bSomethingHappened = true;
+			}
+			if (g_abKeyPressed[K_ENTER] && g_eGameState == S_Inputname)
+			{
+				stringmerge << " (" << (char)firstLetter << (char)secondLetter << (char)thirdLetter << ")";
+				NameHandler[changedline] = stringmerge.str();
+				firstLetter = 65;
+				secondLetter = 65;
+				thirdLetter = 65;
+				for (int i = 0; 6 > i; i++)
+				{
+					score << NameHandler[i] << std::endl;
+				}
+				g_eGameState = S_HIGHSCORE;
+			}
+			delay = 0;
+		}
+		
+
+		if (EName == NSECOND && g_eGameState == S_Inputname && delay > 5)
+		{
+			if (g_abKeyPressed[K_DOWN] && secondLetter < 91)
+			{
+				bSomethingHappened = true;
+				secondLetter++;
+
+			}
+			else if (secondLetter == 91)
+				secondLetter = 65;
+
+			if (g_abKeyPressed[K_UP] && secondLetter < 91 && secondLetter > 64)
+			{
+				bSomethingHappened = true;
+				secondLetter--;
+
+			}
+			else if (secondLetter == 64)
+				secondLetter = 90;
+
+			if (g_abKeyPressed[K_RIGHT])
+			{
+				EName = NTHIRD;
+				bSomethingHappened = true;
+			}
+			if (g_abKeyPressed[K_LEFT])
+			{
+				EName = NFIRST;
+				bSomethingHappened = true;
+			}
+			if (g_abKeyPressed[K_ENTER] && g_eGameState == S_Inputname)
+			{
+				stringmerge << " (" << (char)firstLetter << (char)secondLetter << (char)thirdLetter << ")";
+				NameHandler[changedline] = stringmerge.str();
+				firstLetter = 65;
+				secondLetter = 65;
+				thirdLetter = 65;
+				for (int i = 0; 6 > i; i++)
+				{
+					score << NameHandler[i] << std::endl;
+				}
+				g_eGameState = S_HIGHSCORE;
+			}
+			delay = 0;
+		}
+
+		if (EName == NTHIRD && g_eGameState == S_Inputname && delay > 5)
+		{
+			if (g_abKeyPressed[K_DOWN] && thirdLetter < 91)
+			{
+				bSomethingHappened = true;
+				thirdLetter++;
+
+			}
+			else if (thirdLetter == 91)
+				thirdLetter = 65;
+
+			if (g_abKeyPressed[K_UP] && thirdLetter < 91 && thirdLetter > 64)
+			{
+				bSomethingHappened = true;
+				thirdLetter--;
+
+			}
+			else if (thirdLetter == 64)
+				thirdLetter = 90;
+
+			if (g_abKeyPressed[K_RIGHT])
+			{
+				EName = NFIRST;
+				bSomethingHappened = true;
+			}
+			if (g_abKeyPressed[K_LEFT])
+			{
+				EName = NSECOND;
+				bSomethingHappened = true;
+			}
+			if (g_abKeyPressed[K_ENTER] && g_eGameState == S_Inputname)
+			{
+				stringmerge << "(" << (char)firstLetter << (char)secondLetter << (char)thirdLetter << ")";
+				NameHandler[changedline] = stringmerge.str();
+				firstLetter = 65;
+				secondLetter = 65;
+				thirdLetter = 65;
+				for (int i = 0; 6 > i; i++)
+				{
+					score << NameHandler[i] << std::endl;
+				}
+				g_eGameState = S_HIGHSCORE;
+			}
+			delay = 0;
+		}
+		
+		delay++;
+		if (bSomethingHappened)
+		{
+			// set the bounce time to some time in the future to prevent accidental triggers
+			g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
+		}
+		if (g_dBounceTime > g_dElapsedTime)
+			return;
+
+	}
+
+
 	score.close();
 }
 void highscoreLoad()
@@ -3696,22 +3790,37 @@ void highscoreLoad()
 		g_eGameState = S_TITLE;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
+	if (g_abKeyPressed[K_ENTER] && g_eGameState == S_HIGHSCORE)
+		g_eGameState = S_MINIGAME;
 	std::ifstream score("map/highscore.txt");
-	score >> testName;
 	score >> pong_t;
 	score >> pong_t2;
 	score >> pong_t3;
 	score >> snake_length;
 	score >> snake_length2;
 	score >> snake_length3;
+	score.ignore();
+	for (int i = 0; 6 > i; i++)
+	{
+		getline(score,NameHandler[i]);
+		
+	}
 	std::string first = std::to_string(pong_t);
+	first.append(NameHandler[0]);
 	std::string second = std::to_string(pong_t2);
+	second.append(NameHandler[1]);
 	std::string third = std::to_string(pong_t3);
+	third.append(NameHandler[2]);
 	std::string length1 = std::to_string(snake_length);
+	length1.append(NameHandler[3]);
 	std::string length2 = std::to_string(snake_length2);
+	length2.append(NameHandler[4]);
 	std::string length3 = std::to_string(snake_length3);
+	length3.append(NameHandler[5]);
+
+	
 	COORD c = g_Console.getConsoleSize();
-	c.X = 37;
+	c.X = 40;
 	c.Y = 6;
 	g_Console.writeToBuffer(c, first, 0x0f);
 	c.Y += 1;
@@ -3719,7 +3828,6 @@ void highscoreLoad()
 	c.Y += 1;
 	g_Console.writeToBuffer(c, third, 0x0f);
 	c.Y = 15;
-	c.X += 3;
 	g_Console.writeToBuffer(c, length1, 0x0f);
 	c.Y += 1;
 	g_Console.writeToBuffer(c, length2, 0x0f);

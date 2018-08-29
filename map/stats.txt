@@ -1,10 +1,10 @@
-Spear
-1
 Pistol
-24
+150
 Crossbow
-16
+0
+Spear
+0
 Rifle
-40
-3
-2
+0
+10
+11
