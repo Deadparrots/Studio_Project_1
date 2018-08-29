@@ -134,9 +134,7 @@ struct WeaponParameters
 	std::string Name;
 	int Clip; // Ammo in Clip
 	int ClipMax; // Max size of Clip
-	int AmmoTotal; // Total Ammo
 	int Reload; // Reload Speed
-	int ProjectileSpeed; // Projectile Speed
 	int Range; // Range
 };
 

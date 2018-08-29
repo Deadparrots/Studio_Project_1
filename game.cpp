@@ -1668,6 +1668,7 @@ void moveCharacter()
 			currentWeapon++;
 		else
 			currentWeapon = 0;
+		g_shootmaxdist = Weapons[currentWeapon].Range;
 		g_dBounceTime = g_dElapsedTime + 0.2;
 	}
 	if (
@@ -3174,26 +3175,26 @@ void shop() {
 		{
 			m.Y += 2;
 			m.X = g_Console.getConsoleSize().X / 2 - 21;
-			g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x03);
+			g_Console.writeToBuffer(m, "100 Coins: Crossbow", 0x03);
 		}
 		else
 		{
 			m.Y += 2;
 			m.X = g_Console.getConsoleSize().X / 2 - 21;
-			g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x0D);
+			g_Console.writeToBuffer(m, "100 Coins: Crossbow", 0x0D);
 		}
 
 		if (Weapon2 == 0)
 		{
 			m.Y = 17;
 			m.X = m.X / 2 + 32;
-			g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x03);
+			g_Console.writeToBuffer(m, "150 Coins: Rifle", 0x03);
 		}
 		else
 		{
 			m.Y = 17;
 			m.X = m.X / 2 + 32;
-			g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x0D);
+			g_Console.writeToBuffer(m, "150 Coins: Rifle", 0x0D);
 		}
 
 		m.Y += 2;
@@ -3210,20 +3211,20 @@ void shop() {
 
 		m.Y += 2;
 		m.X = g_Console.getConsoleSize().X / 2 - 21;
-		g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x0E);
+		g_Console.writeToBuffer(m, "100 Coins: Crossbow", 0x0E);
 
 
 		if (Weapon2 == 0)
 		{
 			m.Y = 17;
 			m.X = m.X / 2 + 32;
-			g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x03);
+			g_Console.writeToBuffer(m, "150 Coins: Rifle", 0x03);
 		}
 		else
 		{
 			m.Y = 17;
 			m.X = m.X / 2 + 32;
-			g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x0D);
+			g_Console.writeToBuffer(m, "150 Coins: Rifle", 0x0D);
 		}
 
 		m.Y += 2;
@@ -3242,18 +3243,18 @@ void shop() {
 		{
 			m.Y += 2;
 			m.X = g_Console.getConsoleSize().X / 2 - 21;
-			g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x03);
+			g_Console.writeToBuffer(m, "100 Coins: Crossbow", 0x03);
 		}
 		else
 		{
 			m.Y += 2;
 			m.X = g_Console.getConsoleSize().X / 2 - 21;
-			g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x0D);
+			g_Console.writeToBuffer(m, "100 Coins: Crossbow", 0x0D);
 		}
 
 		m.Y = 17;
 		m.X = m.X / 2 + 32;
-		g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x0E);
+		g_Console.writeToBuffer(m, "150 Coins: Rifle", 0x0E);
 
 		m.Y += 2;
 		m.X = g_Console.getConsoleSize().X / 2 + 1;
@@ -3272,26 +3273,26 @@ void shop() {
 		{
 			m.Y += 2;
 			m.X = g_Console.getConsoleSize().X / 2 - 21;
-			g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x03);
+			g_Console.writeToBuffer(m, "100 Coins: Crossbow", 0x03);
 		}
 		else if (Weapon1)
 		{
 			m.Y += 2;
 			m.X = g_Console.getConsoleSize().X / 2 - 21;
-			g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x0D);
+			g_Console.writeToBuffer(m, "100 Coins: Crossbow", 0x0D);
 		}
 
 		if (Weapon2 == 0)
 		{
 			m.Y = 17;
 			m.X = m.X / 2 + 32;
-			g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x03);
+			g_Console.writeToBuffer(m, "150 Coins: Rifle", 0x03);
 		}
 		else
 		{
 			m.Y = 17;
 			m.X = m.X / 2 + 32;
-			g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x0D);
+			g_Console.writeToBuffer(m, "150 Coins: Rifle", 0x0D);
 		}
 
 		m.Y += 2;
@@ -3416,7 +3417,7 @@ void shop() {
 
 	else 
 		g_PressedToMove = true;
-	processUserInput();
+	//processUserInput();
 	renderUI();
 }
 
@@ -3441,18 +3442,18 @@ void shopoption()
 
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMW1 && g_eGameState == S_SHOP && Weapon1 == 0) // CONTINUE_GAME
 	{
-		if (Coin >= 50 && Weapon1 == 0)
+		if (Coin >= 100 && Weapon1 == 0)
 		{
-			Coin -= 50;
+			Coin -= 100;
 			Weapon1 = 1;
 		}
 	}
 
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMW2 && g_eGameState == S_SHOP && Weapon2 == 0) // CONTINUE_GAME
 	{
-		if (Coin >= 70 && Weapon2 == 0)
+		if (Coin >= 150 && Weapon2 == 0)
 		{
-			Coin -= 70;
+			Coin -= 150;
 			Weapon2 = 1;
 		}
 	}
