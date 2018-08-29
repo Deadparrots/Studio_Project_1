@@ -3929,32 +3929,32 @@ void highscoreSave()
 {
 	std::fstream score("map/highscore.txt");
 
-	if (rally > pong_t && StageType == EMinigame2)
+	if (rally >= pong_t && StageType == EMinigame2)
 	{
 		pong_t3 = pong_t2;
 		pong_t2 = pong_t;
 		pong_t = rally;
 	}
-	else if (rally > pong_t2 && rally < pong_t && StageType == EMinigame2)
+	else if (rally >= pong_t2 && rally < pong_t && StageType == EMinigame2)
 	{
 		pong_t3 = pong_t2;
 		pong_t2 = rally;
 	}
-	else if (rally > pong_t3 && rally < pong_t2 && StageType == EMinigame2)
+	else if (rally >= pong_t3 && rally < pong_t2 && StageType == EMinigame2)
 		pong_t3 = rally;
 
-	if (snake_Size > snake_length && StageType == EMiniGameSnake)
+	if (snake_Size >= snake_length && StageType == EMiniGameSnake)
 	{
 		snake_length3 = snake_length2;
 		snake_length2 = snake_length;
 		snake_length = snake_Size;
 	}
-	else if (snake_Size > snake_length2 && snake_Size < snake_length && StageType == EMiniGameSnake)
+	else if (snake_Size >= snake_length2 && snake_Size < snake_length && StageType == EMiniGameSnake)
 	{
 		snake_length3 = snake_length2;
 		snake_length2 = snake_Size;
 	}
-	else if (snake_Size > snake_length3 && snake_Size < snake_length2 && StageType == EMiniGameSnake)
+	else if (snake_Size >= snake_length3 && snake_Size < snake_length2 && StageType == EMiniGameSnake)
 		snake_length3 = snake_Size;
 
 	score << pong_t << std::endl;
@@ -4348,6 +4348,32 @@ void tictactoeWin()
 				win = false;
 			}
 		}
+		if (charOne != 49 &&
+			charTwo != 50 &&
+			charThree != 51 &&
+			charFour != 52 &&
+			charFive != 53 &&
+			charSix != 54 &&
+			charSeven != 55 &&
+			charEight != 56 &&
+			charNine != 57)
+		{
+			g_Console.writeToBuffer(c, "Tie", 0x0f);
+			if (g_abKeyPressed[K_SPACE])
+			{
+				b_number = 1;
+				charOne = 49;
+				charTwo = 50;
+				charThree = 51;
+				charFour = 52;
+				charFive = 53;
+				charSix = 54;
+				charSeven = 55;
+				charEight = 56;
+				charNine = 57;
+				win = false;
+			}
+		}
 	}
 }
 void minigame()
@@ -4517,6 +4543,7 @@ void minigameselect()
 		g_eGameState = S_GAME;
 		minigame1_init();
 		stages = 50;
+		Lives = 1;
 		int_stages = 50;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
@@ -4528,7 +4555,7 @@ void minigameselect()
 		StageType = EMinigame2;
 		g_eGameState = S_GAME;
 		minigame2_init();
-	    Lives = 2;
+	    Lives = 1;
 		stages = 10;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
