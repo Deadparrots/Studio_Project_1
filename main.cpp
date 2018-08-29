@@ -18,6 +18,7 @@ void mainLoop( void );
 // You should not be modifying this unless you know what you are doing
 int main( void )
 {
+	convertToString();
     mainLoop();  // main loop
     shutdown();  // do clean up, if any. free memory.
     
