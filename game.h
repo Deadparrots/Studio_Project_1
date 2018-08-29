@@ -91,7 +91,6 @@ enum EMAINMENU
 	MMminigame
 };
 
-
 enum ENAME
 {
 	NFIRST,

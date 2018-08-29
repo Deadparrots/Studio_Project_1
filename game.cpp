@@ -453,7 +453,7 @@ void render()
 	case S_CONTINUE: continueSave();
 		break;
 	case S_Inputname: highscoreSave();
-      break;
+		break;
 	case S_SHOP: shop();
 		break;
 	}
@@ -490,7 +490,7 @@ void intro()
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
-		g_dBounceTime = g_dElapsedTime + 0.15; // 150ms should be enough
+		g_dBounceTime = g_dElapsedTime + 0.15; // 125ms should be enough
 	}
 }
 void splashScreenWait()
@@ -565,7 +565,6 @@ void splashScreenWait()
 	else if (MMSelect == MMminigame && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMInstructions;
-
 		bSomethingHappened = true;
 	}
 	else if (MMSelect == MMStart && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
@@ -629,7 +628,7 @@ void splashScreenWait()
 		Weapon1 = 0;
 		Weapon2 = 0;
 		save();
-		g_eGameState = S_GAME;
+		g_eGameState = S_CONTINUE;
 	}
 	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMContinue && g_eGameState == S_TITLE)
 	{
@@ -1058,10 +1057,7 @@ void minigame2_moveCharacter()
 		    g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
 	}
 	if (bSomethingHappened)	
-	{	
 		g_dBounceTime = g_dElapsedTime + 0.03 + 0.1/stages; // 125ms should be enough	
-	}	
-
 }
 void bossbattle_moveCharacter()
 {
@@ -1220,7 +1216,6 @@ void bossbattle_moveCharacter()
 		g_gaster1.m_bFire = true;
 		g_gaster1.m_cLocation.X = 50 - 30 * (g_dElapsedTime - 43);
 		shootsound = true;
-
 	}
 	else if (g_dElapsedTime > 45 && g_dElapsedTime <= 46)
 	{
@@ -1703,42 +1698,36 @@ void moveCharacter()
 		g_enemy1.m_bActive = false;
 		g_enemy1.m_cLocation.X = 0;
 		g_enemy1.m_cLocation.Y = 0;
-		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y)
 	{
 		g_enemy2.m_bActive = false;
 		g_enemy2.m_cLocation.X = 0;
 		g_enemy2.m_cLocation.Y = 0;
-		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y)
 	{
 		g_enemy3.m_bActive = false;
 		g_enemy3.m_cLocation.X = 0;
 		g_enemy3.m_cLocation.Y = 0;
-		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y)
 	{
 		g_enemy4.m_bActive = false;
 		g_enemy4.m_cLocation.X = 0;
 		g_enemy4.m_cLocation.Y = 0;
-		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y)
 	{
 		g_enemy5.m_bActive = false;
 		g_enemy5.m_cLocation.X = 0;
 		g_enemy5.m_cLocation.Y = 0;
-		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y)
 	{
 		g_enemy6.m_bActive = false;
 		g_enemy6.m_cLocation.X = 0;
 		g_enemy6.m_cLocation.Y = 0;
-		reload();
 	}
 	size_t rate = 100 / (stages + 1) + 100;
 	switch (rand() % rate)
@@ -2057,20 +2046,18 @@ void processUserInput()
 		{
 			highscoreLoad();
 			highscoreSave();
-
 			if (newScore)
 				g_eGameState = S_Inputname;
 			else
 				g_eGameState = S_MINIGAME;
 			g_dBounceTime = g_dElapsedTime + 0.125;
 			PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
-
 			b_play = false;
 		}
 		else
 		{
-			PlaySound(TEXT("sound/die.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 			g_eGameState = S_GAMEOVER;
+			PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME | SND_LOOP);
 		}
 	}
 	if (g_abKeyPressed[K_C])
@@ -2170,8 +2157,6 @@ void processUserInput()
 				minigame2_init();
 			else
 				init();
-			save();
-
 			if (Lives != 99)
 				Lives++;
 			save();
@@ -2923,83 +2908,6 @@ void renderpaddle2()
 	}
 }						
 void renderDoor()
-
-{
-	WORD charColor = 0x0E;
-	char character = '<';
-	if (g_minigame1_beat1.m_bLeft)
-		character = '>';
-	if (g_minigame1_beat1.m_bActive)
-	{
-		g_Console.writeToBuffer(g_minigame1_beat1.m_cLocation, character, charColor);
-	}
-}
-void renderbeat2()
-{
-	WORD charColor = 0x0E;
-	char character = '<';
-	if (g_minigame1_beat2.m_bLeft)
-		character = '>';
-	if (g_minigame1_beat2.m_bActive)
-	{
-		g_Console.writeToBuffer(g_minigame1_beat2.m_cLocation, character, charColor);
-	}
-}
-void renderbeat3()
-{
-	WORD charColor = 0x0E;
-	char character = '<';
-	if (g_minigame1_beat3.m_bLeft)
-		character = '>';
-	if (g_minigame1_beat3.m_bActive)
-	{
-		g_Console.writeToBuffer(g_minigame1_beat3.m_cLocation, character, charColor);
-	}
-}
-void renderbeat4()
-{
-	WORD charColor = 0x0E;
-	char character = '<';
-	if (g_minigame1_beat4.m_bLeft)
-		character = '>';
-	if (g_minigame1_beat4.m_bActive)
-	{
-		g_Console.writeToBuffer(g_minigame1_beat4.m_cLocation, character, charColor);
-	}
-}
-void renderpaddle1()
-{
-	WORD charColor = 0x0A;
-	char character = 186;
-	if (g_minigame2_paddle1.m_bActive)
-	{
-		COORD c;
-		for (size_t i = 0; i < 5; i++)
-		{
-			c.X = g_minigame2_paddle1.m_cLocation.X;
-			c.Y = g_minigame2_paddle1.m_cLocation.Y + i - 2;
-			g_Console.writeToBuffer(c, character, charColor);
-		}
-
-	}
-}
-void renderpaddle2()
-{
-	WORD charColor = 0x0C;
-	char character = 186;
-	if (g_minigame2_paddle2.m_bActive)
-	{
-		COORD c;
-		for (size_t i = 0; i < 5; i++)
-		{
-			c.X = g_minigame2_paddle2.m_cLocation.X;
-			c.Y = g_minigame2_paddle2.m_cLocation.Y + i - 2;
-			g_Console.writeToBuffer(c, character, charColor);
-		}
-
-	}
-}						
-void renderDoor()
 {
 	// Draw the location of the door
 	WORD charColor = 0x0B;
@@ -3162,10 +3070,6 @@ void renderBossSpeech()
 		{
 			g_Console.writeToBuffer(COORD{ i % 4 + 63, i / 4 + 7 }, text[i % 4], 0x0C);
 		}
-	for (size_t i = 0; i < 80 * 24; i++)
-	{
-		if (Map[i] == '`' && i > 80 && i < 23 * 80 && ((Map[i - 80] == ' ') || Map[i + 80] == ' '|| Map[i + 1] == ' ' || Map[i - 1] == ' '))
-			Map[i] = 219;	
 	}
 }
 void renderFramerate()
@@ -3191,1131 +3095,72 @@ void renderToScreen()
 	// Writes the buffer to the console, hence you will see what you have written
 	g_Console.flushBufferToConsole();
 }
-void convertToString()
+void gameOver()
 {
-	std::fstream myfile1("map/bossmap.txt");
-	std::string sLine;
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile1.seekg(i);
-		char * buffer = new char[1];
-		myfile1.read(buffer, 1);
-		if (buffer[0] != '\n')
-			SansMap.push_back(buffer[0]);
-	}
-	myfile1.close();
-	std::fstream myfile2("map/bossscreen.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile2.seekg(i);
-		char * buffer = new char[1];
-		myfile2.read(buffer, 1);
-		if (buffer[0] != '\n')
-			SansFightMap.push_back(buffer[0]);
-	}
-	myfile2.close();
-	std::fstream myfile3("map/instructions.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile3.seekg(i);
-		char * buffer = new char[1];
-		myfile3.read(buffer, 1);
-		if (buffer[0] != '\n')
-			Instructions.push_back(buffer[0]);
-	}
-	myfile3.close();
-	std::fstream myfile4("map/title.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile4.seekg(i);
-		char * buffer = new char[1];
-		myfile4.read(buffer, 1);
-		if (buffer[0] != '\n')
-			Title.push_back(buffer[0]);
-	}
-	myfile4.close();
-	std::fstream myfile5("map/gameover.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile5.seekg(i);
-		char * buffer = new char[1];
-		myfile5.read(buffer, 1);
-		if (buffer[0] != '\n')
-			GameOver.push_back(buffer[0]);
-	}
-	myfile5.close();
-	std::fstream myfile6("map/scene1.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile6.seekg(i);
-		char * buffer = new char[1];
-		myfile6.read(buffer, 1);
-		if (buffer[0] != '\n')
-			Scene1.push_back(buffer[0]);
-	}
-	myfile6.close();
-	std::fstream myfile7("map/scene2.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile7.seekg(i);
-		char * buffer = new char[1];
-		myfile7.read(buffer, 1);
-		if (buffer[0] != '\n')
-			Scene2.push_back(buffer[0]);
-	}
-	myfile7.close();
-	std::fstream myfile8("map/scene3.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile8.seekg(i);
-		char * buffer = new char[1];
-		myfile8.read(buffer, 1);
-		if (buffer[0] != '\n')
-			Scene3.push_back(buffer[0]);
-	}
-	myfile8.close();
-	std::fstream myfile9("map/scene4.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile9.seekg(i);
-		char * buffer = new char[1];
-		myfile9.read(buffer, 1);
-		if (buffer[0] != '\n')
-			Scene4.push_back(buffer[0]);
-	}
-	myfile9.close();
-	std::fstream myfile10("map/scene5.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile10.seekg(i);
-		char * buffer = new char[1];
-		myfile10.read(buffer, 1);
-		if (buffer[0] != '\n')
-			Scene5.push_back(buffer[0]);
-	}
-	myfile10.close();
-	std::fstream myfile11("map/minigame1map.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile11.seekg(i);
-		char * buffer = new char[1];
-		myfile11.read(buffer, 1);
-		if (buffer[0] != '\n')
-			Minigame1Map.push_back(buffer[0]);
-	}
-	myfile11.close();
-	std::fstream myfile12("map/minigame2map.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile12.seekg(i);
-		char * buffer = new char[1];
-		myfile12.read(buffer, 1);
-		if (buffer[0] != '\n')
-			Minigame2Map.push_back(buffer[0]);
-	}
-	myfile12.close();
-
-	std::fstream tictactoe("map/tictactoe.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		tictactoe.seekg(i);
-		char * buffer = new char[1];
-		tictactoe.read(buffer, 1);
-		if (buffer[0] != '\n')
-			tictactoeGame.push_back(buffer[0]);
-	}
-	tictactoe.close();
-	std::fstream MgameMenu("map/minigamemenu.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		MgameMenu.seekg(i);
-		char * buffer = new char[1];
-		MgameMenu.read(buffer, 1);
-		if (buffer[0] != '\n')
-			minigameMenu.push_back(buffer[0]);
-	}
-	MgameMenu.close();
-	std::fstream myfile13("map/snek.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile11.seekg(i);
-		char * buffer = new char[i];
-		myfile13.read(buffer, 1);
-		if (buffer[0] != '\n')
-		{
-			SnakeMap.push_back(buffer[0]);
-		}
-	}
-	myfile13.close();
-	std::fstream score("map/ladder.txt");
-	for (short i = 0; i < 25 * 80; i++)
-	{
-		myfile11.seekg(i);
-		char * buffer = new char[i];
-		score.read(buffer, 1);
-		if (buffer[0] != '\n')
-		{
-			Highscore.push_back(buffer[0]);
-		}
-	}
-	score.close();
-}					
-void save()
-{
-	std::ofstream stats("map/stats.txt");
-	for (int currentWeapon = 0; currentWeapon < 4; currentWeapon++)
-	{
-		stats << Weapons[currentWeapon].Name << std::endl;
-		stats << Weapons[currentWeapon].Clip << std::endl;
-	}
-	stats << Lives << std::endl;
-	stats << int_stages << std::endl;
-	stats.close();
-	g_eGameState = S_GAME;
-}
-void continueSave()
-{
-	init();
-	std::fstream stats("map/stats.txt"); // get back the stats from ui (for every weapons + lives left + stage level currently at + location of stuffs)
-	for (int currentWeapon = 0; currentWeapon < 4; currentWeapon++)
-	{
-		stats >> Weapons[currentWeapon].Name;
-		stats >> Weapons[currentWeapon].Clip;
-	}
-	stats >> Lives;
-	stats >> int_stages;
-	stats.close();
-	stages = 0.000 + int_stages;
-	if (int_stages == 50)
-		StageType = EBoss;
-	else if (int_stages % 10 == 0)
-		StageType = EMinigame1;
-	else if (int_stages % 5 == 0)
-		StageType = EMinigame2;
-	else
-	{
-		if (StageType == EBossBattle || StageType == EMinigame1 || StageType == EMinigame2)
-			b_play = false;
-		StageType = EStage;
-	}
-	if (StageType == EBoss)
-		boss_init();
-	else if (StageType == EMinigame1)
-		minigame1_init();
-	else if (StageType == EMinigame2)
-		minigame2_init();
-	else
-		init();
-	MMSelect = MMStart;
-	g_eGameState = S_GAME;
-}
-void highscoreSave()
-{
-	std::fstream score("map/highscore.txt");
-	short savenamelocation = 0;
-	if (rally >= pong_t && StageType == EMinigame2)
-	{
-		pong_t3 = pong_t2;
-		pong_t2 = pong_t;
-		pong_t = rally;
-		changedline = 0;
-		newScore = true;
-	}
-	else if (rally >= pong_t2 && rally < pong_t && StageType == EMinigame2)
-	{
-		pong_t3 = pong_t2;
-		pong_t2 = rally;
-		changedline = 1;
-		newScore = true;
-	}
-	else if (rally >= pong_t3 && rally < pong_t2 && StageType == EMinigame2)
-	{
-		pong_t3 = rally;
-		changedline = 2;
-		newScore = true;
-	}
-
-	if (snake_Size >= snake_length && StageType == EMiniGameSnake)
-	{
-		snake_length3 = snake_length2;
-		snake_length2 = snake_length;
-		snake_length = snake_Size;
-		changedline = 3;
-		newScore = true;
-	}
-	else if (snake_Size >= snake_length2 && snake_Size < snake_length && StageType == EMiniGameSnake)
-	{
-		snake_length3 = snake_length2;
-		snake_length2 = snake_Size;
-		changedline = 4;
-		newScore = true;
-	}
-	else if (snake_Size >= snake_length3 && snake_Size < snake_length2 && StageType == EMiniGameSnake)
-	{
-		snake_length3 = snake_Size;
-		changedline = 5;
-		newScore = true;
-
-	}
-
-	score << pong_t << std::endl;
-	score << pong_t2 << std::endl;
-	score << pong_t3 << std::endl;
-	score << snake_length << std::endl;
-	score << snake_length2 << std::endl;
-	score << snake_length3 << std::endl;
-
-	COORD c = g_Console.getConsoleSize();
-	std::stringstream stringmerge;
-	c.X = 40;
-	c.Y = 10;
-	bool bSomethingHappened = false;
-
-	if (newScore)
-	{
-
-		if (EName == NFIRST)
-			g_Console.writeToBuffer(c, firstLetter, 0x0d);
-		else
-			g_Console.writeToBuffer(c, firstLetter, 0x0f);
-		c.X += 1;
-		if (EName == NSECOND)
-			g_Console.writeToBuffer(c, secondLetter, 0x0d);
-		else
-			g_Console.writeToBuffer(c, secondLetter, 0x0f);
-		c.X += 1;
-		if (EName == NTHIRD)
-			g_Console.writeToBuffer(c, thirdLetter, 0x0d);
-		else
-			g_Console.writeToBuffer(c, thirdLetter, 0x0f);
-
-
-		if (EName == NFIRST && g_eGameState == S_Inputname && delay > 5)
-		{
-			if (g_abKeyPressed[K_DOWN] && firstLetter < 91)
-			{
-				bSomethingHappened = true;
-				firstLetter++;
-
-			}
-			else if (firstLetter == 91)
-				firstLetter = 65;
-
-			if (g_abKeyPressed[K_UP] && firstLetter < 91 && firstLetter > 64)
-			{
-				bSomethingHappened = true;
-				firstLetter--;
-
-			}
-			else if (firstLetter == 64)
-				firstLetter = 90;
-
-			if (g_abKeyPressed[K_RIGHT])
-			{
-				EName = NSECOND;
-				bSomethingHappened = true;
-			}
-			if (g_abKeyPressed[K_LEFT])
-			{
-				EName = NTHIRD;
-				bSomethingHappened = true;
-			}
-			if (g_abKeyPressed[K_ENTER] && g_eGameState == S_Inputname)
-			{
-				stringmerge << " (" << (char)firstLetter << (char)secondLetter << (char)thirdLetter << ")";
-				NameHandler[changedline] = stringmerge.str();
-				firstLetter = 65;
-				secondLetter = 65;
-				thirdLetter = 65;
-				for (int i = 0; 6 > i; i++)
-				{
-					score << NameHandler[i] << std::endl;
-				}
-				g_eGameState = S_HIGHSCORE;
-			}
-			delay = 0;
-		}
-		
-
-		if (EName == NSECOND && g_eGameState == S_Inputname && delay > 5)
-		{
-			if (g_abKeyPressed[K_DOWN] && secondLetter < 91)
-			{
-				bSomethingHappened = true;
-				secondLetter++;
-
-			}
-			else if (secondLetter == 91)
-				secondLetter = 65;
-
-			if (g_abKeyPressed[K_UP] && secondLetter < 91 && secondLetter > 64)
-			{
-				bSomethingHappened = true;
-				secondLetter--;
-
-			}
-			else if (secondLetter == 64)
-				secondLetter = 90;
-
-			if (g_abKeyPressed[K_RIGHT])
-			{
-				EName = NTHIRD;
-				bSomethingHappened = true;
-			}
-			if (g_abKeyPressed[K_LEFT])
-			{
-				EName = NFIRST;
-				bSomethingHappened = true;
-			}
-			if (g_abKeyPressed[K_ENTER] && g_eGameState == S_Inputname)
-			{
-				stringmerge << " (" << (char)firstLetter << (char)secondLetter << (char)thirdLetter << ")";
-				NameHandler[changedline] = stringmerge.str();
-				firstLetter = 65;
-				secondLetter = 65;
-				thirdLetter = 65;
-				for (int i = 0; 6 > i; i++)
-				{
-					score << NameHandler[i] << std::endl;
-				}
-				g_eGameState = S_HIGHSCORE;
-			}
-			delay = 0;
-		}
-
-		if (EName == NTHIRD && g_eGameState == S_Inputname && delay > 5)
-		{
-			if (g_abKeyPressed[K_DOWN] && thirdLetter < 91)
-			{
-				bSomethingHappened = true;
-				thirdLetter++;
-
-			}
-			else if (thirdLetter == 91)
-				thirdLetter = 65;
-
-			if (g_abKeyPressed[K_UP] && thirdLetter < 91 && thirdLetter > 64)
-			{
-				bSomethingHappened = true;
-				thirdLetter--;
-
-			}
-			else if (thirdLetter == 64)
-				thirdLetter = 90;
-
-			if (g_abKeyPressed[K_RIGHT])
-			{
-				EName = NFIRST;
-				bSomethingHappened = true;
-			}
-			if (g_abKeyPressed[K_LEFT])
-			{
-				EName = NSECOND;
-				bSomethingHappened = true;
-			}
-			if (g_abKeyPressed[K_ENTER] && g_eGameState == S_Inputname)
-			{
-				stringmerge << "(" << (char)firstLetter << (char)secondLetter << (char)thirdLetter << ")";
-				NameHandler[changedline] = stringmerge.str();
-				firstLetter = 65;
-				secondLetter = 65;
-				thirdLetter = 65;
-				for (int i = 0; 6 > i; i++)
-				{
-					score << NameHandler[i] << std::endl;
-				}
-				g_eGameState = S_HIGHSCORE;
-			}
-			delay = 0;
-		}
-		
-		delay++;
-		if (bSomethingHappened)
-		{
-			// set the bounce time to some time in the future to prevent accidental triggers
-			g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
-		}
-		if (g_dBounceTime > g_dElapsedTime)
-			return;
-
-	}
-
-
-	score.close();
-}
-void highscoreLoad()
-{
-	std::vector<char>::iterator it = Highscore.begin();
-	for (short i = 0; i < 80 * 24; ++i)
-	{
-		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
-	}
-	if (g_abKeyPressed[K_ESCAPE])
-	{
-		g_eGameState = S_TITLE;
-		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
-	}
-	if (g_abKeyPressed[K_ENTER] && g_eGameState == S_HIGHSCORE)
-		g_eGameState = S_MINIGAME;
-	std::ifstream score("map/highscore.txt");
-	score >> pong_t;
-	score >> pong_t2;
-	score >> pong_t3;
-	score >> snake_length;
-	score >> snake_length2;
-	score >> snake_length3;
-	score.ignore();
-	for (int i = 0; 6 > i; i++)
-	{
-		getline(score,NameHandler[i]);
-		
-	}
-	std::string first = std::to_string(pong_t);
-	first.append(NameHandler[0]);
-	std::string second = std::to_string(pong_t2);
-	second.append(NameHandler[1]);
-	std::string third = std::to_string(pong_t3);
-	third.append(NameHandler[2]);
-	std::string length1 = std::to_string(snake_length);
-	length1.append(NameHandler[3]);
-	std::string length2 = std::to_string(snake_length2);
-	length2.append(NameHandler[4]);
-	std::string length3 = std::to_string(snake_length3);
-	length3.append(NameHandler[5]);
-
-	
-	COORD c = g_Console.getConsoleSize();
-	c.X = 40;
-	c.Y = 6;
-	g_Console.writeToBuffer(c, first, 0x0f);
-	c.Y += 1;
-	g_Console.writeToBuffer(c, second, 0x0f);
-	c.Y += 1;
-	g_Console.writeToBuffer(c, third, 0x0f);
-	c.Y = 15;
-	g_Console.writeToBuffer(c, length1, 0x0f);
-	c.Y += 1;
-	g_Console.writeToBuffer(c, length2, 0x0f);
-	c.Y += 1;
-	g_Console.writeToBuffer(c, length3, 0x0f);
-	score.close();
-}
-void tictactoePlay()
-{
-	if (b_number == 0)
-	{
-		b_number = 1;
-		if (charOne == '1' && (charTwo == charThree || charFour == charSeven || charFive == charNine)) // Counter/Win priority
-			charOne = 88;
-		else if (charTwo == '2' && (charOne == charThree || charFive == charEight))
-			charTwo = 88;
-		else if (charThree == '3' && (charOne == charTwo || charSix == charNine || charFive == charSeven))
-			charThree = 88;
-		else if (charFour == '4' && (charOne == charSeven || charFive == charSix))
-			charFour = 88;
-		else if (charFive == '5' && (charFour == charSix || charTwo == charEight || charOne == charNine || charThree == charSeven))
-			charFive = 88;
-		else if (charSix == '6' && (charThree == charNine || charFour == charFive))
-			charSix = 88;
-		else if (charSeven == '7' && (charOne == charFour || charEight == charNine || charFive == charThree))
-			charSeven = 88;
-		else if (charEight == '8' && (charSeven == charNine || charTwo == charFive))
-			charEight = 88;
-		else if (charNine == '9' && (charOne == charFive || charSeven == charEight || charThree == charSix))
-			charNine = 88;
-		else if (charFive == '5') // Middle slot next priority
-			charFive = 88;
-		else if (charOne == '1') // Corner slots next priority
-			charOne = 88;
-		else if (charThree == '3')
-			charThree = 88;
-		else if (charSeven == '7')
-			charSeven = 88;
-		else if (charNine == '9')
-			charNine = 88;
-		else if (charTwo == '2') // The rest of the slots not as important
-			charTwo = 88;
-		else if (charFour == '4')
-			charFour = 88;
-		else if (charSix == '6')
-			charSix = 88;
-		else if (charEight == '8')
-			charEight = 88;
-		else
-			b_number = 2;
-	}
-	else if (b_number == 1)
-	{
-		if (g_abKeyPressed[K_1] && charOne == '1')
-		{
-			charOne = 79;
-			b_number = 0;
-		}
-		else if (g_abKeyPressed[K_2] && charTwo == '2')
-		{
-			charTwo = 79;
-			b_number = 0;
-		}
-		else if (g_abKeyPressed[K_3] && charThree == '3')
-		{
-			charThree = 79;
-			b_number = 0;
-		}
-		else if (g_abKeyPressed[K_4] && charFour == '4')
-		{
-			charFour = 79;
-			b_number = 0;
-		}
-		else if (g_abKeyPressed[K_5] && charFive == '5')
-		{
-			charFive = 79;
-			b_number = 0;
-		}
-		else if (g_abKeyPressed[K_6] && charSix == '6')
-		{
-			charSix = 79;
-			b_number = 0;
-		}
-		else if (g_abKeyPressed[K_7] && charSeven == '7')
-		{
-			charSeven = 79;
-			b_number = 0;
-		}
-		else if (g_abKeyPressed[K_8] && charEight == '8')
-		{
-			charEight = 79;
-			b_number = 0;
-		}
-		else if (g_abKeyPressed[K_9] && charNine == '9')
-		{
-			charNine = 79;
-			b_number = 0;
-		}
-	}
-}
-void tictactoeMulti()
-{
-	bool bSomethingHappened = false;
-	if (b_number == 1 && !win)
-	{
-		if (g_abKeyPressed[K_1])
-			if (charOne == '1')
-			{
-				charOne = 79;
-				b_number++;
-			}
-		if (g_abKeyPressed[K_2])
-			if (charTwo == '2')
-			{
-				charTwo = 79;
-				b_number++;
-			}
-		if (g_abKeyPressed[K_3])
-			if (charThree == '3')
-			{
-				charThree = 79;
-				b_number++;
-			}
-		if (g_abKeyPressed[K_4])
-			if (charFour == '4')
-			{
-				charFour = 79;
-				b_number++;
-			}
-		if (g_abKeyPressed[K_5])
-			if (charFive == '5')
-			{
-				charFive = 79;
-				b_number++;
-			}
-		if (g_abKeyPressed[K_6])
-			if (charSix == '6')
-			{
-				charSix = 79;
-				b_number++;
-			}
-		if (g_abKeyPressed[K_7])
-			if (charSeven == '7')
-			{
-				charSeven = 79;
-				b_number++;
-			}
-		if (g_abKeyPressed[K_8])
-			if (charEight == '8')
-			{
-				charEight = 79;
-				b_number++;
-			}
-		if (g_abKeyPressed[K_9])
-			if (charNine == '9')
-			{
-				charNine = 79;
-				b_number++;
-			}
-	}
-	else if (b_number == 2 && !win)
-	{
-		if (g_abKeyPressed[K_1])
-			if (charOne == '1')
-			{
-				charOne = 88;
-				b_number--;
-			}
-		if (g_abKeyPressed[K_2])
-			if (charTwo == '2')
-			{
-				charTwo = 88;
-				b_number--;
-			}
-		if (g_abKeyPressed[K_3])
-			if (charThree == '3')
-			{
-				charThree = 88;
-				b_number--;
-			}
-		if (g_abKeyPressed[K_4])
-			if (charFour == '4')
-			{
-				charFour = 88;
-				b_number--;
-			}
-		if (g_abKeyPressed[K_5])
-			if (charFive == '5')
-			{
-				charFive = 88;
-				b_number--;
-			}
-		if (g_abKeyPressed[K_6])
-			if (charSix == '6')
-			{
-				charSix = 88;
-				b_number--;
-			}
-		if (g_abKeyPressed[K_7])
-			if (charSeven == '7')
-			{
-				charSeven = 88;
-				b_number--;
-			}
-		if (g_abKeyPressed[K_8])
-			if (charEight == '8')
-			{
-				charEight = 88;
-				b_number--;
-			}
-		if (g_abKeyPressed[K_9])
-			if (charNine == '9')
-			{
-				charNine = 88;
-				b_number--;
-			}
-	}
-	if (g_dBounceTime > g_dElapsedTime)
-		return;
-	if (bSomethingHappened)
-	{
-		g_dBounceTime = g_dElapsedTime + 0.125; // set the bounce time to some time in the future to prevent accidental triggers // 125ms should be enough
-	}
-}
-void renderTicTacToe()
-{
-	std::vector<char>::iterator it = tictactoeGame.begin();
-	for (short i = 0; i < 80 * 24; ++i)
-	{
-		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
-	}
-	COORD one; one.X = 33; one.Y = 9;
-	COORD two; two.X = 40; two.Y = 9;
-	COORD three; three.X = 47; three.Y = 9;
-	COORD four; four.X = 33; four.Y = 12;
-	COORD five; five.X = 40; five.Y = 12;
-	COORD six; six.X = 47; six.Y = 12;
-	COORD seven; seven.X = 33; seven.Y = 15;
-	COORD eight; eight.X = 40; eight.Y = 15;
-	COORD nine; nine.X = 47; nine.Y = 15;
-	COORD player; player.X = 5; player.Y = 21; // player b_number
-	g_sChar.m_cLocation.X = 0;
-	g_sChar.m_cLocation.Y = 0;
-	g_Console.writeToBuffer(one, charOne, charColouring(charOne));
-	g_Console.writeToBuffer(two, charTwo, charColouring(charTwo));
-	g_Console.writeToBuffer(three, charThree, charColouring(charThree));
-	g_Console.writeToBuffer(four, charFour, charColouring(charFour));
-	g_Console.writeToBuffer(five, charFive, charColouring(charFive));
-	g_Console.writeToBuffer(six, charSix, charColouring(charSix));
-	g_Console.writeToBuffer(seven, charSeven, charColouring(charSeven));
-	g_Console.writeToBuffer(eight, charEight, charColouring(charEight));
-	g_Console.writeToBuffer(nine, charNine, charColouring(charNine));
-	if (multi)
-	{
-		COORD c = g_Console.getConsoleSize();
-		c.X = 24;
-		c.Y = 18;
-		g_Console.writeToBuffer(c, "PLAYER 1", 0x0f);
-		c.X += 3;
-		c.Y += 1;
-		g_Console.writeToBuffer(c, "PLAYER 2", 0x0f);
-
-		g_Console.writeToBuffer(player, "Player", 0x0f);
-		player.X += 7;
-		std::string playerNo = std::to_string(b_number);
-		g_Console.writeToBuffer(player, playerNo, 0x0f);
-	}
-	tictactoeWin();
-}
-void tictactoeWin()
-{
-	COORD c; c.X = 37; c.Y = 21;
-	if (!multi)
-	{
-		if (b_number == 2)
-		{
-			g_Console.writeToBuffer(c, "Tie", 0x0f);
-
-		}
-		else if (charOne == charTwo && charTwo == charThree
-			|| charFour == charFive && charFive == charSix
-			|| charSeven == charEight && charEight == charNine
-			|| charOne == charFour && charFour == charSeven
-			|| charTwo == charFive && charFive == charEight
-			|| charThree == charSix && charSix == charNine
-			|| charOne == charFive && charFive == charNine
-			|| charThree == charFive && charFive == charSeven)
-		{
-			if (b_number == 0 || b_number == 3)
-			{
-				g_Console.writeToBuffer(c, "You Win", 0x0f);
-				b_number = 3;
-			}
-			else if (b_number == 1 || b_number == 4)
-			{
-				g_Console.writeToBuffer(c, "You Lose", 0x0f);
-				b_number = 4;
-			}
-		}
-		if (g_abKeyPressed[K_SPACE])
-		{
-			b_number = 1;
-			charOne = 49;
-			charTwo = 50;
-			charThree = 51;
-			charFour = 52;
-			charFive = 53;
-			charSix = 54;
-			charSeven = 55;
-			charEight = 56;
-			charNine = 57;
-		}
-	}
-	else
-	{
-		if (charOne == charTwo && charTwo == charThree
-			|| charFour == charFive && charFive == charSix
-			|| charSeven == charEight && charEight == charNine
-			|| charOne == charFour && charFour == charSeven
-			|| charTwo == charFive && charFive == charEight
-			|| charThree == charSix && charSix == charNine
-			|| charOne == charFive && charFive == charNine
-			|| charThree == charFive && charFive == charSeven)
-		{
-			win = true;
-			if (b_number == 1)
-			{
-				g_Console.writeToBuffer(c, "Player 2 win", 0x0f);
-			}
-			if (b_number == 2)
-			{
-				g_Console.writeToBuffer(c, "Player 1 win", 0x0f);
-			}
-		}
-		else if (charOne != '1' && charTwo != '2' && charThree != '3' && charFour != '4' && charFive != '5' && charSix != '6' && charSeven != '7' && charEight != '8' && charNine != '9' && !win)
-			g_Console.writeToBuffer(c, "TIE", 0x0f);
-
-		if (g_abKeyPressed[K_SPACE])
-		{
-			b_number = 1;
-			charOne = 49;
-			charTwo = 50;
-			charThree = 51;
-			charFour = 52;
-			charFive = 53;
-			charSix = 54;
-			charSeven = 55;
-			charEight = 56;
-			charNine = 57;
-			win = false;
-		}
-	}
-}
-void minigame()
-{
-	std::vector<char>::iterator it = minigameMenu.begin();
+	std::vector<char>::iterator it = GameOver.begin();
 	for (short i = 0; i < 80 * 24; ++i)
 	{
 		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
 	}
 	COORD m = g_Console.getConsoleSize();
-	switch (MMgame)
+	switch (MMSelect)
 	{
-	case MMrhythm:
-		m.Y = 6;
-		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x0E);
+	case MMStart:
+		m.Y = 20;
+		m.X = m.X / 2 - 4;
+		g_Console.writeToBuffer(m, "TRY AGAIN", 0x0E);
 		m.Y += 2;
-		g_Console.writeToBuffer(m, "2. Pong", 0x03);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "3. Tic Tac Toe >", 0x03);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "4. Snake", 0x03);
+		m.X = g_Console.getConsoleSize().X / 2 - 2;
+		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
-	case MMpong:
-		m.Y = 6;
-		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
+	case MMExit:
+		m.Y = 20;
+		m.X = m.X / 2 - 4;
+		g_Console.writeToBuffer(m, "TRY AGAIN", 0x03);
 		m.Y += 2;
-		g_Console.writeToBuffer(m, "2. Pong", 0x0E);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "3. Tic Tac Toe >", 0x03);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "4. Snake", 0x03);
-		break;
-	case MMtictactoe:
-		m.Y = 6;
-		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "2. Pong", 0x03);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "3. Tic Tac Toe >", 0x0E);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "4. Snake", 0x03);
-		break;
-	case MMsnake:
-		m.Y = 6;
-		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "2. Pong", 0x03);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "3. Tic Tac Toe >", 0x03);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "4. Snake", 0x0E);
-		break;
-	case MM1P:
-		m.Y = 6;
-		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "2. Pong", 0x03);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x03);
-		m.Y += 2;
-		m.X += 3;
-		g_Console.writeToBuffer(m, "1 Player", 0x0E);
-		m.Y += 1;
-		g_Console.writeToBuffer(m, "2 Player", 0x03);
-		m.Y += 2;
-		m.X -= 3;
-		g_Console.writeToBuffer(m, "4. Snake", 0x03);
-		break;
-	case MM2P:
-		m.Y = 6;
-		m.X = 33;
-		g_Console.writeToBuffer(m, "1. Beat Tapper", 0x03);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "2. Pong", 0x03);
-		m.Y += 2;
-		g_Console.writeToBuffer(m, "3. Tic Tac Toe", 0x03);
-		m.Y += 2;
-		m.X += 3;
-		g_Console.writeToBuffer(m, "1 Player", 0x03);
-		m.Y += 1;
-		g_Console.writeToBuffer(m, "2 Player", 0x0E);
-		m.Y += 2;
-		m.X -= 3;
-		g_Console.writeToBuffer(m, "4. Snake", 0x03);
+		m.X = g_Console.getConsoleSize().X / 2 - 2;
+		g_Console.writeToBuffer(m, "Exit", 0x0E);
 		break;
 	}
-}
-void minigameselect()
-{
-	g_bMinigame = true;
-	Lives = 5;
-	b_play = false;
-	ost();
 	bool bSomethingHappened = false;
 	if (g_dBounceTime > g_dElapsedTime)
 		return;
-	if (MMgame == MMrhythm && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	if (MMSelect == MMStart && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_GAMEOVER) // MENU FOR GAME_OVER
 	{
-		MMgame = MMpong;
+		MMSelect = MMExit;
 		bSomethingHappened = true;
 	}
-	else if (MMgame == MMpong && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	else if (MMSelect == MMExit && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_GAMEOVER)
 	{
-		MMgame = MMtictactoe;
+		MMSelect = MMStart;
 		bSomethingHappened = true;
 	}
-	else if (MMgame == MMtictactoe && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMExit && g_eGameState == S_GAMEOVER) // QUIT_GAME
 	{
-		MMgame = MMsnake;
-		bSomethingHappened = true;
-	}
-	else if (MMgame == MMsnake && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
-	{
-		MMgame = MMrhythm;
-		bSomethingHappened = true;
-	}
-	else if (MMgame == MMrhythm && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
-	{
-		MMgame = MMsnake;
-		bSomethingHappened = true;
-	}
-	else if (MMgame == MMpong && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
-	{
-		MMgame = MMrhythm;
-		bSomethingHappened = true;
-	}
-	else if (MMgame == MMtictactoe && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
-	{
-		MMgame = MMpong;
-		bSomethingHappened = true;
-	}
-	else if (MMgame == MMsnake && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_MINIGAME)
-	{
-		MMgame = MMtictactoe;
-		bSomethingHappened = true;
-	}
-	else if (MMgame == MMtictactoe && (g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D]) && g_eGameState == S_MINIGAME)
-	{
-		MMgame = MM1P;
-		bSomethingHappened = true;
-	}
-	else if ((MMgame == MM1P || MMgame == MM2P) && (g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_A]) && g_eGameState == S_MINIGAME)
-	{
-		MMgame = MMtictactoe;
-		bSomethingHappened = true;
-	}
-	else if (MMgame == MM1P && (g_abKeyPressed[K_W] || g_abKeyPressed[K_S] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
-	{
-		MMgame = MM2P;
-		bSomethingHappened = true;
-	}
-	else if (MMgame == MM2P && (g_abKeyPressed[K_W] || g_abKeyPressed[K_S] || g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_MINIGAME)
-	{
-		MMgame = MM1P;
-		bSomethingHappened = true;
-	}
-	if (MMgame == MMrhythm && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
-	{
-		b_play = false;
-		g_dElapsedTime = 0;
-		StageType = EMinigame1;
-		g_eGameState = S_GAME;
-		minigame1_init();
-		stages = 50;
-		int_stages = 50;
-		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
-	}
-	else if (MMgame == MMpong && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
-	{
-		b_play = false;
-	    g_bforscore = true;
-		newScore = false;
-		g_dElapsedTime = 0;
-		StageType = EMinigame2;
-		g_eGameState = S_GAME;
-		minigame2_init();
-	    Lives = 2;
-		stages = 5;
-		int_stages = 50;
-		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
-	}
-	else if (MMgame == MM1P && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
-	{
-		b_play = false;
-		multi = false;
-		g_eGameState = S_GAME;
-		StageType = ETicTacToe;
-		b_number = 1;
-		charOne = 49;
-		charTwo = 50;
-		charThree = 51;
-		charFour = 52;
-		charFive = 53;
-		charSix = 54;
-		charSeven = 55;
-		charEight = 56;
-		charNine = 57;
-		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
-	}
-	else if (MMgame == MM2P && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
-	{
-		b_play = false;
-		multi = true;
-		g_eGameState = S_GAME;
-		StageType = ETicTacToe2;
-		b_number = 1;
-		charOne = 49;
-		charTwo = 50;
-		charThree = 51;
-		charFour = 52;
-		charFive = 53;
-		charSix = 54;
-		charSeven = 55;
-		charEight = 56;
-		charNine = 57;
-		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
-	}
-	else if (MMgame == MMsnake && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
-	{
-		b_play = false;
-		newScore = false;
-		snake_Size = 1;
-		SnakeLocation.resize(1);
-		g_dElapsedTime = 0;
-		g_eGameState = S_GAME;
-		StageType = EMiniGameSnake;
-		g_snake.X = 40;
-		g_snake.Y = 15;
-		g_sChar.m_cLocation.X = 0;
-		g_sChar.m_cLocation.Y = 0;
-	}
-	if(bSomethingHappened)
-	{
-		// set the bounce time to some time in the future to prevent accidental triggers
-		g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
-	}
-	if (g_abKeyPressed[K_ESCAPE])
-	{
-		g_eGameState = S_TITLE;
 		StageType = EMainMenu;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
+		g_eGameState = S_TITLE;
 	}
-}					
-void renderSnake()
-{
-	for (size_t i = 0; SnakeLocation.size() > i; i++)
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_GAMEOVER) // CONTINUE_GAME
 	{
-		if (i == SnakeLocation.size() - 1)
-		{
-			g_Console.writeToBuffer(SnakeLocation[i], '#', 0x0a);
-		}
-		else
-			g_Console.writeToBuffer(SnakeLocation[i], 254, 0x0a);
-		for (size_t j = 0; SnakeLocation.size() > j; j++)
-		{
-			if (i == j)
-			{
-				break;
-			}
-			if (SnakeLocation[i].X == SnakeLocation[j].X && SnakeLocation[i].Y == SnakeLocation[j].Y)
-			{
-				highscoreLoad();
-				highscoreSave();
-				g_eGameState = S_MINIGAME;
-				b_play = false;
-			}
+		StageType = EStage;
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		b_play = false;
+		init();
+		Lives = 3;
+		stages = 1;
+		Coin = 0;
+		int_stages = 1;
+		for (size_t i = 1; i < 4; i++)
+			Weapons[i].Clip = 0;
+		g_eGameState = S_CONTINUE;
+	}
+	if (bSomethingHappened)
+	{
+		g_dBounceTime = g_dElapsedTime + 0.125;
+	}
+}
 void shop() {
 
 	std::vector<char>::iterator it = SHOP.begin();
@@ -4815,7 +3660,7 @@ void weapdata()
 {
 	int i = 0;
 	std::string in;
-	std::ifstream weapondata("weapons.txt");
+	std::ifstream weapondata("map/weapons.txt");
 	getline(weapondata, Weapons[i].Name); // Gets Spear
 	weapondata >> Weapons[i].ClipMax;
 	weapondata >> Weapons[i].Reload;
@@ -5097,41 +3942,210 @@ void continueSave()
 void highscoreSave()
 {
 	std::fstream score("map/highscore.txt");
-
-	if (rally >= pong_t && StageType == EMinigame2)
+	short savenamelocation = 0;
+	if (rally > pong_t2 && rally <= pong_t && StageType == EMinigame2)
+	{
+	pong_t3 = pong_t2;
+	pong_t2 = rally;
+	changedline = 1;
+	newScore = true;
+	}
+	else if (rally > pong_t3 && rally <= pong_t2 && StageType == EMinigame2)
+	{
+	pong_t3 = rally;
+	changedline = 2;
+	newScore = true;
+	}
+	else if (rally >= pong_t && StageType == EMinigame2)
 	{
 		pong_t3 = pong_t2;
 		pong_t2 = pong_t;
 		pong_t = rally;
+		changedline = 0;
+		newScore = true;
 	}
-	else if (rally >= pong_t2 && rally < pong_t && StageType == EMinigame2)
+	if (snake_Size >= snake_length2 && snake_Size <= snake_length && StageType == EMiniGameSnake)
 	{
-		pong_t3 = pong_t2;
-		pong_t2 = rally;
+		snake_length3 = snake_length2;
+		snake_length2 = snake_Size;
+		changedline = 4;
+		newScore = true;
 	}
-	else if (rally >= pong_t3 && rally < pong_t2 && StageType == EMinigame2)
-		pong_t3 = rally;
-
-	if (snake_Size >= snake_length && StageType == EMiniGameSnake)
+	else if (snake_Size >= snake_length3 && snake_Size <= snake_length2 && StageType == EMiniGameSnake)
+	{
+		snake_length3 = snake_Size;
+		changedline = 5;
+		newScore = true;
+	}
+	else if (snake_Size >= snake_length && StageType == EMiniGameSnake)
 	{
 		snake_length3 = snake_length2;
 		snake_length2 = snake_length;
 		snake_length = snake_Size;
+		changedline = 3;
+		newScore = true;
 	}
-	else if (snake_Size >= snake_length2 && snake_Size < snake_length && StageType == EMiniGameSnake)
-	{
-		snake_length3 = snake_length2;
-		snake_length2 = snake_Size;
-	}
-	else if (snake_Size >= snake_length3 && snake_Size < snake_length2 && StageType == EMiniGameSnake)
-		snake_length3 = snake_Size;
-
 	score << pong_t << std::endl;
 	score << pong_t2 << std::endl;
 	score << pong_t3 << std::endl;
 	score << snake_length << std::endl;
 	score << snake_length2 << std::endl;
 	score << snake_length3 << std::endl;
+	COORD c = g_Console.getConsoleSize();
+	std::stringstream stringmerge;
+	c.X = 40;
+	c.Y = 10;
+	bool bSomethingHappened = false;
+	if (newScore)
+	{
+		if (EName == NFIRST)
+			g_Console.writeToBuffer(c, firstLetter, 0x0d);
+		else
+			g_Console.writeToBuffer(c, firstLetter, 0x0f);
+		c.X += 1;
+		if (EName == NSECOND)
+			g_Console.writeToBuffer(c, secondLetter, 0x0d);
+		else
+			g_Console.writeToBuffer(c, secondLetter, 0x0f);
+		c.X += 1;
+		if (EName == NTHIRD)
+			g_Console.writeToBuffer(c, thirdLetter, 0x0d);
+		else
+			g_Console.writeToBuffer(c, thirdLetter, 0x0f);
+		if (g_dBounceTime > g_dElapsedTime)
+			return;
+		if (EName == NFIRST && g_eGameState == S_Inputname && delay > 5)
+		{
+			if ((g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_S]) && firstLetter < 91)
+			{
+				bSomethingHappened = true;
+				firstLetter++;
+			}
+			else if (firstLetter == 91)
+				firstLetter = 65;
+			if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_W]) && firstLetter < 91 && firstLetter > 64)
+			{
+				bSomethingHappened = true;
+				firstLetter--;
+			}
+			else if (firstLetter == 64)
+				firstLetter = 90;
+			if (g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D])
+			{
+				EName = NSECOND;
+				bSomethingHappened = true;
+			}
+			if (g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_A])
+			{
+				EName = NTHIRD;
+				bSomethingHappened = true;
+			}
+			if ((g_abKeyPressed[K_ENTER] || g_abKeyPressed[K_SPACE]) && g_eGameState == S_Inputname)
+			{
+				stringmerge << " (" << (char)firstLetter << (char)secondLetter << (char)thirdLetter << ")";
+				NameHandler[changedline] = stringmerge.str();
+				firstLetter = 65;
+				secondLetter = 65;
+				thirdLetter = 65;
+				for (int i = 0; 6 > i; i++)
+				{
+					score << NameHandler[i] << std::endl;
+				}
+				g_eGameState = S_HIGHSCORE;
+			}
+			delay = 0;
+		}
+
+		if (EName == NSECOND && g_eGameState == S_Inputname && delay > 5)
+		{
+			if ((g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_S]) && secondLetter < 91)
+			{
+				bSomethingHappened = true;
+				secondLetter++;
+			}
+			else if (secondLetter == 91)
+				secondLetter = 65;
+			if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_W]) && secondLetter < 91 && secondLetter > 64)
+			{
+				bSomethingHappened = true;
+				secondLetter--;
+			}
+			else if (secondLetter == 64)
+				secondLetter = 90;
+			if (g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D])
+			{
+				EName = NTHIRD;
+				bSomethingHappened = true;
+			}
+			if (g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_A])
+			{
+				EName = NFIRST;
+				bSomethingHappened = true;
+			}
+			if ((g_abKeyPressed[K_ENTER] || g_abKeyPressed[K_SPACE]) && g_eGameState == S_Inputname)
+			{
+				stringmerge << " (" << (char)firstLetter << (char)secondLetter << (char)thirdLetter << ")";
+				NameHandler[changedline] = stringmerge.str();
+				firstLetter = 65;
+				secondLetter = 65;
+				thirdLetter = 65;
+				for (int i = 0; 6 > i; i++)
+				{
+					score << NameHandler[i] << std::endl;
+				}
+				g_eGameState = S_HIGHSCORE;
+			}
+			delay = 0;
+		}
+		if (EName == NTHIRD && g_eGameState == S_Inputname && delay > 5)
+		{
+			if ((g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_S]) && thirdLetter < 91)
+			{
+				bSomethingHappened = true;
+				thirdLetter++;
+			}
+			else if (thirdLetter == 91)
+				thirdLetter = 65;
+			if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_W]) && thirdLetter < 91 && thirdLetter > 64)
+			{
+				bSomethingHappened = true;
+				thirdLetter--;
+			}
+			else if (thirdLetter == 64)
+				thirdLetter = 90;
+			if (g_abKeyPressed[K_RIGHT] || g_abKeyPressed[K_D])
+			{
+				EName = NFIRST;
+				bSomethingHappened = true;
+			}
+			if (g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_A])
+			{
+				EName = NSECOND;
+				bSomethingHappened = true;
+			}
+			if ((g_abKeyPressed[K_ENTER] || g_abKeyPressed[K_SPACE]) && g_eGameState == S_Inputname)
+			{
+				stringmerge << " (" << (char)firstLetter << (char)secondLetter << (char)thirdLetter << ")";
+				NameHandler[changedline] = stringmerge.str();
+				firstLetter = 65;
+				secondLetter = 65;
+				thirdLetter = 65;
+				for (int i = 0; 6 > i; i++)
+				{
+					score << NameHandler[i] << std::endl;
+				}
+				g_eGameState = S_HIGHSCORE;
+			}
+			delay = 0;
+		}
+
+		delay++;
+		if (bSomethingHappened)
+		{
+			// set the bounce time to some time in the future to prevent accidental triggers
+			g_dBounceTime = g_dElapsedTime + 0.15; // 125ms should be enough
+		}
+	}
 	score.close();
 }
 void highscoreLoad()
@@ -5146,6 +4160,8 @@ void highscoreLoad()
 		g_eGameState = S_TITLE;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
+	if (g_abKeyPressed[K_ENTER] && g_eGameState == S_HIGHSCORE)
+		g_eGameState = S_MINIGAME;
 	std::ifstream score("map/highscore.txt");
 	score >> pong_t;
 	score >> pong_t2;
@@ -5153,14 +4169,27 @@ void highscoreLoad()
 	score >> snake_length;
 	score >> snake_length2;
 	score >> snake_length3;
+	score.ignore();
+	for (int i = 0; 6 > i; i++)
+	{
+		getline(score, NameHandler[i]);
+
+	}
 	std::string first = std::to_string(pong_t);
+	first.append(NameHandler[0]);
 	std::string second = std::to_string(pong_t2);
+	second.append(NameHandler[1]);
 	std::string third = std::to_string(pong_t3);
+	third.append(NameHandler[2]);
 	std::string length1 = std::to_string(snake_length);
+	length1.append(NameHandler[3]);
 	std::string length2 = std::to_string(snake_length2);
+	length2.append(NameHandler[4]);
 	std::string length3 = std::to_string(snake_length3);
+	length3.append(NameHandler[5]);
+
 	COORD c = g_Console.getConsoleSize();
-	c.X = 37;
+	c.X = 40;
 	c.Y = 6;
 	g_Console.writeToBuffer(c, first, 0x0f);
 	c.Y += 1;
@@ -5168,7 +4197,6 @@ void highscoreLoad()
 	c.Y += 1;
 	g_Console.writeToBuffer(c, third, 0x0f);
 	c.Y = 15;
-	c.X += 3;
 	g_Console.writeToBuffer(c, length1, 0x0f);
 	c.Y += 1;
 	g_Console.writeToBuffer(c, length2, 0x0f);
@@ -5811,8 +4839,10 @@ void renderSnake()
 			{
 				highscoreLoad();
 				highscoreSave();
-				g_eGameState = S_MINIGAME;
-				b_play = false;
+				if (newScore)
+					g_eGameState = S_Inputname;
+				else
+					g_eGameState = S_MINIGAME;
 			}
 		}
 	}
@@ -5854,97 +4884,10 @@ void snakeInput()
 		{
 			highscoreLoad();
 			highscoreSave();
-			g_eGameState = S_MINIGAME;
-			b_play = false;
-		}
-		if (g_snake.X == Apple.X && g_snake.Y == Apple.Y)
-		{
-			AppleCollected = true;
-			shootsound = true;
-			snake_Size++;
-		}
-	}
-}
-void snakeMovement()
-{
-	if(delay > 15) // Once every 15 frames move by 1.
-	{
-		if(Direction == 'W')
-		{
-			g_snake.Y--;
-			SnakeLocation.push_back(g_snake);
-		}
-		if(Direction == 'A')
-		{
-			g_snake.X--;
-			SnakeLocation.push_back(g_snake);
-		}
-		if(Direction == 'S')
-		{
-			g_snake.Y++;
-			SnakeLocation.push_back(g_snake);
-		}
-		if(Direction == 'D')
-		{
-			g_snake.X++;
-			SnakeLocation.push_back(g_snake);
-		}
-		if(SnakeLocation.size() > snake_Size) // Controls the size of the snake
-		{
-			SnakeLocation.erase(SnakeLocation.begin());
-		}
-		delay = 0;
-	}
-	delay++;
-}
-WORD charColouring(char character)
-{
-	if (character == 79)
-		return 0x0C;
-	else if (character == 88)
-		return 0x0B;
-	else
-		return 0x0F;
-}
-void renderApple()
-{
-	if (AppleCollected == true)
-	{
-		Apple.X = rand() % 78 + 1;
-		Apple.Y = rand() % 19 + 4;
-		if (SnakeMap[Apple.X + Apple.Y * 80] == ' ')
-		{
-			AppleCollected = false;
-		}
-	}
-	g_Console.writeToBuffer(Apple,254,0x0c);
-}
-void snakeInput()
-{
-	if (StageType == EMiniGameSnake)
-	{
-		if (g_abKeyPressed[K_W])
-		{
-			Direction = 'W';
-		}
-		if (g_abKeyPressed[K_A])
-		{
-			Direction = 'A';
-		}
-		if (g_abKeyPressed[K_S])
-		{
-			Direction = 'S';
-		}
-		if (g_abKeyPressed[K_D])
-		{
-			Direction = 'D';
-		}
-		if (SnakeMap[g_snake.X + g_snake.Y * 80] != ' ' && SnakeMap[g_snake.X + g_snake.Y * 80] != 'a')
-		{
-			highscoreLoad();
-			highscoreSave();
-			g_eGameState = S_MINIGAME;
-			b_play = false;
+			if (newScore)
+				g_eGameState = S_Inputname;
+			else
+				g_eGameState = S_MINIGAME;
 		}
 		if (g_snake.X == Apple.X && g_snake.Y == Apple.Y)
 		{
