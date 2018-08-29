@@ -1057,7 +1057,7 @@ void minigame2_moveCharacter()
 		    g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
 	}
 	if (bSomethingHappened)	
-		g_dBounceTime = g_dElapsedTime + 0.03 + 0.1/stages; // 125ms should be enough	
+		g_dBounceTime = g_dElapsedTime + 0.03 + 0.1/stages;	
 }
 void bossbattle_moveCharacter()
 {
@@ -4855,6 +4855,7 @@ void renderSnake()
 					g_eGameState = S_Inputname;
 				else
 					g_eGameState = S_MINIGAME;
+				StageType = EMainMenu;
 			}
 		}
 	}
@@ -4900,6 +4901,7 @@ void snakeInput()
 				g_eGameState = S_Inputname;
 			else
 				g_eGameState = S_MINIGAME;
+			StageType = EMainMenu;
 		}
 		if (g_snake.X == Apple.X && g_snake.Y == Apple.Y)
 		{
