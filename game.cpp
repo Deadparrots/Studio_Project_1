@@ -8,8 +8,13 @@ double  g_dElapsedTime;
 double  g_dDeltaTime;
 bool    g_abKeyPressed[K_COUNT];
 
+
+bool	g_Pressed = true;
+
+bool	g_PressedToMove = true;
+
 // Game specific variables here
-SGameChar   g_sChar; // Player Character
+SGameChar	g_sChar; // Player Character
 SGameChar	g_enemy1;
 SGameChar	g_enemy2;
 SGameChar	g_enemy3;
@@ -28,10 +33,12 @@ SMinigame1	g_minigame1_beat4;
 SGameChar	g_minigame2_paddle1;	
 SGameChar	g_minigame2_paddle2;
 SGameChar	g_door;
+SGameChar	g_shopkeeper;
 COORD		g_snake;
 COORD		Apple;
 std::vector<char>	Title;
 std::vector<char>	GameOver;
+std::vector<char>	SHOP;
 std::vector<char>	Map;
 std::vector<char>	Instructions;
 std::vector<char>	SansMap;
@@ -62,6 +69,8 @@ double		stages = 0.000 + int_stages;
 size_t		StageType = EMainMenu;
 bool		b_play = false;
 bool		bossSpeech = false;
+int			Weapon1 = 0;
+int			Weapon2 = 0;
 bool		ticgame = false;
 bool        multi = false;
 bool        win = false;
@@ -85,6 +94,7 @@ char        charEight = 56;
 char        charNine = 57;
 double      g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
 int		    Lives = 3; // Number of lives the player has left (Base Value is 3)
+int			Coin = 0;
 int		    currentWeapon = 0; // Current Weapon
 WeaponParameters Weapons[4]; // Number of Weapons
 
@@ -129,6 +139,7 @@ void minigame1_init()
 	g_door.m_cLocation.X = 40;
 	g_door.m_cLocation.Y = 13;
 	g_door.m_bActive = false;
+	g_shopkeeper.m_bActive = false;
 	if (!g_bMinigame)
 	{
 		if (Lives + int_stages / 10 <= 99)
@@ -158,6 +169,7 @@ void minigame2_init()
 	g_door.m_cLocation.X = 10;
 	g_door.m_cLocation.Y = 13;
 	g_door.m_bActive = false;
+	g_shopkeeper.m_bActive = false;
 }
 void boss_init()
 {
@@ -292,6 +304,16 @@ void init(void)
 	g_door.m_cLocation.X = enemyX;
 	g_door.m_cLocation.Y = enemyY;
 	g_door.m_bActive = false;
+	while (1)
+	{
+		enemyX = rand() % 80;
+		enemyY = rand() % 24;
+		if (Map[enemyX + enemyY * 80] == ' ')
+			break;
+	}
+	g_shopkeeper.m_cLocation.X = enemyX;
+	g_shopkeeper.m_cLocation.Y = enemyY;
+	g_shopkeeper.m_bActive = false;
 	g_weapon.m_cLocation.X = 10;
 	g_weapon.m_cLocation.Y = 2;
 	g_gaster1.m_bActive = false;
@@ -388,6 +410,8 @@ void update(double dt)
 		break;
 	case S_MINIGAME: minigameselect();
 		break;
+	case S_SHOP: shopoption();
+		break;
 	}
 }
 
@@ -419,6 +443,8 @@ void render()
 	case S_HIGHSCORE: highscoreLoad();
 		break;
 	case S_CONTINUE: continueSave();
+		break;
+	case S_SHOP: shop();
 		break;
 	}
 	renderFramerate();  // renders debug information, frame rate, elapsed time, etc
@@ -589,7 +615,10 @@ void splashScreenWait()
 		b_play = false;
 		Weapons[0].Clip = Weapons[0].ClipMax;
 		int_stages = 1;
-		g_eGameState = S_GAME;
+		Weapon1 = 0;
+		Weapon2 = 0;
+		save();
+		g_eGameState = S_CONTINUE;
 	}
 	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMContinue && g_eGameState == S_TITLE)
 	{
@@ -1623,16 +1652,22 @@ void moveCharacter()
 	}
 	if (g_abKeyPressed[K_E])
 	{
-		if (currentWeapon < 3)
-		{
-			currentWeapon++;
-			g_shootmaxdist = Weapons[currentWeapon].Range;
-		}
-		else if (currentWeapon = 3)
-		{
+		if (currentWeapon < 1 && !Weapon1 && !Weapon2)
+			currentWeapon = 1;
+		else if (currentWeapon == 1 && !Weapon1 && !Weapon2)
 			currentWeapon = 0;
-			g_shootmaxdist = Weapons[currentWeapon].Range;
-		}
+		else if (currentWeapon == 1 && Weapon1 && !Weapon2)
+			currentWeapon = 2;
+		else if (currentWeapon == 1 && !Weapon1 && Weapon2)
+			currentWeapon = 3;
+		else if (currentWeapon == 2 && !Weapon2)
+			currentWeapon = 0;
+		else if (currentWeapon == 2 && Weapon2)
+			currentWeapon = 3;
+		else if (currentWeapon < 3)
+			currentWeapon++;
+		else
+			currentWeapon = 0;
 		g_dBounceTime = g_dElapsedTime + 0.2;
 	}
 	if (
@@ -1664,42 +1699,36 @@ void moveCharacter()
 		g_enemy1.m_bActive = false;
 		g_enemy1.m_cLocation.X = 0;
 		g_enemy1.m_cLocation.Y = 0;
-		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y)
 	{
 		g_enemy2.m_bActive = false;
 		g_enemy2.m_cLocation.X = 0;
 		g_enemy2.m_cLocation.Y = 0;
-		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y)
 	{
 		g_enemy3.m_bActive = false;
 		g_enemy3.m_cLocation.X = 0;
 		g_enemy3.m_cLocation.Y = 0;
-		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y)
 	{
 		g_enemy4.m_bActive = false;
 		g_enemy4.m_cLocation.X = 0;
 		g_enemy4.m_cLocation.Y = 0;
-		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y)
 	{
 		g_enemy5.m_bActive = false;
 		g_enemy5.m_cLocation.X = 0;
 		g_enemy5.m_cLocation.Y = 0;
-		reload();
 	}
 	if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y)
 	{
 		g_enemy6.m_bActive = false;
 		g_enemy6.m_cLocation.X = 0;
 		g_enemy6.m_cLocation.Y = 0;
-		reload();
 	}
 	size_t rate = 100 / (stages + 1) + 100;
 	switch (rand() % rate)
@@ -2012,7 +2041,7 @@ void processUserInput()
 {
 	if (g_abKeyPressed[K_SPACE] && StageType == EBossBattle && g_dElapsedTime < 20)
 		g_dElapsedTime = 20;
-	if (Lives < 1 || g_abKeyPressed[K_ESCAPE])
+	if ((Lives < 1 || g_abKeyPressed[K_ESCAPE]) && g_eGameState != S_SHOP)
 	{
 		if (g_bMinigame)
 		{
@@ -2024,8 +2053,8 @@ void processUserInput()
 		}
 		else
 		{
-			PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME | SND_LOOP);
 			g_eGameState = S_GAMEOVER;
+			PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME | SND_LOOP);
 		}
 	}
 	if (g_abKeyPressed[K_C])
@@ -2082,7 +2111,13 @@ void processUserInput()
 		g_enemy5.m_bActive == false &&
 		g_enemy6.m_bActive == false &&
 		StageType == EStage)
-		g_door.m_bActive = true;
+	{
+		if (int_stages % 5 == 4)
+			g_shopkeeper.m_bActive = true;
+		else
+			g_door.m_bActive = true;
+
+	}
 	if (g_door.m_bActive == true && g_sChar.m_cLocation.X == g_door.m_cLocation.X && g_sChar.m_cLocation.Y == g_door.m_cLocation.Y)
 	{
 		if (StageType == EBoss)
@@ -2117,10 +2152,23 @@ void processUserInput()
 				minigame2_init();
 			else
 				init();
-			save();
 			if (Lives != 99)
 				Lives++;
+			save();
 		}
+	}
+	if (g_shopkeeper.m_bActive == true && g_sChar.m_cLocation.X == g_shopkeeper.m_cLocation.X && g_sChar.m_cLocation.Y == g_shopkeeper.m_cLocation.Y)
+	{
+		StageType = EShop;
+		g_eGameState = S_SHOP;
+
+		g_door.m_bActive = false;
+
+		g_sChar.m_cLocation.X = 0;
+		g_sChar.m_cLocation.Y = 0;
+		g_shopkeeper.m_bActive = false;
+		g_shopkeeper.m_cLocation.X = 0;
+		g_shopkeeper.m_cLocation.Y = 0;
 	}
 	if (StageType == EMiniGameSnake)
 	{
@@ -2319,6 +2367,7 @@ void renderGame()
 		renderEnemy5();
 		renderEnemy6();
 		renderWeapon();
+		renderShopkeeper();
 	}
 	if (StageType == EBossBattle)
 	{
@@ -2410,11 +2459,11 @@ void renderMap()
 
 	}
 }
+
 void renderUI()
 {
 	COORD UIBG;
 	COORD UI;
-	std::string display;
 	for (int i = 0; g_Console.getConsoleSize().X > i; i++) // For every value of x
 	{
 		UIBG.X = i;
@@ -2424,42 +2473,40 @@ void renderUI()
 			g_Console.writeToBuffer(UIBG, " ", 0x90);
 		}
 	}
+
 	UI.Y = 1; // Sets Height of UI text
-	if ( StageType == EMiniGameSnake) // if snake
-	{
-		UI.X = g_Console.getConsoleSize().X / 4;
-		g_Console.writeToBuffer(UI, "Length : ", 0x9F);
-		UI.X += 9;
-		display = std::to_string(snake_Size);
-		g_Console.writeToBuffer(UI, display, 0x9F);
-		UI.X += display.size() + 1;
-		g_Console.writeToBuffer(UI, "Time : ", 0x9F);
-		UI.X += 7;
-		display = std::to_string((int)(g_dElapsedTime)); // Shows Time elapsed
-		g_Console.writeToBuffer(UI, display, 0x9F);
-	}
-	else 
-	{
-		UI.X = g_Console.getConsoleSize().X / 3 - 13; // Start of UI text
-		g_Console.writeToBuffer(UI, "Lives : ", 0x9f);
-		UI.X = g_Console.getConsoleSize().X / 4 + 1;
-		display = std::to_string(Lives);
-		g_Console.writeToBuffer(UI, display, 0x9f); // Displays the number of lives
-		UI.X = g_Console.getConsoleSize().X / 3 + 1;
-		g_Console.writeToBuffer(UI, "Weapon : ", 0x9f);
-		UI.X = UI.X + 9;
-		g_Console.writeToBuffer(UI, Weapons[currentWeapon].Name, 0x9f); // Display Equipped Weapon
-		UI.X = UI.X + Weapons[currentWeapon].Name.length() + 3; // Increases UI.X by text length of weapon 1's name
-		g_Console.writeToBuffer(UI, "Ammo : ", 0x9f);
-		UI.X = UI.X + 7;
-		display = std::to_string(Weapons[currentWeapon].Clip);
-		g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Clip
-		UI.X += 5;
-		g_Console.writeToBuffer(UI, "Stage ", 0x9f);
-		UI.X = UI.X + 6;
-		display = std::to_string(int_stages);
-		g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Stage
-	}
+	UI.X = g_Console.getConsoleSize().X / 3 - 15; // Start of UI text
+	g_Console.writeToBuffer(UI, "Lives : ", 0x9f);
+
+	UI.X = g_Console.getConsoleSize().X / 4 - 1;
+	std::string display = std::to_string(Lives);
+	g_Console.writeToBuffer(UI, display, 0x9f); // Displays the number of lives
+
+	UI.X = g_Console.getConsoleSize().X / 3 - 3;
+	g_Console.writeToBuffer(UI, "Weapon : ", 0x9f);
+	UI.X = UI.X + 9;
+	g_Console.writeToBuffer(UI, Weapons[currentWeapon].Name, 0x9f); // Display Equipped Weapon
+
+	UI.X = UI.X + Weapons[currentWeapon].Name.length() + 3; // Increases UI.X by text length of weapon's name
+	g_Console.writeToBuffer(UI, "Ammo : ", 0x9f);
+
+	UI.X = UI.X + 7;
+	display = std::to_string(Weapons[currentWeapon].Clip);
+	g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Clip
+
+	UI.X += 6; // Increases UI.X by 
+	g_Console.writeToBuffer(UI, "Coin : ", 0x9f);
+
+	UI.X = UI.X + 6;
+	display = std::to_string(Coin);
+	g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Coin
+	
+	UI.X += 6;
+	g_Console.writeToBuffer(UI, "Stage ", 0x9f);
+
+	UI.X = UI.X + 6;
+	display = std::to_string(int_stages);
+	g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Stage
 }
 void renderCharacter()
 {
@@ -2855,20 +2902,19 @@ void renderpaddle2()
 void renderDoor()
 {
 	// Draw the location of the door
-	WORD charColor = 0x00;
-	if (g_door.m_bActive == true)
-		charColor = 0x0B;
-	g_Console.writeToBuffer(g_door.m_cLocation, (char)'D', charColor);
+	WORD charColor = 0x0B;
+	if (g_door.m_bActive)
+		g_Console.writeToBuffer(g_door.m_cLocation, (char)'D', charColor);
+}
+void renderShopkeeper()
+{
+	// Draw the location of the moving shopkeeper
+	WORD charColor = 0x0D;
+	if (g_shopkeeper.m_bActive == true)
+		g_Console.writeToBuffer(g_shopkeeper.m_cLocation, (char)'S', charColor);
 }
 void renderWeapon()
 {
-	//for (size_t i = 0; i < Shots.size();i++)
-	//{
-	//	// Draw the location of the weapon
-	//	WORD charColor = 0x0E;
-	//	g_Console.writeToBuffer(g_weapon.m_cLocation, (char)254, charColor);
-	//}
-	// Draw the location of the weapon
 	WORD charColor = 0x0E;
 	g_Console.writeToBuffer(g_weapon.m_cLocation, (char)254, charColor);
 }
@@ -3096,15 +3142,354 @@ void gameOver()
 		init();
 		Lives = 3;
 		stages = 1;
+		Coin = 0;
 		int_stages = 1;
 		for (size_t i = 1; i < 4; i++)
 			Weapons[i].Clip = 0;
-		g_eGameState = S_GAME;
+		g_eGameState = S_CONTINUE;
 	}
 	if (bSomethingHappened)
 	{
 		g_dBounceTime = g_dElapsedTime + 0.125;
 	}
+}
+void shop() {
+
+	std::vector<char>::iterator it = SHOP.begin();
+	for (short i = 0; i < 80 * 24; ++i)
+	{
+		g_Console.writeToBuffer(COORD{ i % 80, i / 80 }, it[i], 0x0F);
+	}
+	COORD m = g_Console.getConsoleSize();
+	switch (MMSelect)
+	{
+		//buy lives
+	case MMLive:
+		m.Y = 17;
+		m.X = m.X / 2 - 21;
+		g_Console.writeToBuffer(m, "25 Coins: 1 life", 0x0E);
+
+
+		if (Weapon1 == 0)
+		{
+			m.Y += 2;
+			m.X = g_Console.getConsoleSize().X / 2 - 21;
+			g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x03);
+		}
+		else
+		{
+			m.Y += 2;
+			m.X = g_Console.getConsoleSize().X / 2 - 21;
+			g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x0D);
+		}
+
+		if (Weapon2 == 0)
+		{
+			m.Y = 17;
+			m.X = m.X / 2 + 32;
+			g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x03);
+		}
+		else
+		{
+			m.Y = 17;
+			m.X = m.X / 2 + 32;
+			g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x0D);
+		}
+
+		m.Y += 2;
+		m.X = g_Console.getConsoleSize().X / 2 + 1;
+		g_Console.writeToBuffer(m, "Next Level", 0x03);
+
+		break;
+
+		//buy Crossbow
+	case MMW1:
+		m.Y = 17;
+		m.X = m.X / 2 - 21;
+		g_Console.writeToBuffer(m, "25 Coins: 1 life", 0x03);
+
+		m.Y += 2;
+		m.X = g_Console.getConsoleSize().X / 2 - 21;
+		g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x0E);
+
+
+		if (Weapon2 == 0)
+		{
+			m.Y = 17;
+			m.X = m.X / 2 + 32;
+			g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x03);
+		}
+		else
+		{
+			m.Y = 17;
+			m.X = m.X / 2 + 32;
+			g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x0D);
+		}
+
+		m.Y += 2;
+		m.X = g_Console.getConsoleSize().X / 2 + 1;
+		g_Console.writeToBuffer(m, "Next Level", 0x03);
+
+		break;
+
+		//buy Rifle
+	case MMW2:
+		m.Y = 17;
+		m.X = m.X / 2 - 21;
+		g_Console.writeToBuffer(m, "25 Coins: 1 life", 0x03);
+
+		if (Weapon1 == 0)
+		{
+			m.Y += 2;
+			m.X = g_Console.getConsoleSize().X / 2 - 21;
+			g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x03);
+		}
+		else
+		{
+			m.Y += 2;
+			m.X = g_Console.getConsoleSize().X / 2 - 21;
+			g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x0D);
+		}
+
+		m.Y = 17;
+		m.X = m.X / 2 + 32;
+		g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x0E);
+
+		m.Y += 2;
+		m.X = g_Console.getConsoleSize().X / 2 + 1;
+		g_Console.writeToBuffer(m, "Next Level", 0x03);
+
+		break;
+
+		//back to game
+	case MMBack:
+		m.Y = 17;
+		m.X = m.X / 2 - 21;
+		g_Console.writeToBuffer(m, "25 Coins: 1 life", 0x03);
+
+
+		if (Weapon1 == 0)
+		{
+			m.Y += 2;
+			m.X = g_Console.getConsoleSize().X / 2 - 21;
+			g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x03);
+		}
+		else if (Weapon1)
+		{
+			m.Y += 2;
+			m.X = g_Console.getConsoleSize().X / 2 - 21;
+			g_Console.writeToBuffer(m, "50 Coins: Crossbow", 0x0D);
+		}
+
+		if (Weapon2 == 0)
+		{
+			m.Y = 17;
+			m.X = m.X / 2 + 32;
+			g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x03);
+		}
+		else
+		{
+			m.Y = 17;
+			m.X = m.X / 2 + 32;
+			g_Console.writeToBuffer(m, "70 Coins: Rifle", 0x0D);
+		}
+
+		m.Y += 2;
+		m.X = g_Console.getConsoleSize().X / 2 + 1;
+		g_Console.writeToBuffer(m, "Next Level", 0x0E);
+
+		break;
+	}
+
+	if (MMSelect == MMLive && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_SHOP)
+	{
+
+		if (g_PressedToMove == true)
+		{
+			g_PressedToMove = false;
+			MMSelect = MMW1;
+		}
+		else if ((g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_PressedToMove == false)
+		{
+			g_PressedToMove = false;
+		}
+	}
+
+	else if (MMSelect == MMW1 && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_SHOP)
+	{
+
+		if (g_PressedToMove == true)
+		{
+			g_PressedToMove = false;
+			MMSelect = MMLive;
+		}
+		else if ((g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_PressedToMove == false)
+		{
+			g_PressedToMove = false;
+		}
+	}
+
+
+	else if (MMSelect == MMLive && (g_abKeyPressed[K_D] || g_abKeyPressed[K_RIGHT]) && g_eGameState == S_SHOP)
+	{
+
+		if (g_PressedToMove == true)
+		{
+			g_PressedToMove = false;
+			MMSelect = MMW2;
+		}
+		else if ((g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_PressedToMove == false)
+		{
+			g_Pressed = false;
+		}
+	}
+
+	else if (MMSelect == MMW2 && (g_abKeyPressed[K_A] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_SHOP)
+	{
+
+		if (g_PressedToMove == true)
+		{
+			g_PressedToMove = false;
+			MMSelect = MMLive;
+		}
+		else if ((g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_PressedToMove == false)
+		{
+			g_PressedToMove = false;
+		}
+	}
+
+	else if (MMSelect == MMW2 && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_SHOP)
+	{
+
+		if (g_PressedToMove == true)
+		{
+			g_PressedToMove = false;
+			MMSelect = MMBack;
+		}
+		else if ((g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_PressedToMove == false)
+		{
+			g_Pressed = false;
+		}
+	}
+
+	else if (MMSelect == MMBack && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_SHOP)
+	{
+		MMSelect = MMW2;
+		if (g_PressedToMove == true)
+		{
+			g_PressedToMove = false;
+			MMSelect = MMW2;
+		}
+		else if ((g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_PressedToMove == false)
+		{
+			g_PressedToMove = false;
+		}
+	}
+
+	else if (MMSelect == MMBack && (g_abKeyPressed[K_A] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_SHOP)
+	{
+		MMSelect = MMW1;
+		if (g_PressedToMove == true)
+		{
+			g_PressedToMove = false;
+			MMSelect = MMW1;
+		}
+		else if ((g_abKeyPressed[K_A] || g_abKeyPressed[K_LEFT]) && g_PressedToMove == false)
+		{
+			g_PressedToMove = false;
+		}
+	}
+
+	else if (MMSelect == MMW1 && (g_abKeyPressed[K_D] || g_abKeyPressed[K_RIGHT]) && g_eGameState == S_SHOP)
+	{
+		MMSelect = MMBack;
+		if (g_PressedToMove == true)
+		{
+			g_PressedToMove = false;
+			MMSelect = MMW1;
+		}
+		else if ((g_abKeyPressed[K_D] || g_abKeyPressed[K_RIGHT]) && g_PressedToMove == false)
+		{
+			g_PressedToMove = false;
+		}
+	}
+
+	else 
+		g_PressedToMove = true;
+	processUserInput();
+	renderUI();
+}
+
+void shopoption()
+{
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMLive && g_eGameState == S_SHOP) // When pressed Add 1 live
+	{
+		if (Coin >= 25 && g_Pressed == true)
+		{
+			Coin -= 25;
+			Lives++;
+			g_Pressed = false;
+		}
+		else if (g_abKeyPressed[K_SPACE] && g_Pressed == false)
+		{
+			g_Pressed = false;
+		}
+	}
+	else {
+		g_Pressed = true;
+	}
+
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMW1 && g_eGameState == S_SHOP && Weapon1 == 0) // CONTINUE_GAME
+	{
+		if (Coin >= 50 && Weapon1 == 0)
+		{
+			Coin -= 50;
+			Weapon1 = 1;
+		}
+	}
+
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMW2 && g_eGameState == S_SHOP && Weapon2 == 0) // CONTINUE_GAME
+	{
+		if (Coin >= 70 && Weapon2 == 0)
+		{
+			Coin -= 70;
+			Weapon2 = 1;
+		}
+	}
+
+	if (g_abKeyPressed[K_SPACE] && MMSelect == MMBack && g_eGameState == S_SHOP)
+	{
+		int_stages++;
+		stages++;
+		if (int_stages == 50)
+			StageType = EBoss;
+		else if (int_stages % 10 == 0)
+			StageType = EMinigame1;
+		else if (int_stages % 5 == 0)
+		{
+			StageType = EMinigame2;
+			g_bforscore = false;
+		}
+		else
+		{
+			if (StageType == EBossBattle || StageType == EMinigame1 || StageType == EMinigame2)
+				b_play = false;
+			StageType = EStage;
+		}
+		if (StageType == EBoss)
+			boss_init();
+		else if (StageType == EMinigame1)
+			minigame1_init();
+		else if (StageType == EMinigame2)
+			minigame2_init();
+		else
+			init();
+		if (Lives != 99)
+			Lives++;
+		save();
+		g_eGameState = S_CONTINUE;
+	}
+
 }
 void instructions()
 {
@@ -3295,6 +3680,7 @@ void weapdata()
 }
 void reload()
 {
+	Coin += 3; //Add Coin
 	if (currentWeapon)
 		Weapons[currentWeapon].Clip += Weapons[currentWeapon].ClipMax;	// Adds ammo left in clip to total
 	else
@@ -3308,7 +3694,7 @@ void ost()
 		PlaySound(TEXT("sound/cave.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	else if (StageType == EBoss)
 		PlaySound(TEXT("sound/boss.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
-	else if (StageType == EMinigame1 || StageType == EMinigame2 || StageType == ETicTacToe || StageType == ETicTacToe2 || StageType == EMiniGameSnake)
+	else if (StageType == EMinigame1 || StageType == EMinigame2 || StageType == ETicTacToe || StageType == ETicTacToe2 || StageType == EMiniGameSnake | StageType == EShop)
 		PlaySound(TEXT("sound/minigame.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 	b_play = true;
 }
@@ -3480,6 +3866,15 @@ void convertToString()
 		}
 	}
 	score.close();
+	std::fstream myfile14("map/Shop.txt");
+	for (short i = 0; i < 25 * 80; i++)
+	{
+		myfile14.seekg(i);
+		char * buffer = new char[1];
+		myfile14.read(buffer, 1);
+		if (buffer[0] != '\n')
+			SHOP.push_back(buffer[0]);
+	}
 }					
 void save()
 {
@@ -3489,6 +3884,9 @@ void save()
 		stats << Weapons[currentWeapon].Name << std::endl;
 		stats << Weapons[currentWeapon].Clip << std::endl;
 	}
+	stats << Weapon1 << std::endl;
+	stats << Weapon2 << std::endl;
+	stats << Coin << std::endl;
 	stats << Lives << std::endl;
 	stats << int_stages << std::endl;
 	stats.close();
@@ -3503,6 +3901,9 @@ void continueSave()
 		stats >> Weapons[currentWeapon].Name;
 		stats >> Weapons[currentWeapon].Clip;
 	}
+	stats >> Weapon1;
+	stats >> Weapon2;
+	stats >> Coin;
 	stats >> Lives;
 	stats >> int_stages;
 	stats.close();

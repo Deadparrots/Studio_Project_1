@@ -53,7 +53,8 @@ enum EGAMESTATES
 	S_COUNT,
 	S_CONTINUE,
 	S_MINIGAME,
-	S_HIGHSCORE
+	S_HIGHSCORE,
+	S_SHOP
 };
 
 enum EWEAPONSTATES
@@ -75,7 +76,8 @@ enum ESTAGETYPE
 	EMinigame2,
 	ETicTacToe,
 	ETicTacToe2,
-	EMiniGameSnake
+	EMiniGameSnake,
+	EShop
 };
 
 enum EMAINMENU
@@ -96,6 +98,14 @@ enum EMINIGAME
 	MM1P,
 	MM2P,
 	MMHighscore
+};
+
+enum ESHOP
+{
+	MMLive,
+	MMW1,
+	MMW2,
+	MMBack
 };
 
 // struct for the game character
@@ -165,6 +175,9 @@ void renderEnemy3();
 void renderEnemy4();
 void renderEnemy5();
 void renderEnemy6();
+void renderShopkeeper();
+void shop();
+void shopoption();
 void renderbeat1();
 void renderbeat2();
 void renderbeat3();

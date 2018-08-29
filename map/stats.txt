@@ -1,10 +1,13 @@
 Spear
 1
 Pistol
-156
+54
 Crossbow
 0
 Rifle
 0
-3
-3
+0
+0
+27
+7
+5
