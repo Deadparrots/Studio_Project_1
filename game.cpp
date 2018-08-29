@@ -2455,6 +2455,7 @@ void renderUI()
 {
 	COORD UIBG;
 	COORD UI;
+	std::string display;
 	for (int i = 0; g_Console.getConsoleSize().X > i; i++) // For every value of x
 	{
 		UIBG.X = i;
@@ -2464,40 +2465,42 @@ void renderUI()
 			g_Console.writeToBuffer(UIBG, " ", 0x90);
 		}
 	}
-
 	UI.Y = 1; // Sets Height of UI text
-	UI.X = g_Console.getConsoleSize().X / 3 - 15; // Start of UI text
-	g_Console.writeToBuffer(UI, "Lives : ", 0x9f);
-
-	UI.X = g_Console.getConsoleSize().X / 4 - 1;
-	std::string display = std::to_string(Lives);
-	g_Console.writeToBuffer(UI, display, 0x9f); // Displays the number of lives
-
-	UI.X = g_Console.getConsoleSize().X / 3 - 3;
-	g_Console.writeToBuffer(UI, "Weapon : ", 0x9f);
-	UI.X = UI.X + 9;
-	g_Console.writeToBuffer(UI, Weapons[currentWeapon].Name, 0x9f); // Display Equipped Weapon
-
-	UI.X = UI.X + Weapons[currentWeapon].Name.length() + 3; // Increases UI.X by text length of weapon's name
-	g_Console.writeToBuffer(UI, "Ammo : ", 0x9f);
-
-	UI.X = UI.X + 7;
-	display = std::to_string(Weapons[currentWeapon].Clip);
-	g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Clip
-
-	UI.X += 6; // Increases UI.X by 
-	g_Console.writeToBuffer(UI, "Coin : ", 0x9f);
-
-	UI.X = UI.X + 6;
-	display = std::to_string(Coin);
-	g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Coin
-	
-	UI.X += 6;
-	g_Console.writeToBuffer(UI, "Stage ", 0x9f);
-
-	UI.X = UI.X + 6;
-	display = std::to_string(int_stages);
-	g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Stage
+	if (StageType == EMiniGameSnake) // if snake
+	{
+		UI.X = g_Console.getConsoleSize().X / 4;
+		g_Console.writeToBuffer(UI, "Length : ", 0x9F);
+		UI.X += 9;
+		display = std::to_string(snake_Size);
+		g_Console.writeToBuffer(UI, display, 0x9F);
+		UI.X += display.size() + 1;
+		g_Console.writeToBuffer(UI, "Time : ", 0x9F);
+		UI.X += 7;
+		display = std::to_string((int)(g_dElapsedTime)); // Shows Time elapsed
+		g_Console.writeToBuffer(UI, display, 0x9F);
+	}
+	else
+	{
+		UI.X = g_Console.getConsoleSize().X / 3 - 13; // Start of UI text
+		g_Console.writeToBuffer(UI, "Lives : ", 0x9f);
+		UI.X = g_Console.getConsoleSize().X / 4 + 1;
+		display = std::to_string(Lives);
+		g_Console.writeToBuffer(UI, display, 0x9f); // Displays the number of lives
+		UI.X = g_Console.getConsoleSize().X / 3 + 1;
+		g_Console.writeToBuffer(UI, "Weapon : ", 0x9f);
+		UI.X = UI.X + 9;
+		g_Console.writeToBuffer(UI, Weapons[currentWeapon].Name, 0x9f); // Display Equipped Weapon
+		UI.X = UI.X + Weapons[currentWeapon].Name.length() + 3; // Increases UI.X by text length of weapon 1's name
+		g_Console.writeToBuffer(UI, "Ammo : ", 0x9f);
+		UI.X = UI.X + 7;
+		display = std::to_string(Weapons[currentWeapon].Clip);
+		g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Clip
+		UI.X += 5;
+		g_Console.writeToBuffer(UI, "Stage ", 0x9f);
+		UI.X = UI.X + 6;
+		display = std::to_string(int_stages);
+		g_Console.writeToBuffer(UI, display, 0x9f); // Display Current Stage
+	}
 }
 void renderCharacter()
 {
