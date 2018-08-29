@@ -454,7 +454,7 @@ void intro()
 	if (bSomethingHappened)
 	{
 		// set the bounce time to some time in the future to prevent accidental triggers
-		g_dBounceTime = g_dElapsedTime + 0.125; // 125ms should be enough
+		g_dBounceTime = g_dElapsedTime + 0.15; // 125ms should be enough
 	}
 }
 void splashScreenWait()
