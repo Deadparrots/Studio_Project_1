@@ -2029,10 +2029,6 @@ void processUserInput()
 			g_eGameState = S_GAMEOVER;
 		}
 	}
-	if (g_abKeyPressed[K_9])
-	{
-		g_eGameState = S_HIGHSCORE;
-	}
 	if (g_abKeyPressed[K_C])
 	{
 		g_enemy1.m_bActive = false;
