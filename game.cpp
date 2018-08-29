@@ -7,6 +7,7 @@
 double  g_dElapsedTime;
 double  g_dDeltaTime;
 bool    g_abKeyPressed[K_COUNT];
+
 // Game specific variables here
 SGameChar   g_sChar; // Player Character
 SGameChar	g_enemy1;
@@ -66,9 +67,10 @@ bool        multi = false;
 bool        win = false;
 bool		g_bMinigame = false;
 bool        g_bforscore = false;
+bool        newScore = false;
 int		    g_shootdist = 0;
 int		    g_shootmaxdist = 2; // Shooting distance of weapon. Can be changed.
-EGAMESTATES	g_eGameState = S_INTRO;
+EGAMESTATES	    g_eGameState = S_INTRO;
 EWEAPONSTATES	g_eWeaponState = Hold;
 EWEAPONSTATES	g_eM2WeaponState = FireUp;
 size_t		b_number = 1;
@@ -82,23 +84,26 @@ char        charSix = 54;
 char        charSeven = 55;
 char        charEight = 56;
 char        charNine = 57;
-double  g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
-int		Lives = 3; // Number of lives the player has left (Base Value is 3)
-int		currentWeapon = 0; // Current Weapon
+double      g_dBounceTime; // this is to prevent key bouncing, so we won't trigger keypresses more than once
+int		    Lives = 3; // Number of lives the player has left (Base Value is 3)
+int		    currentWeapon = 0; // Current Weapon
 WeaponParameters Weapons[4]; // Number of Weapons
+
 // Snake Mini Stuff
-int snake_Size = 1; // Size of snake tail
-int delay = 0; // Delay for movement
-char Direction = 0;
-bool AppleCollected = true;
+int         snake_Size = 1; // Size of snake tail
+int         delay = 0; // Delay for movement
+char        Direction = 0;
+bool        AppleCollected = true;
 // Snake Mini Stuff
 
-double rhytime_t = 0;
-double pong_t = 0.0000,pong_t2 = 0.0000,pong_t3 = 0.0000;
-int snake_length = 0;
+// Highscore
+int rally = 0;
+int pong_t = 0,pong_t2 = 0, pong_t3 = 0;
+int snake_length = 0, snake_length2 = 0, snake_length3 = 0;
 
 // Console object
-Console g_Console(80, 24, "Monster Dungeon");
+Console g_Console(80, 24, "Monster Dungeon"); // name at the top
+
 //--------------------------------------------------------------
 // Purpose  : Initialisation function
 //            Initialize variables, allocate memory, load data from file, etc. 
@@ -386,6 +391,7 @@ void update(double dt)
 		break;
 	}
 }
+
 //--------------------------------------------------------------
 // Purpose  : Render function is to update the console screen
 //            At this point, you should know exactly what to draw onto the screen.
@@ -486,6 +492,41 @@ void splashScreenWait()
 		MMSelect = MMStart;
 		bSomethingHappened = true;
 	}
+	else if (MMSelect == MMInstructions && (g_abKeyPressed[K_D] || g_abKeyPressed[K_RIGHT]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMHighscore;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMHighscore && (g_abKeyPressed[K_A] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMInstructions;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMHighscore && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMContinue;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMHighscore && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMExit;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMContinue && (g_abKeyPressed[K_S] || g_abKeyPressed[K_DOWN]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMHighscore;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMExit && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMHighscore;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMHighscore && (g_abKeyPressed[K_A] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMInstructions;
+		bSomethingHappened = true;
+	}
 	else if (MMSelect == MMminigame && (g_abKeyPressed[K_W] || g_abKeyPressed[K_UP]) && g_eGameState == S_TITLE)
 	{
 		MMSelect = MMInstructions;
@@ -521,6 +562,16 @@ void splashScreenWait()
 		MMSelect = MMExit;
 		bSomethingHappened = true;
 	}
+	else if (MMSelect == MMInstructions && (g_abKeyPressed[K_A] || g_abKeyPressed[K_LEFT]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMHighscore;
+		bSomethingHappened = true;
+	}
+	else if (MMSelect == MMHighscore && (g_abKeyPressed[K_D] || g_abKeyPressed[K_RIGHT]) && g_eGameState == S_TITLE)
+	{
+		MMSelect = MMInstructions;
+		bSomethingHappened = true;
+	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMInstructions && g_eGameState == S_TITLE)
 	{
 		g_eGameState = S_INSTRUCTIONS;
@@ -539,8 +590,7 @@ void splashScreenWait()
 		b_play = false;
 		Weapons[0].Clip = Weapons[0].ClipMax;
 		int_stages = 1;
-		save();
-		g_eGameState = S_CONTINUE;
+		g_eGameState = S_GAME;
 	}
 	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMContinue && g_eGameState == S_TITLE)
 	{
@@ -554,6 +604,12 @@ void splashScreenWait()
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 		g_eGameState = S_MINIGAME;
+	}
+	else if (g_abKeyPressed[K_SPACE] && MMSelect == MMHighscore && g_eGameState == S_TITLE)
+	{
+		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
+		b_play = false;
+		g_eGameState = S_HIGHSCORE;
 	}
 	if (bSomethingHappened)
 	{
@@ -930,12 +986,13 @@ void minigame2_moveCharacter()
 		{	
 			g_weapon.m_cLocation.X = 78;	
 			g_door.m_bActive = true;	
-			g_door.m_cLocation = g_sChar.m_cLocation;	
+			g_door.m_cLocation = g_sChar.m_cLocation;
 		}	
 	}	
-	if (g_weapon.m_cLocation.X == g_minigame2_paddle1.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle1.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle1.m_cLocation.Y + 2))	
+	if (g_weapon.m_cLocation.X == g_minigame2_paddle1.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle1.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle1.m_cLocation.Y + 2) && g_eWeaponState == FireLeft)	
 	{	
-		g_eWeaponState = FireRight;	
+		g_eWeaponState = FireRight;
+		rally++;
 		shootsound = true;	
 	}	
 	if (g_weapon.m_cLocation.X == g_minigame2_paddle2.m_cLocation.X && (g_weapon.m_cLocation.Y >= g_minigame2_paddle2.m_cLocation.Y - 2 && g_weapon.m_cLocation.Y <= g_minigame2_paddle2.m_cLocation.Y + 2))	
@@ -965,11 +1022,6 @@ void minigame2_moveCharacter()
 	{
 		if(g_eWeaponState == FireRight && g_minigame2_paddle2.m_cLocation.Y <= g_weapon.m_cLocation.Y + 1 && g_minigame2_paddle2.m_cLocation.Y >= g_weapon.m_cLocation.Y - 1 && g_weapon.m_cLocation.X >= 38)
 			g_minigame2_paddle2.m_cLocation.Y = g_weapon.m_cLocation.Y;
-		if ((Lives == 0 || g_abKeyPressed[K_1]) && StageType == EMinigame2)
-		{
-			highscoreLoad();
-			highscoreSave();
-		}
 	}
 	else
 	{
@@ -981,7 +1033,6 @@ void minigame2_moveCharacter()
 		g_dBounceTime = g_dElapsedTime + 0.03 + 0.1/stages; // 125ms should be enough	
 	}	
 }
-
 void bossbattle_moveCharacter()
 {
 	bool bSomethingHappened = false;
@@ -1393,7 +1444,6 @@ void bossbattle_moveCharacter()
 		g_dBounceTime = g_dElapsedTime + 0.07; // 125ms should be enough
 	}
 }
-
 void boss_moveCharacter()
 {
 	bool bSomethingHappened = false;
@@ -1442,1070 +1492,522 @@ void boss_moveCharacter()
 }
 void moveCharacter()
 {
-	//bool bSomethingHappened = false;
-	//if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0))
-	//{
-	//	shootfailsound = 1;
-	//	bSomethingHappened = true;
-	//}
-	//if (currentWeapon == 0)
-	//	Weapons[currentWeapon].Clip = 1;
-	//if (Weapons[currentWeapon].Clip > 0)
-	//{
-	//	Bullet.Distance = 0;
-	//	if (g_abKeyPressed[K_UP] && g_eWeaponState == Hold)
-	//	{
-	//		g_eWeaponState = FireUp;
-	//		if (g_abKeyPressed[K_W])
-	//		{
-	//			Bullet.p_Location.Y = g_sChar.m_cLocation.Y - 1;
-	//		}
-	//		else
-	//		{
-	//			Bullet.p_Location.Y = g_sChar.m_cLocation.Y;
-	//		}
-	//		Bullet.p_Location.X = g_sChar.m_cLocation.X;
-	//		shootsound++;
-	//		Weapons[currentWeapon].Clip--;
-	//		Bullet.Direction = 0;
-	//		Shots.push_back(Bullet);
-	//		bSomethingHappened = true;
-	//	}
-	//	if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
-	//	{
-	//		g_eWeaponState = FireDown;
-	//		if (g_abKeyPressed[K_S])
-	//			Bullet.p_Location.Y = g_sChar.m_cLocation.Y + 1;
-	//		else
-	//			Bullet.p_Location.Y = g_sChar.m_cLocation.Y;
-	//		Bullet.p_Location.X = g_sChar.m_cLocation.X;
-	//		shootsound++;
-	//		Weapons[currentWeapon].Clip--;
-	//		Bullet.Direction = 3;
-	//		Shots.push_back(Bullet);
-	//		bSomethingHappened = true;
-	//	}
-	//	if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
-	//	{
-	//		g_eWeaponState = FireLeft;
-	//		if (g_abKeyPressed[K_A])
-	//			Bullet.p_Location.X = g_sChar.m_cLocation.X - 1;
-	//		else
-	//			Bullet.p_Location.X = g_sChar.m_cLocation.X;
-	//		Bullet.p_Location.Y = g_sChar.m_cLocation.Y;
-	//		shootsound++;
-	//		Weapons[currentWeapon].Clip--;
-	//		Bullet.Direction = 2;
-	//		Shots.push_back(Bullet);
-	//		bSomethingHappened = true;
-	//	}
-	//	if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
-	//	{
-	//		g_eWeaponState = FireRight;
-	//		if (g_abKeyPressed[K_D])
-	//			Bullet.p_Location.X = g_sChar.m_cLocation.X + 1;
-	//		else
-	//			Bullet.p_Location.X = g_sChar.m_cLocation.X;
-	//		Bullet.p_Location.Y = g_sChar.m_cLocation.Y;
-	//		shootsound++;
-	//		Weapons[currentWeapon].Clip--;
-	//		Bullet.Direction = 1;
-	//		Shots.push_back(Bullet);
-	//		bSomethingHappened = true;
-	//	}
-	//}
-	//for (size_t i = 0; Shots.size() > i;i++) // Shots calculator
-	//{
-	//	if (Shots[i].Direction == 0) // Up State
-	//	{
-	//		if (Map[Shots[i].p_Location.X + Shots[i].p_Location.Y * 80 - 80] == ' ')
-	//		{
-	//			Shots[i].p_Location.Y--;
-	//			Shots[i].Distance++;
-	//		}
-	//		else
-	//		{
-	//			Shots[i].Distance = Weapons[currentWeapon].Range;
-	//		}
-	//	}
-	//	if (Shots[i].Direction == 3) // Down State
-	//	{
-	//		if (Map[Shots[i].p_Location.X + Shots[i].p_Location.Y * 80 + 80] == ' ')
-	//		{
-	//			Shots[i].p_Location.Y++;
-	//			Shots[i].Distance++;
-	//		}
-	//		else
-	//		{
-	//			Shots[i].Distance = Weapons[currentWeapon].Range;
-	//		}
-	//	}
-	//	if (Shots[i].Direction == 2) // Left State
-	//	{
-	//		if (Map[Shots[i].p_Location.X + Shots[i].p_Location.Y * 80 - 1] == ' ')
-	//		{
-	//			Shots[i].p_Location.X--;
-	//			Shots[i].Distance++;
-	//		}
-	//		else
-	//			Shots[i].Distance = Weapons[currentWeapon].Range;
-	//	}
-	//	if (Shots[i].Direction == 1) // Right State
-	//	{
-	//		if (Map[Shots[i].p_Location.X + Shots[i].p_Location.Y * 80 + 1] == ' ')
-	//		{
-	//			Shots[i].p_Location.X++;
-	//			Shots[i].Distance++;
-	//		}
-	//		else
-	//			Shots[i].Distance = Weapons[currentWeapon].Range;
-	//	}
-	//}
-	//if (g_dBounceTime > g_dElapsedTime)
-	//	return;
-	//for (size_t i = 0;i < Shots.size();i++)
-	//{
-	//	if (Shots[i].Distance >= Weapons[currentWeapon].Range)
-	//	{
-	//		g_eWeaponState = Hold;
-	//		Shots.erase(Shots.begin()+i);
-	//	}
-	//}
-	//if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
-	//{
-	//	if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
-	//	{
-	//		g_sChar.m_cLocation.Y--;
-	//		bSomethingHappened = true;
-	//	}
-	//}
-	//if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
-	//{
-	//	if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 1] == ' ')
-	//	{
-	//		g_sChar.m_cLocation.X--;
-	//		bSomethingHappened = true;
-	//	}
-	//}
-	//if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
-	//{
-	//	if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 80] == ' ')
-	//	{
-	//		g_sChar.m_cLocation.Y++;
-	//		bSomethingHappened = true;
-	//	}
-	//}
-	//if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
-	//{
-	//	if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 1] == ' ')
-	//	{
-	//		g_sChar.m_cLocation.X++;
-	//		bSomethingHappened = true;
-	//	}
-	//}
-	//if (g_abKeyPressed[K_E])
-	//{
-	//	if (currentWeapon < 3)
-	//	{
-	//		currentWeapon++;
-	//	}
-	//	else
-	//	{
-	//		currentWeapon = 0;
-	//	}
-	//	g_dBounceTime = g_dElapsedTime + 0.2;
-	//}
-	//if (
-	//	(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == false) ||
-	//	(g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == false) ||
-	//	(g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == false) ||
-	//	(g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == false) ||
-	//	(g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == false) ||
-	//	(g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == false)
-	//	)
-	//{
-	//	reload();
-	//	reloadsound += 2;
-	//}
-	//if (
-	//	(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == true) ||
-	//	(g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == true) ||
-	//	(g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == true) ||
-	//	(g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == true) ||
-	//	(g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == true) ||
-	//	(g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == true)
-	//	)
-	//{
-	//	g_sChar.m_bActive = false;
-	//	bSomethingHappened = true;
-	//}
-	//if (g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y)
-	//{
-	//	g_enemy1.m_bActive = false;
-	//	g_enemy1.m_cLocation.X = 0;
-	//	g_enemy1.m_cLocation.Y = 0;
-	//	reload();
-	//}
-	//if (g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y)
-	//{
-	//	g_enemy2.m_bActive = false;
-	//	g_enemy2.m_cLocation.X = 0;
-	//	g_enemy2.m_cLocation.Y = 0;
-	//	reload();
-	//}
-	//if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y)
-	//{
-	//	g_enemy3.m_bActive = false;
-	//	g_enemy3.m_cLocation.X = 0;
-	//	g_enemy3.m_cLocation.Y = 0;
-	//	reload();
-	//}
-	//if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y)
-	//{
-	//	g_enemy4.m_bActive = false;
-	//	g_enemy4.m_cLocation.X = 0;
-	//	g_enemy4.m_cLocation.Y = 0;
-	//	reload();
-	//}
-	//if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y)
-	//{
-	//	g_enemy5.m_bActive = false;
-	//	g_enemy5.m_cLocation.X = 0;
-	//	g_enemy5.m_cLocation.Y = 0;
-	//	reload();
-	//}
-	//if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y)
-	//{
-	//	g_enemy6.m_bActive = false;
-	//	g_enemy6.m_cLocation.X = 0;
-	//	g_enemy6.m_cLocation.Y = 0;
-	//	reload();
-	//}
-	//size_t rate = 100 / (stages + 1) + 100;
-	//switch (rand() % rate)
-	//{
-	//case 0:
-	//	if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 1] == ' ')
-	//		g_enemy1.m_cLocation.X++;
-	//	break;
-	//case 1:
-	//	if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 80] == ' ')
-	//		g_enemy1.m_cLocation.Y++;
-	//	break;
-	//case 2:
-	//	if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 1] == ' ')
-	//		g_enemy1.m_cLocation.X--;
-	//	break;
-	//case 3:
-	//	if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 80] == ' ')
-	//		g_enemy1.m_cLocation.Y--;
-	//	break;
-	//case 4:
-	//	if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 1] == ' ')
-	//		g_enemy2.m_cLocation.X++;
-	//	break;
-	//case 5:
-	//	if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 80] == ' ')
-	//		g_enemy2.m_cLocation.Y++;
-	//	break;
-	//case 6:
-	//	if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 1] == ' ')
-	//		g_enemy2.m_cLocation.X--;
-	//	break;
-	//case 7:
-	//	if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 80] == ' ')
-	//		g_enemy2.m_cLocation.Y--;
-	//	break;
-	//case 8:
-	//	if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 1] == ' ')
-	//		g_enemy3.m_cLocation.X++;
-	//	break;
-	//case 9:
-	//	if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 80] == ' ')
-	//		g_enemy3.m_cLocation.Y++;
-	//	break;
-	//case 10:
-	//	if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 1] == ' ')
-	//		g_enemy3.m_cLocation.X--;
-	//	break;
-	//case 11:
-	//	if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 80] == ' ')
-	//		g_enemy3.m_cLocation.Y--;
-	//	break;
-	//case 12:
-	//	if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 1] == ' ')
-	//		g_enemy4.m_cLocation.X++;
-	//	break;
-	//case 13:
-	//	if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 80] == ' ')
-	//		g_enemy4.m_cLocation.Y++;
-	//	break;
-	//case 14:
-	//	if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 1] == ' ')
-	//		g_enemy4.m_cLocation.X--;
-	//	break;
-	//case 15:
-	//	if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 80] == ' ')
-	//		g_enemy4.m_cLocation.Y--;
-	//	break;
-	//case 16:
-	//	if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 1] == ' ')
-	//		g_enemy5.m_cLocation.X++;
-	//	break;
-	//case 17:
-	//	if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 80] == ' ')
-	//		g_enemy5.m_cLocation.Y++;
-	//	break;
-	//case 18:
-	//	if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 1] == ' ')
-	//		g_enemy5.m_cLocation.X--;
-	//	break;
-	//case 19:
-	//	if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 80] == ' ')
-	//		g_enemy5.m_cLocation.Y--;
-	//	break;
-	//case 20:
-	//	if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 1] == ' ')
-	//		g_enemy6.m_cLocation.X++;
-	//	break;
-	//case 21:
-	//	if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 80] == ' ')
-	//		g_enemy6.m_cLocation.Y++;
-	//	break;
-	//case 22:
-	//	if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 1] == ' ')
-	//		g_enemy6.m_cLocation.X--;
-	//	break;
-	//case 23:
-	//	if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 80] == ' ')
-	//		g_enemy6.m_cLocation.Y--;
-	//	break;
-	//}	
-	//for (size_t i = 0; Shots.size() > i; i++)
-	//{
-	//	if (Shots[i].p_Location.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == true)
-	//	{
-	//		switch (rand() % 100 / (int_stages + 1) + 5)
-	//		{
-	//		case 0:
-	//			if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 80] == ' ')
-	//				g_enemy1.m_cLocation.X++;
-	//			else
-	//				g_enemy1.m_cLocation.X--;
-
-	//			break;
-	//		case 1:
-	//			if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 80] == ' ')
-	//				g_enemy1.m_cLocation.X--;
-	//			else
-	//				g_enemy1.m_cLocation.X++;
-	//			break;
-	//		}
-	//	}
-	//	else if (Shots[i].p_Location.X == g_enemy1.m_cLocation.X && g_enemy1.m_bActive == true)
-	//	{
-	//		switch (rand() % 100 / (int_stages + 1) + 5)
-	//		{
-	//		case 0:
-	//			if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 1] == ' ')
-	//				g_enemy1.m_cLocation.Y++;
-	//			else
-	//				g_enemy1.m_cLocation.Y--;
-	//			break;
-	//		case 1:
-	//			if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 1] == ' ')
-	//				g_enemy1.m_cLocation.Y--;
-	//			else
-	//				g_enemy1.m_cLocation.Y--;
-	//			break;
-	//		}
-	//	}
-	//	if (g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == true)
-	//	{
-	//		switch (rand() % 100 / (int_stages + 1) + 5)
-	//		{
-	//		case 0:
-	//			if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 1] == ' ')
-	//				g_enemy2.m_cLocation.X++;
-	//			else
-	//				g_enemy2.m_cLocation.X--;
-
-	//			break;
-	//		case 1:
-	//			if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 1] == ' ')
-	//				g_enemy2.m_cLocation.X--;
-	//			else
-	//				g_enemy2.m_cLocation.X++;
-	//			break;
-	//		}
-	//	}
-	//	else if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_enemy6.m_bActive == true)
-	//	{
-	//		switch (rand() % 100 / (int_stages + 1) + 5)
-	//		{
-	//		case 0:
-	//			if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 80] == ' ')
-	//				g_enemy2.m_cLocation.Y++;
-	//			else
-	//				g_enemy2.m_cLocation.Y--;
-	//			break;
-	//		case 1:
-	//			if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 80] == ' ')
-	//				g_enemy2.m_cLocation.Y--;
-	//			else
-	//				g_enemy2.m_cLocation.Y++;
-	//			break;
-	//		}
-	//	}
-	//	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_enemy3.m_bActive == true && !(rand() % 20))
-	//	{
-	//		if (g_sChar.m_cLocation.Y > g_enemy3.m_cLocation.Y)
-	//		{
-	//			if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 80] == ' ')
-	//				g_enemy3.m_cLocation.Y++;
-	//		}
-	//		else
-	//		{
-	//			if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 80] == ' ')
-	//				g_enemy3.m_cLocation.Y--;
-	//		}
-	//	}
-	//	else if (g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == true && !(rand() % 20))
-	//	{
-	//		if (g_sChar.m_cLocation.X > g_enemy3.m_cLocation.X)
-	//		{
-	//			if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 1] == ' ')
-	//				g_enemy3.m_cLocation.X++;
-	//		}
-	//		else
-	//		{
-	//			if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 1] == ' ')
-	//				g_enemy3.m_cLocation.X--;
-	//		}
-	//	}
-	//	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_enemy4.m_bActive == true && !(rand() % 20))
-	//	{
-	//		if (g_sChar.m_cLocation.Y > g_enemy4.m_cLocation.Y)
-	//		{
-	//			if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 80] == ' ')
-	//				g_enemy4.m_cLocation.Y++;
-	//		}
-	//		else
-	//		{
-	//			if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 80] == ' ')
-	//				g_enemy4.m_cLocation.Y--;
-	//		}
-	//	}
-	//	else if (g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == true && !(rand() % 20))
-	//	{
-	//		if (g_sChar.m_cLocation.X > g_enemy4.m_cLocation.X)
-	//		{
-	//			if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 1] == ' ')
-	//				g_enemy4.m_cLocation.X++;
-	//		}
-	//		else
-	//		{
-	//			if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 1] == ' ')
-	//				g_enemy4.m_cLocation.X--;
-	//		}
-	//	}
-	//	if (g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == true)
-	//	{
-	//		switch (rand() % 100 / (int_stages + 1) + 5)
-	//		{
-	//		case 0:
-	//			if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 80] == ' ')
-	//				g_enemy5.m_cLocation.X++;
-	//			else
-	//				g_enemy5.m_cLocation.X--;
-
-	//			break;
-	//		case 1:
-	//			if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 80] == ' ')
-	//				g_enemy5.m_cLocation.X--;
-	//			else
-	//				g_enemy5.m_cLocation.X++;
-	//			break;
-	//		}
-	//	}
-	//	else if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_enemy5.m_bActive == true)
-	//	{
-	//		switch (rand() % 100 / (int_stages + 1) + 5)
-	//		{
-	//		case 0:
-	//			if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 1] == ' ')
-	//				g_enemy5.m_cLocation.Y++;
-	//			else
-	//				g_enemy5.m_cLocation.Y--;
-	//			break;
-	//		case 1:
-	//			if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 1] == ' ')
-	//				g_enemy5.m_cLocation.Y--;
-	//			else
-	//				g_enemy5.m_cLocation.Y--;
-	//			break;
-	//		}
-	//	}
-	//	if (g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == true)
-	//	{
-	//		switch (rand() % 100 / (int_stages + 1) + 5)
-	//		{
-	//		case 0:
-	//			if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 80] == ' ')
-	//				g_enemy6.m_cLocation.X++;
-	//			else
-	//				g_enemy6.m_cLocation.X--;
-
-	//			break;
-	//		case 1:
-	//			if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 80] == ' ')
-	//				g_enemy6.m_cLocation.X--;
-	//			else
-	//				g_enemy6.m_cLocation.X++;
-	//			break;
-	//		}
-	//	}
-	//	else if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_enemy6.m_bActive == true)
-	//	{
-	//		switch (rand() % 100 / (int_stages + 1) + 5)
-	//		{
-	//		case 0:
-	//			if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 1] == ' ')
-	//				g_enemy6.m_cLocation.Y++;
-	//			else
-	//				g_enemy6.m_cLocation.Y--;
-	//			break;
-	//		case 1:
-	//			if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 1] == ' ')
-	//				g_enemy6.m_cLocation.Y--;
-	//			else
-	//				g_enemy6.m_cLocation.Y--;
-	//			break;
-	//		}
-	//	}
-	//}
-	//if (bSomethingHappened)
-	//{
-	//	// set the bounce time to some time in the future to prevent accidental triggers
-	//	g_dBounceTime = g_dElapsedTime + 0.07; // 125ms should be enough
-	//}
-
-if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0) && currentWeapon)
-{
-	shootfailsound = true;
-}
-if (Weapons[currentWeapon].Clip > 0)
-{
-	if (g_abKeyPressed[K_UP] && g_eWeaponState == Hold)
+	if ((g_abKeyPressed[K_UP] || g_abKeyPressed[K_DOWN] || g_abKeyPressed[K_LEFT] || g_abKeyPressed[K_RIGHT]) && (g_eWeaponState != Hold || Weapons[currentWeapon].Clip == 0) && currentWeapon)
 	{
-		g_eWeaponState = FireUp;
-		g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-		shootsound = true;
-		if (currentWeapon)
-			Weapons[currentWeapon].Clip--;
+		shootfailsound = true;
 	}
-	if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
+	if (Weapons[currentWeapon].Clip > 0)
 	{
-		g_eWeaponState = FireDown;
-		g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-		shootsound = true;
-		if (currentWeapon)
-			Weapons[currentWeapon].Clip--;
+		if (g_abKeyPressed[K_UP] && g_eWeaponState == Hold)
+		{
+			g_eWeaponState = FireUp;
+			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+			shootsound = true;
+			if (currentWeapon)
+				Weapons[currentWeapon].Clip--;
+		}
+		if (g_abKeyPressed[K_DOWN] && g_eWeaponState == Hold)
+		{
+			g_eWeaponState = FireDown;
+			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+			shootsound = true;
+			if (currentWeapon)
+				Weapons[currentWeapon].Clip--;
+		}
+		if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
+		{
+			g_eWeaponState = FireLeft;
+			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			shootsound = true;
+			if (currentWeapon)
+				Weapons[currentWeapon].Clip--;
+		}
+		if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
+		{
+			g_eWeaponState = FireRight;
+			g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
+			g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
+			shootsound = true;
+			if (currentWeapon)
+				Weapons[currentWeapon].Clip--;
+		}
 	}
-	if (g_abKeyPressed[K_LEFT] && g_eWeaponState == Hold)
+	if (g_eWeaponState == FireUp)
 	{
-		g_eWeaponState = FireLeft;
-		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-		g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-		shootsound = true;
-		if (currentWeapon)
-			Weapons[currentWeapon].Clip--;
+		if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 80] == ' ')
+		{
+			g_weapon.m_cLocation.Y--;
+			g_shootdist++;
+		}
+		else
+			g_shootdist = g_shootmaxdist;
 	}
-	if (g_abKeyPressed[K_RIGHT] && g_eWeaponState == Hold)
+	if (g_eWeaponState == FireDown)
 	{
-		g_eWeaponState = FireRight;
-		g_weapon.m_cLocation.X = g_sChar.m_cLocation.X;
-		g_weapon.m_cLocation.Y = g_sChar.m_cLocation.Y;
-		shootsound = true;
-		if (currentWeapon)
-			Weapons[currentWeapon].Clip--;
+		if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 80] == ' ')
+		{
+			g_weapon.m_cLocation.Y++;
+			g_shootdist++;
+		}
+		else
+			g_shootdist = g_shootmaxdist;
 	}
-}
-if (g_eWeaponState == FireUp)
-{
-	if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 80] == ' ')
+	if (g_eWeaponState == FireLeft)
 	{
-		g_weapon.m_cLocation.Y--;
-		g_shootdist++;
+		if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 1] == ' ')
+		{
+			g_weapon.m_cLocation.X--;
+			g_shootdist++;
+		}
+		else
+			g_shootdist = g_shootmaxdist;
 	}
-	else
-		g_shootdist = g_shootmaxdist;
-}
-if (g_eWeaponState == FireDown)
-{
-	if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 80] == ' ')
+	if (g_eWeaponState == FireRight)
 	{
-		g_weapon.m_cLocation.Y++;
-		g_shootdist++;
+		if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 1] == ' ')
+		{
+			g_weapon.m_cLocation.X++;
+			g_shootdist++;
+		}
+		else
+			g_shootdist = g_shootmaxdist;
 	}
-	else
-		g_shootdist = g_shootmaxdist;
-}
-if (g_eWeaponState == FireLeft)
-{
-	if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 - 1] == ' ')
-	{
-		g_weapon.m_cLocation.X--;
-		g_shootdist++;
-	}
-	else
-		g_shootdist = g_shootmaxdist;
-}
-if (g_eWeaponState == FireRight)
-{
-	if (Map[g_weapon.m_cLocation.X + g_weapon.m_cLocation.Y * 80 + 1] == ' ')
-	{
-		g_weapon.m_cLocation.X++;
-		g_shootdist++;
-	}
-	else
-		g_shootdist = g_shootmaxdist;
-}
 
-if (g_shootdist >= g_shootmaxdist)
-{
-	g_eWeaponState = Hold;
-	g_weapon.m_cLocation.X = 10;
-	g_weapon.m_cLocation.Y = 2;
-	g_shootdist = 0;
-}
-
-bool bSomethingHappened = false;
-if (g_dBounceTime > g_dElapsedTime)
-return;
-// Updating the location of the character based on the key press
-// providing a beep sound whenver we shift the character
-
-if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
-{
-	if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
+	if (g_shootdist >= g_shootmaxdist)
 	{
-		g_sChar.m_cLocation.Y--;
+		g_eWeaponState = Hold;
+		g_weapon.m_cLocation.X = 10;
+		g_weapon.m_cLocation.Y = 2;
+		g_shootdist = 0;
+	}
+
+	bool bSomethingHappened = false;
+	if (g_dBounceTime > g_dElapsedTime)
+		return;
+	// Updating the location of the character based on the key press
+	// providing a beep sound whenver we shift the character
+
+	if (g_abKeyPressed[K_W] && g_sChar.m_cLocation.Y > 0)
+	{
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 80] == ' ')
+		{
+			g_sChar.m_cLocation.Y--;
+			bSomethingHappened = true;
+		}
+	}
+	if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
+	{
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 1] == ' ')
+		{
+			g_sChar.m_cLocation.X--;
+			bSomethingHappened = true;
+		}
+	}
+	if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
+	{
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 80] == ' ')
+		{
+			g_sChar.m_cLocation.Y++;
+			bSomethingHappened = true;
+		}
+	}
+	if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
+	{
+		if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 1] == ' ')
+		{
+			g_sChar.m_cLocation.X++;
+			bSomethingHappened = true;
+		}
+	}
+	if (g_abKeyPressed[K_E])
+	{
+		if (currentWeapon < 3)
+		{
+			currentWeapon++;
+			g_shootmaxdist = Weapons[currentWeapon].Range;
+		}
+		else if (currentWeapon = 3)
+		{
+			currentWeapon = 0;
+			g_shootmaxdist = Weapons[currentWeapon].Range;
+		}
+		g_dBounceTime = g_dElapsedTime + 0.2;
+	}
+	if (
+		(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == false) ||
+		(g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == false) ||
+		(g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == false) ||
+		(g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == false) ||
+		(g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == false) ||
+		(g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == false)
+		)
+	{
+		reload();
+		reloadsound += 2;
+	}
+	if (
+		(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == true) ||
+		(g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == true) ||
+		(g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == true) ||
+		(g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == true) ||
+		(g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == true) ||
+		(g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == true)
+		)
+	{
+		g_sChar.m_bActive = false;
 		bSomethingHappened = true;
 	}
-}
-if (g_abKeyPressed[K_A] && g_sChar.m_cLocation.X > 0)
-{
-	if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 - 1] == ' ')
+	if (g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y)
 	{
-		g_sChar.m_cLocation.X--;
-		bSomethingHappened = true;
+		g_enemy1.m_bActive = false;
+		g_enemy1.m_cLocation.X = 0;
+		g_enemy1.m_cLocation.Y = 0;
+		reload();
 	}
-}
-if (g_abKeyPressed[K_S] && g_sChar.m_cLocation.Y < g_Console.getConsoleSize().Y - 1)
-{
-	if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 80] == ' ')
+	if (g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y)
 	{
-		g_sChar.m_cLocation.Y++;
-		bSomethingHappened = true;
+		g_enemy2.m_bActive = false;
+		g_enemy2.m_cLocation.X = 0;
+		g_enemy2.m_cLocation.Y = 0;
+		reload();
 	}
-}
-if (g_abKeyPressed[K_D] && g_sChar.m_cLocation.X < g_Console.getConsoleSize().X - 1)
-{
-	if (Map[g_sChar.m_cLocation.X + g_sChar.m_cLocation.Y * 80 + 1] == ' ')
+	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y)
 	{
-		g_sChar.m_cLocation.X++;
-		bSomethingHappened = true;
+		g_enemy3.m_bActive = false;
+		g_enemy3.m_cLocation.X = 0;
+		g_enemy3.m_cLocation.Y = 0;
+		reload();
 	}
-}
-if (g_abKeyPressed[K_E])
-{
-	if (currentWeapon < 3)
+	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y)
 	{
-		currentWeapon++;
-		g_shootmaxdist = Weapons[currentWeapon].Range;
+		g_enemy4.m_bActive = false;
+		g_enemy4.m_cLocation.X = 0;
+		g_enemy4.m_cLocation.Y = 0;
+		reload();
 	}
-	else if (currentWeapon = 3)
+	if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y)
 	{
-		currentWeapon = 0;
-		g_shootmaxdist = Weapons[currentWeapon].Range;
+		g_enemy5.m_bActive = false;
+		g_enemy5.m_cLocation.X = 0;
+		g_enemy5.m_cLocation.Y = 0;
+		reload();
 	}
-	g_dBounceTime = g_dElapsedTime + 0.2;
-}
-if (
-(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == false) ||
-(g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == false) ||
-(g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == false) ||
-(g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == false) ||
-(g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == false) ||
-(g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == false)
-)
-{
-	reload();
-	reloadsound += 2;
-}
-if (
-(g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == true) ||
-(g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == true) ||
-(g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == true) ||
-(g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == true) ||
-(g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == true) ||
-(g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == true)
-)
-{
-	g_sChar.m_bActive = false;
-	bSomethingHappened = true;
-}
-if (g_sChar.m_cLocation.X == g_enemy1.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy1.m_cLocation.Y)
-{
-	g_enemy1.m_bActive = false;
-	g_enemy1.m_cLocation.X = 0;
-	g_enemy1.m_cLocation.Y = 0;
-	reload();
-}
-if (g_sChar.m_cLocation.X == g_enemy2.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y)
-{
-	g_enemy2.m_bActive = false;
-	g_enemy2.m_cLocation.X = 0;
-	g_enemy2.m_cLocation.Y = 0;
-	reload();
-}
-if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y)
-{
-	g_enemy3.m_bActive = false;
-	g_enemy3.m_cLocation.X = 0;
-	g_enemy3.m_cLocation.Y = 0;
-	reload();
-}
-if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y)
-{
-	g_enemy4.m_bActive = false;
-	g_enemy4.m_cLocation.X = 0;
-	g_enemy4.m_cLocation.Y = 0;
-	reload();
-}
-if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y)
-{
-	g_enemy5.m_bActive = false;
-	g_enemy5.m_cLocation.X = 0;
-	g_enemy5.m_cLocation.Y = 0;
-	reload();
-}
-if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y)
-{
-	g_enemy6.m_bActive = false;
-	g_enemy6.m_cLocation.X = 0;
-	g_enemy6.m_cLocation.Y = 0;
-	reload();
-}
-size_t rate = 100 / (stages + 1) + 100;
-switch (rand() % rate)
-{
-case 0:
-	if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 1] == ' ')
-		g_enemy1.m_cLocation.X++;
-	break;
-case 1:
-	if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 80] == ' ')
-		g_enemy1.m_cLocation.Y++;
-	break;
-case 2:
-	if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 1] == ' ')
-		g_enemy1.m_cLocation.X--;
-	break;
-case 3:
-	if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 80] == ' ')
-		g_enemy1.m_cLocation.Y--;
-	break;
-case 4:
-	if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 1] == ' ')
-		g_enemy2.m_cLocation.X++;
-	break;
-case 5:
-	if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 80] == ' ')
-		g_enemy2.m_cLocation.Y++;
-	break;
-case 6:
-	if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 1] == ' ')
-		g_enemy2.m_cLocation.X--;
-	break;
-case 7:
-	if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 80] == ' ')
-		g_enemy2.m_cLocation.Y--;
-	break;
-case 8:
-	if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 1] == ' ')
-		g_enemy3.m_cLocation.X++;
-	break;
-case 9:
-	if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 80] == ' ')
-		g_enemy3.m_cLocation.Y++;
-	break;
-case 10:
-	if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 1] == ' ')
-		g_enemy3.m_cLocation.X--;
-	break;
-case 11:
-	if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 80] == ' ')
-		g_enemy3.m_cLocation.Y--;
-	break;
-case 12:
-	if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 1] == ' ')
-		g_enemy4.m_cLocation.X++;
-	break;
-case 13:
-	if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 80] == ' ')
-		g_enemy4.m_cLocation.Y++;
-	break;
-case 14:
-	if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 1] == ' ')
-		g_enemy4.m_cLocation.X--;
-	break;
-case 15:
-	if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 80] == ' ')
-		g_enemy4.m_cLocation.Y--;
-	break;
-case 16:
-	if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 1] == ' ')
-		g_enemy5.m_cLocation.X++;
-	break;
-case 17:
-	if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 80] == ' ')
-		g_enemy5.m_cLocation.Y++;
-	break;
-case 18:
-	if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 1] == ' ')
-		g_enemy5.m_cLocation.X--;
-	break;
-case 19:
-	if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 80] == ' ')
-		g_enemy5.m_cLocation.Y--;
-	break;
-case 20:
-	if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 1] == ' ')
-		g_enemy6.m_cLocation.X++;
-	break;
-case 21:
-	if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 80] == ' ')
-		g_enemy6.m_cLocation.Y++;
-	break;
-case 22:
-	if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 1] == ' ')
-		g_enemy6.m_cLocation.X--;
-	break;
-case 23:
-	if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 80] == ' ')
-		g_enemy6.m_cLocation.Y--;
-	break;
-}
-if (g_weapon.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == true)
-{
-	switch (rand() % 100 / (int_stages + 1) + 5)
+	if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y)
+	{
+		g_enemy6.m_bActive = false;
+		g_enemy6.m_cLocation.X = 0;
+		g_enemy6.m_cLocation.Y = 0;
+		reload();
+	}
+	size_t rate = 100 / (stages + 1) + 100;
+	switch (rand() % rate)
 	{
 	case 0:
-		if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 80] == ' ')
+		if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 1] == ' ')
 			g_enemy1.m_cLocation.X++;
-		else
-			g_enemy1.m_cLocation.X--;
-
 		break;
 	case 1:
-		if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 80] == ' ')
-			g_enemy1.m_cLocation.X--;
-		else
-			g_enemy1.m_cLocation.X++;
-		break;
-	}
-}
-else if (g_weapon.m_cLocation.X == g_enemy1.m_cLocation.X && g_enemy1.m_bActive == true)
-{
-	switch (rand() % 100 / (int_stages + 1) + 5)
-	{
-	case 0:
-		if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 1] == ' ')
+		if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 80] == ' ')
 			g_enemy1.m_cLocation.Y++;
-		else
+		break;
+	case 2:
+		if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 1] == ' ')
+			g_enemy1.m_cLocation.X--;
+		break;
+	case 3:
+		if (g_enemy1.m_bActive == true && Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 80] == ' ')
 			g_enemy1.m_cLocation.Y--;
 		break;
-	case 1:
-		if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 1] == ' ')
-			g_enemy1.m_cLocation.Y--;
-		else
-			g_enemy1.m_cLocation.Y--;
-		break;
-	}
-}
-if (g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == true)
-{
-	switch (rand() % 100 / (int_stages + 1) + 5)
-	{
-	case 0:
-		if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 1] == ' ')
-			g_enemy2.m_cLocation.X++;
-		else
-			g_enemy2.m_cLocation.X--;
-
-		break;
-	case 1:
-		if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 1] == ' ')
-			g_enemy2.m_cLocation.X--;
-		else
+	case 4:
+		if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 1] == ' ')
 			g_enemy2.m_cLocation.X++;
 		break;
-	}
-}
-else if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_enemy6.m_bActive == true)
-{
-	switch (rand() % 100 / (int_stages + 1) + 5)
-	{
-	case 0:
-		if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 80] == ' ')
-			g_enemy2.m_cLocation.Y++;
-		else
-			g_enemy2.m_cLocation.Y--;
-		break;
-	case 1:
-		if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 80] == ' ')
-			g_enemy2.m_cLocation.Y--;
-		else
+	case 5:
+		if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 80] == ' ')
 			g_enemy2.m_cLocation.Y++;
 		break;
-	}
-}
-if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_enemy3.m_bActive == true && !(rand() % 20))
-{
-	if (g_sChar.m_cLocation.Y > g_enemy3.m_cLocation.Y)
-	{
-		if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 80] == ' ')
-			g_enemy3.m_cLocation.Y++;
-	}
-	else
-	{
-		if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 80] == ' ')
-			g_enemy3.m_cLocation.Y--;
-	}
-}
-else if (g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == true && !(rand() % 20))
-{
-	if (g_sChar.m_cLocation.X > g_enemy3.m_cLocation.X)
-	{
-		if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 1] == ' ')
+	case 6:
+		if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 1] == ' ')
+			g_enemy2.m_cLocation.X--;
+		break;
+	case 7:
+		if (g_enemy2.m_bActive == true && Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 80] == ' ')
+			g_enemy2.m_cLocation.Y--;
+		break;
+	case 8:
+		if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 1] == ' ')
 			g_enemy3.m_cLocation.X++;
-	}
-	else
-	{
-		if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 1] == ' ')
+		break;
+	case 9:
+		if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 80] == ' ')
+			g_enemy3.m_cLocation.Y++;
+		break;
+	case 10:
+		if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 1] == ' ')
 			g_enemy3.m_cLocation.X--;
-	}
-}
-if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_enemy4.m_bActive == true && !(rand() % 20))
-{
-	if (g_sChar.m_cLocation.Y > g_enemy4.m_cLocation.Y)
-	{
-		if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 80] == ' ')
-			g_enemy4.m_cLocation.Y++;
-	}
-	else
-	{
-		if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 80] == ' ')
-			g_enemy4.m_cLocation.Y--;
-	}
-}
-else if (g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == true && !(rand() % 20))
-{
-	if (g_sChar.m_cLocation.X > g_enemy4.m_cLocation.X)
-	{
-		if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 1] == ' ')
+		break;
+	case 11:
+		if (g_enemy3.m_bActive == true && Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 80] == ' ')
+			g_enemy3.m_cLocation.Y--;
+		break;
+	case 12:
+		if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 1] == ' ')
 			g_enemy4.m_cLocation.X++;
-	}
-	else
-	{
-		if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 1] == ' ')
+		break;
+	case 13:
+		if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 80] == ' ')
+			g_enemy4.m_cLocation.Y++;
+		break;
+	case 14:
+		if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 1] == ' ')
 			g_enemy4.m_cLocation.X--;
-	}
-}
-if (g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == true)
-{
-	switch (rand() % 100 / (int_stages + 1) + 5)
-	{
-	case 0:
-		if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 80] == ' ')
-			g_enemy5.m_cLocation.X++;
-		else
-			g_enemy5.m_cLocation.X--;
-
 		break;
-	case 1:
-		if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 80] == ' ')
-			g_enemy5.m_cLocation.X--;
-		else
+	case 15:
+		if (g_enemy4.m_bActive == true && Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 80] == ' ')
+			g_enemy4.m_cLocation.Y--;
+		break;
+	case 16:
+		if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 1] == ' ')
 			g_enemy5.m_cLocation.X++;
 		break;
-	}
-}
-else if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_enemy5.m_bActive == true)
-{
-	switch (rand() % 100 / (int_stages + 1) + 5)
-	{
-	case 0:
-		if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 1] == ' ')
+	case 17:
+		if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 80] == ' ')
 			g_enemy5.m_cLocation.Y++;
-		else
+		break;
+	case 18:
+		if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 1] == ' ')
+			g_enemy5.m_cLocation.X--;
+		break;
+	case 19:
+		if (g_enemy5.m_bActive == true && Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 80] == ' ')
 			g_enemy5.m_cLocation.Y--;
 		break;
-	case 1:
-		if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 1] == ' ')
-			g_enemy5.m_cLocation.Y--;
-		else
-			g_enemy5.m_cLocation.Y--;
-		break;
-	}
-}
-if (g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == true)
-{
-	switch (rand() % 100 / (int_stages + 1) + 5)
-	{
-	case 0:
-		if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 80] == ' ')
-			g_enemy6.m_cLocation.X++;
-		else
-			g_enemy6.m_cLocation.X--;
-
-		break;
-	case 1:
-		if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 80] == ' ')
-			g_enemy6.m_cLocation.X--;
-		else
+	case 20:
+		if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 1] == ' ')
 			g_enemy6.m_cLocation.X++;
 		break;
-	}
-}
-else if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_enemy6.m_bActive == true)
-{
-	switch (rand() % 100 / (int_stages + 1) + 5)
-	{
-	case 0:
-		if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 1] == ' ')
+	case 21:
+		if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 80] == ' ')
 			g_enemy6.m_cLocation.Y++;
-		else
-			g_enemy6.m_cLocation.Y--;
 		break;
-	case 1:
-		if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 1] == ' ')
-			g_enemy6.m_cLocation.Y--;
-		else
+	case 22:
+		if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 1] == ' ')
+			g_enemy6.m_cLocation.X--;
+		break;
+	case 23:
+		if (g_enemy6.m_bActive == true && Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 80] == ' ')
 			g_enemy6.m_cLocation.Y--;
 		break;
 	}
-}
+	if (g_weapon.m_cLocation.Y == g_enemy1.m_cLocation.Y && g_enemy1.m_bActive == true)
+	{
+		switch (rand() % 100 / (int_stages + 1) + 5)
+		{
+		case 0:
+			if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 80] == ' ')
+				g_enemy1.m_cLocation.X++;
+			else
+				g_enemy1.m_cLocation.X--;
 
-if (bSomethingHappened)
-{
-	// set the bounce time to some time in the future to prevent accidental triggers
-	g_dBounceTime = g_dElapsedTime + 0.07; // 125ms should be enough
-}
+			break;
+		case 1:
+			if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 80] == ' ')
+				g_enemy1.m_cLocation.X--;
+			else
+				g_enemy1.m_cLocation.X++;
+			break;
+		}
+	}
+	else if (g_weapon.m_cLocation.X == g_enemy1.m_cLocation.X && g_enemy1.m_bActive == true)
+	{
+		switch (rand() % 100 / (int_stages + 1) + 5)
+		{
+		case 0:
+			if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 + 1] == ' ')
+				g_enemy1.m_cLocation.Y++;
+			else
+				g_enemy1.m_cLocation.Y--;
+			break;
+		case 1:
+			if (Map[g_enemy1.m_cLocation.X + g_enemy1.m_cLocation.Y * 80 - 1] == ' ')
+				g_enemy1.m_cLocation.Y--;
+			else
+				g_enemy1.m_cLocation.Y--;
+			break;
+		}
+	}
+	if (g_sChar.m_cLocation.Y == g_enemy2.m_cLocation.Y && g_enemy2.m_bActive == true)
+	{
+		switch (rand() % 100 / (int_stages + 1) + 5)
+		{
+		case 0:
+			if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 1] == ' ')
+				g_enemy2.m_cLocation.X++;
+			else
+				g_enemy2.m_cLocation.X--;
+
+			break;
+		case 1:
+			if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 1] == ' ')
+				g_enemy2.m_cLocation.X--;
+			else
+				g_enemy2.m_cLocation.X++;
+			break;
+		}
+	}
+	else if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_enemy6.m_bActive == true)
+	{
+		switch (rand() % 100 / (int_stages + 1) + 5)
+		{
+		case 0:
+			if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 + 80] == ' ')
+				g_enemy2.m_cLocation.Y++;
+			else
+				g_enemy2.m_cLocation.Y--;
+			break;
+		case 1:
+			if (Map[g_enemy2.m_cLocation.X + g_enemy2.m_cLocation.Y * 80 - 80] == ' ')
+				g_enemy2.m_cLocation.Y--;
+			else
+				g_enemy2.m_cLocation.Y++;
+			break;
+		}
+	}
+	if (g_sChar.m_cLocation.X == g_enemy3.m_cLocation.X && g_enemy3.m_bActive == true && !(rand() % 20))
+	{
+		if (g_sChar.m_cLocation.Y > g_enemy3.m_cLocation.Y)
+		{
+			if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 80] == ' ')
+				g_enemy3.m_cLocation.Y++;
+		}
+		else
+		{
+			if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 80] == ' ')
+				g_enemy3.m_cLocation.Y--;
+		}
+	}
+	else if (g_sChar.m_cLocation.Y == g_enemy3.m_cLocation.Y && g_enemy3.m_bActive == true && !(rand() % 20))
+	{
+		if (g_sChar.m_cLocation.X > g_enemy3.m_cLocation.X)
+		{
+			if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 + 1] == ' ')
+				g_enemy3.m_cLocation.X++;
+		}
+		else
+		{
+			if (Map[g_enemy3.m_cLocation.X + g_enemy3.m_cLocation.Y * 80 - 1] == ' ')
+				g_enemy3.m_cLocation.X--;
+		}
+	}
+	if (g_sChar.m_cLocation.X == g_enemy4.m_cLocation.X && g_enemy4.m_bActive == true && !(rand() % 20))
+	{
+		if (g_sChar.m_cLocation.Y > g_enemy4.m_cLocation.Y)
+		{
+			if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 80] == ' ')
+				g_enemy4.m_cLocation.Y++;
+		}
+		else
+		{
+			if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 80] == ' ')
+				g_enemy4.m_cLocation.Y--;
+		}
+	}
+	else if (g_sChar.m_cLocation.Y == g_enemy4.m_cLocation.Y && g_enemy4.m_bActive == true && !(rand() % 20))
+	{
+		if (g_sChar.m_cLocation.X > g_enemy4.m_cLocation.X)
+		{
+			if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 + 1] == ' ')
+				g_enemy4.m_cLocation.X++;
+		}
+		else
+		{
+			if (Map[g_enemy4.m_cLocation.X + g_enemy4.m_cLocation.Y * 80 - 1] == ' ')
+				g_enemy4.m_cLocation.X--;
+		}
+	}
+	if (g_sChar.m_cLocation.Y == g_enemy5.m_cLocation.Y && g_enemy5.m_bActive == true)
+	{
+		switch (rand() % 100 / (int_stages + 1) + 5)
+		{
+		case 0:
+			if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 80] == ' ')
+				g_enemy5.m_cLocation.X++;
+			else
+				g_enemy5.m_cLocation.X--;
+
+			break;
+		case 1:
+			if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 80] == ' ')
+				g_enemy5.m_cLocation.X--;
+			else
+				g_enemy5.m_cLocation.X++;
+			break;
+		}
+	}
+	else if (g_sChar.m_cLocation.X == g_enemy5.m_cLocation.X && g_enemy5.m_bActive == true)
+	{
+		switch (rand() % 100 / (int_stages + 1) + 5)
+		{
+		case 0:
+			if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 + 1] == ' ')
+				g_enemy5.m_cLocation.Y++;
+			else
+				g_enemy5.m_cLocation.Y--;
+			break;
+		case 1:
+			if (Map[g_enemy5.m_cLocation.X + g_enemy5.m_cLocation.Y * 80 - 1] == ' ')
+				g_enemy5.m_cLocation.Y--;
+			else
+				g_enemy5.m_cLocation.Y--;
+			break;
+		}
+	}
+	if (g_sChar.m_cLocation.Y == g_enemy6.m_cLocation.Y && g_enemy6.m_bActive == true)
+	{
+		switch (rand() % 100 / (int_stages + 1) + 5)
+		{
+		case 0:
+			if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 80] == ' ')
+				g_enemy6.m_cLocation.X++;
+			else
+				g_enemy6.m_cLocation.X--;
+
+			break;
+		case 1:
+			if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 80] == ' ')
+				g_enemy6.m_cLocation.X--;
+			else
+				g_enemy6.m_cLocation.X++;
+			break;
+		}
+	}
+	else if (g_sChar.m_cLocation.X == g_enemy6.m_cLocation.X && g_enemy6.m_bActive == true)
+	{
+		switch (rand() % 100 / (int_stages + 1) + 5)
+		{
+		case 0:
+			if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 + 1] == ' ')
+				g_enemy6.m_cLocation.Y++;
+			else
+				g_enemy6.m_cLocation.Y--;
+			break;
+		case 1:
+			if (Map[g_enemy6.m_cLocation.X + g_enemy6.m_cLocation.Y * 80 - 1] == ' ')
+				g_enemy6.m_cLocation.Y--;
+			else
+				g_enemy6.m_cLocation.Y--;
+			break;
+		}
+	}
+
+	if (bSomethingHappened)
+	{
+		// set the bounce time to some time in the future to prevent accidental triggers
+		g_dBounceTime = g_dElapsedTime + 0.07; // 125ms should be enough
+	}
 }
 void processUserInput()
 {
@@ -2515,6 +2017,8 @@ void processUserInput()
 	{
 		if (g_bMinigame)
 		{
+			highscoreLoad();
+			highscoreSave();
 			g_eGameState = S_MINIGAME;
 			g_dBounceTime = g_dElapsedTime + 0.125;
 			PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
@@ -2522,7 +2026,7 @@ void processUserInput()
 		}
 		else
 		{
-			PlaySound(TEXT("sound/dead.wav"), NULL, SND_FILENAME);
+			PlaySound(TEXT("sound/die.wav"), NULL, SND_FILENAME | SND_ASYNC | SND_LOOP);
 			g_eGameState = S_GAMEOVER;
 		}
 	}
@@ -2541,45 +2045,6 @@ void processUserInput()
 		if(StageType == EBossBattle)
 			g_dElapsedTime = 20;
 	}
-	//if (g_sChar.m_bActive == false) // Took damage
-	//{
-	//	g_sChar.m_bActive = true;
-	//	Lives--;
-	//	deathsound = 5;
-	//}
-	//for (size_t i = 0; Shots.size() > i; i++)
-	//{
-	//	if (g_enemy1.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy1.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy1.m_bActive == true)
-	//	{
-	//		g_enemy1.m_bActive = false;
-	//		deathsound = 5;
-	//	}
-	//	if (g_enemy2.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy2.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy2.m_bActive == true)
-	//	{
-	//		g_enemy2.m_bActive = false;
-	//		deathsound = 5;
-	//	}
-	//	if (g_enemy3.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy3.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy3.m_bActive == true)
-	//	{
-	//		g_enemy3.m_bActive = false;
-	//		deathsound = 5;
-	//	}
-	//	if (g_enemy4.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy4.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy4.m_bActive == true)
-	//	{
-	//		g_enemy4.m_bActive = false;
-	//		deathsound = 5;
-	//	}
-	//	if (g_enemy5.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy5.m_cLocation.Y == g_weapon.m_cLocation.Y && g_enemy5.m_bActive == true)
-	//	{
-	//		g_enemy5.m_bActive = false;
-	//		deathsound = 5;
-	//	}
-	//	if (g_enemy6.m_cLocation.X == g_weapon.m_cLocation.X && g_enemy6.m_cLocation.Y == Shots[i].p_Location.Y && g_enemy6.m_bActive == true)
-	//	{
-	//		g_enemy6.m_bActive = false;
-	//		deathsound = 5;
-	//	}
-	//}
 	if (g_sChar.m_bActive == false) // Took damage
 	{
 		g_sChar.m_bActive = true;
@@ -2673,7 +2138,6 @@ void clearScreen()
 	// Clears the buffer with this colour attribute
 	g_Console.clearBuffer(0x00);
 }
-
 void renderIntro()
 {
 	if (introPage == 0)
@@ -2729,86 +2193,125 @@ void renderSplashScreen()  // renders the splash screen
 	{
 	case MMStart:
 		m.Y = 20;
-		m.X = 30;
+		m.X = 27;
+		g_Console.writeToBuffer(m, (char)3, 0x0E);
+		m.X += 2;
 		g_Console.writeToBuffer(m, "Start", 0x0E);
-		m.X = 44;
+		m.X = 46;
 		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
-		m.X = 30;
+		m.X = 26;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
+		m.X = 44;
+		g_Console.writeToBuffer(m, "LeaderBoard", 0x03);
 		m.Y += 1;
-		m.X = 30;
+		m.X = 27;
 		g_Console.writeToBuffer(m, "Minigames", 0x03);
-		m.X = 46;
+		m.X = 47;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
 
 	case MMInstructions:
 		m.Y = 20;
-		m.X = 30;
+		m.X = 29;
 		g_Console.writeToBuffer(m, "Start", 0x03);
-		m.X = 44;
+		m.X = 46;
 		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
-		m.X = 30;
+		m.X = 24;
+		g_Console.writeToBuffer(m, (char)3, 0x0E);
+		m.X += 2;
 		g_Console.writeToBuffer(m, "Instructions", 0x0E);
+		m.X = 44;
+		g_Console.writeToBuffer(m, "LeaderBoard", 0x03);
 		m.Y += 1;
-		m.X = 30;
+		m.X = 27;
 		g_Console.writeToBuffer(m, "Minigames", 0x03);
-		m.X = 46;
+		m.X = 47;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
 
 	case MMExit:
 		m.Y = 20;
-		m.X = 30;
+		m.X = 29;
 		g_Console.writeToBuffer(m, "Start", 0x03);
-		m.X = 44;
+		m.X = 46;
 		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
-		m.X = 30;
+		m.X = 26;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
+		m.X = 44;
+		g_Console.writeToBuffer(m, "LeaderBoard", 0x03);
 		m.Y += 1;
-		m.X = 30;
+		m.X = 27;
 		g_Console.writeToBuffer(m, "Minigames", 0x03);
-		m.X = 46;
+		m.X = 45;
+		g_Console.writeToBuffer(m, (char)3, 0x0E);
+		m.X += 2;;
 		g_Console.writeToBuffer(m, "Exit", 0x0E);
 		break;
 
 	case MMContinue:
 		m.Y = 20;
-		m.X = 30;
+		m.X = 29;
 		g_Console.writeToBuffer(m, "Start", 0x03);
 		m.X = 44;
+		g_Console.writeToBuffer(m, (char)3, 0x0E);
+		m.X += 2;
 		g_Console.writeToBuffer(m, "Continue", 0x0E);
 		m.Y += 1;
-		m.X = 30;
+		m.X = 26;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
+		m.X = 44;
+		g_Console.writeToBuffer(m, "LeaderBoard", 0x03);
 		m.Y += 1;
-		m.X = 30;
+		m.X = 27;
 		g_Console.writeToBuffer(m, "Minigames", 0x03);
-		m.X = 46;
+		m.X = 47;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
 
 	case MMminigame:
 		m.Y = 20;
-		m.X = 30;
+		m.X = 29;
 		g_Console.writeToBuffer(m, "Start", 0x03);
-		m.X = 44;
+		m.X = 46;
 		g_Console.writeToBuffer(m, "Continue", 0x03);
 		m.Y += 1;
-		m.X = 30;
+		m.X = 26;
 		g_Console.writeToBuffer(m, "Instructions", 0x03);
+		m.X = 44;
+		g_Console.writeToBuffer(m, "LeaderBoard", 0x03);
 		m.Y += 1;
-		m.X = 30;
+		m.X = 25;
+		g_Console.writeToBuffer(m, (char)3, 0x0E);
+		m.X += 2;
 		g_Console.writeToBuffer(m, "Minigames", 0x0E);
+		m.X = 47;
+		g_Console.writeToBuffer(m, "Exit", 0x03);
+		break;
+
+	case MMHighscore:
+		m.Y = 20;
+		m.X = 29;
+		g_Console.writeToBuffer(m, "Start", 0x03);
 		m.X = 46;
+		g_Console.writeToBuffer(m, "Continue", 0x03);
+		m.Y += 1;
+		m.X = 26;
+		g_Console.writeToBuffer(m, "Instructions", 0x03);
+		m.X = 42;
+		g_Console.writeToBuffer(m, (char)3, 0x0E);
+		m.X += 2;
+		g_Console.writeToBuffer(m, "LeaderBoard", 0x0E);
+		m.Y += 1;
+		m.X = 27;
+		g_Console.writeToBuffer(m, "Minigames", 0x03);
+		m.X = 47;
 		g_Console.writeToBuffer(m, "Exit", 0x03);
 		break;
 	}
 }
-
 void renderGame()
 {
 	renderMap();        // renders the map to the buffer first
@@ -3278,8 +2781,7 @@ void renderEnemy6()
 		charColor = 0x0E;
 	}
 	g_Console.writeToBuffer(g_enemy6.m_cLocation, character, charColor);
-}
-						
+}						
 void renderbeat1()
 {
 	WORD charColor = 0x0E;
@@ -3355,8 +2857,7 @@ void renderpaddle2()
 		}
 
 	}
-}
-						
+}						
 void renderDoor()
 {
 	// Draw the location of the door
@@ -3591,19 +3092,20 @@ void gameOver()
 		StageType = EMainMenu;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
-		g_eGameState = S_GAME;
-		init();
-		Lives = 3;
-		stages = 0;
-		for (size_t i = 0; i < 4; i++)
-			Weapons[i].Clip = 0;
+		g_eGameState = S_TITLE;
 	}
 	if (g_abKeyPressed[K_SPACE] && MMSelect == MMStart && g_eGameState == S_GAMEOVER) // CONTINUE_GAME
 	{
 		StageType = EStage;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
-		g_eGameState = S_CONTINUE;
+		init();
+		Lives = 3;
+		stages = 1;
+		int_stages = 1;
+		for (size_t i = 1; i < 4; i++)
+			Weapons[i].Clip = 0;
+		g_eGameState = S_GAME;
 	}
 	if (bSomethingHappened)
 	{
@@ -4038,23 +3540,41 @@ void highscoreSave()
 {
 	std::fstream score("map/highscore.txt");
 
-	if (g_dElapsedTime > pong_t)
+	if (rally > pong_t && StageType == EMinigame2)
 	{
 		pong_t3 = pong_t2;
 		pong_t2 = pong_t;
-		pong_t = g_dElapsedTime;
+		pong_t = rally;
 	}
-	else if (g_dElapsedTime > pong_t2 && g_dElapsedTime < pong_t)
+	else if (rally > pong_t2 && rally < pong_t && StageType == EMinigame2)
 	{
 		pong_t3 = pong_t2;
-		pong_t2 = g_dElapsedTime;
+		pong_t2 = rally;
 	}
-	else if (g_dElapsedTime > pong_t3 && g_dElapsedTime < pong_t2)
-		pong_t3 = g_dElapsedTime;
+	else if (rally > pong_t3 && rally < pong_t2 && StageType == EMinigame2)
+		pong_t3 = rally;
+
+	if (snake_Size > snake_length && StageType == EMiniGameSnake)
+	{
+		snake_length3 = snake_length2;
+		snake_length2 = snake_length;
+		snake_length = snake_Size;
+	}
+	else if (snake_Size > snake_length2 && snake_Size < snake_length && StageType == EMiniGameSnake)
+	{
+		snake_length3 = snake_length2;
+		snake_length2 = snake_Size;
+	}
+	else if (snake_Size > snake_length3 && snake_Size < snake_length2 && StageType == EMiniGameSnake)
+		snake_length3 = snake_Size;
+
 
 	score << pong_t << std::endl;
 	score << pong_t2 << std::endl;
 	score << pong_t3 << std::endl;
+	score << snake_length << std::endl;
+	score << snake_length2 << std::endl;
+	score << snake_length3 << std::endl;
 	score.close();
 }
 void highscoreLoad()
@@ -4073,9 +3593,15 @@ void highscoreLoad()
 	score >> pong_t;
 	score >> pong_t2;
 	score >> pong_t3;
+	score >> snake_length;
+	score >> snake_length2;
+	score >> snake_length3;
 	std::string first = to_string(pong_t);
 	std::string second = to_string(pong_t2);
 	std::string third = to_string(pong_t3);
+	std::string length1 = to_string(snake_length);
+	std::string length2 = to_string(snake_length2);
+	std::string length3 = to_string(snake_length3);
 	COORD c = g_Console.getConsoleSize();
 	c.X = 37;
 	c.Y = 6;
@@ -4084,8 +3610,14 @@ void highscoreLoad()
 	g_Console.writeToBuffer(c, second, 0x0f);
 	c.Y += 1;
 	g_Console.writeToBuffer(c, third, 0x0f);
+	c.Y = 15;
+	c.X += 3;
+	g_Console.writeToBuffer(c, length1, 0x0f);
+	c.Y += 1;
+	g_Console.writeToBuffer(c, length2, 0x0f);
+	c.Y += 1;
+	g_Console.writeToBuffer(c, length3, 0x0f);
 	score.close();
-
 }
 void tictactoePlay()
 {
@@ -4604,12 +4136,13 @@ void minigameselect()
 	{
 		b_play = false;
 	    g_bforscore = true;
+		newScore = false;
 		g_dElapsedTime = 0;
 		StageType = EMinigame2;
 		g_eGameState = S_GAME;
 		minigame2_init();
-	    Lives = 5;
-		stages = 50;
+	    Lives = 2;
+		stages = 5;
 		int_stages = 50;
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 	}
@@ -4652,6 +4185,7 @@ void minigameselect()
 	else if (MMgame == MMsnake && g_abKeyPressed[K_SPACE] && g_eGameState == S_MINIGAME)
 	{
 		b_play = false;
+		newScore = false;
 		snake_Size = 1;
 		SnakeLocation.resize(1);
 		g_dElapsedTime = 0;
@@ -4674,21 +4208,17 @@ void minigameselect()
 		PlaySound(TEXT("sound/damage.wav"), NULL, SND_FILENAME);
 		b_play = false;
 	}
-}
-WORD charColouring(char character)
-{
-	if (character == 79)
-		return 0x0C;
-	else if (character == 88)
-		return 0x0B;
-	else
-		return 0x0F;
-}						
+}					
 void renderSnake()
 {
 	for (size_t i = 0; SnakeLocation.size() > i; i++)
 	{
-		g_Console.writeToBuffer(SnakeLocation[i],254,0x0a);
+		if (i == SnakeLocation.size() - 1)
+		{
+			g_Console.writeToBuffer(SnakeLocation[i], '#', 0x0a);
+		}
+		else
+			g_Console.writeToBuffer(SnakeLocation[i], 254, 0x0a);
 		for (size_t j = 0; SnakeLocation.size() > j; j++)
 		{
 			if (i == j)
@@ -4697,6 +4227,8 @@ void renderSnake()
 			}
 			if (SnakeLocation[i].X == SnakeLocation[j].X && SnakeLocation[i].Y == SnakeLocation[j].Y)
 			{
+				highscoreLoad();
+				highscoreSave();
 				g_eGameState = S_MINIGAME;
 				b_play = false;
 			}
@@ -4714,7 +4246,7 @@ void renderApple()
 			AppleCollected = false;
 		}
 	}
-	g_Console.writeToBuffer(Apple,"a",0x0c);
+	g_Console.writeToBuffer(Apple,254,0x0c);
 }
 void snakeInput()
 {
@@ -4738,12 +4270,15 @@ void snakeInput()
 		}
 		if (SnakeMap[g_snake.X + g_snake.Y * 80] != ' ' && SnakeMap[g_snake.X + g_snake.Y * 80] != 'a')
 		{
+			highscoreLoad();
+			highscoreSave();
 			g_eGameState = S_MINIGAME;
 			b_play = false;
 		}
 		if (g_snake.X == Apple.X && g_snake.Y == Apple.Y)
 		{
 			AppleCollected = true;
+			shootsound = true;
 			snake_Size++;
 		}
 	}
@@ -4779,4 +4314,13 @@ void snakeMovement()
 		delay = 0;
 	}
 	delay++;
+}
+WORD charColouring(char character)
+{
+	if (character == 79)
+		return 0x0C;
+	else if (character == 88)
+		return 0x0B;
+	else
+		return 0x0F;
 }

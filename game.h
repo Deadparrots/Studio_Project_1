@@ -53,8 +53,9 @@ enum EGAMESTATES
 	S_COUNT,
 	S_CONTINUE,
 	S_MINIGAME,
-	S_HIGHSCORE,
+	S_HIGHSCORE
 };
+
 enum EWEAPONSTATES
 {
 	Hold,
@@ -85,6 +86,7 @@ enum EMAINMENU
 	MMContinue,
 	MMminigame
 };
+
 enum EMINIGAME
 {
 	MMrhythm,
@@ -93,6 +95,7 @@ enum EMINIGAME
 	MMsnake,
 	MM1P,
 	MM2P,
+	MMHighscore
 };
 
 // struct for the game character
@@ -126,23 +129,24 @@ struct WeaponParameters
 	int ProjectileSpeed; // Projectile Speed
 	int Range; // Range
 };
-void init(void);      // initialize your variables, allocate memory, etc
+
 void minigame1_init();
 void minigame2_init();
 void boss_init();
 void boss_battle_init();
+void init(void);      // initialize your variables, allocate memory, etc
+void shutdown(void);      // do clean up, free memory
 void getInput(void);      // get input from player
 void update(double dt); // update the game and the state of the game
 void render(void);      // renders the current state of the game to the console
-void shutdown(void);      // do clean up, free memory
 void intro();
 void splashScreenWait();    // waits for time to pass in splash screen
 void gameplay();            // gameplay logic
 void minigame1_moveCharacter();
 void minigame2_moveCharacter();
-void moveCharacter();       // moves the character, collision detection, physics, etc
-void boss_moveCharacter();
 void bossbattle_moveCharacter();
+void boss_moveCharacter();
+void moveCharacter();       // moves the character, collision detection, physics, etc
 void processUserInput();    // checks if you should change states or do something else with the game, e.g. pause, exit
 void clearScreen();         // clears the current screen and draw from scratch 
 void renderIntro();
@@ -172,27 +176,27 @@ void renderWeapon();
 void renderBossSpeech();
 void renderFramerate();     // renders debug information, frame rate, elapsed time, etc
 void renderToScreen();      // dump the contents of the buffer to the screen, one frame worth of game
-void generate();
+void gameOver();
+void instructions();
 void sound();
+void generate();
 void weapdata();
 void reload();
 void ost();
-void gameOver();
-void instructions();
 void convertToString();
 void save();
 void continueSave();
+void highscoreSave();
+void highscoreLoad();
 void tictactoePlay();
+void tictactoeMulti();
 void renderTicTacToe();
 void tictactoeWin();
-void tictactoeMulti();
 void minigame();
 void minigameselect();
-WORD charColouring(char character);
 void renderSnake();
 void renderApple();
 void snakeInput();
 void snakeMovement();
-void highscoreSave();
-void highscoreLoad();
+WORD charColouring(char character);
 #endif // _GAME_H
